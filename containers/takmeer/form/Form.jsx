@@ -9,12 +9,13 @@ import Button from '@mui/material/Button'
 import SelectRoles from '@/components/forms/SelectRoles';
 import { extractSelect } from '@/lib/helpers/helper';
 import { useDispatch, useSelector } from 'react-redux';
-import { createUser } from '@/store/actions/user.action';
+import { createUser, updateUser } from '@/store/actions/user.action';
 
-function Form() {
+function Form({ isEdit = false }) {
   const router = useRouter();
+  const { pid } = router.query;
   const dispatch = useDispatch();
-  const { isLoadingCreate } = useSelector((state) => state.user);
+  const { isLoadingCreate, detail } = useSelector((state) => state.user);
   const [generatedPassword, setGeneratedPassword] = React.useState('');
 
   const onSubmit = (values) => {
@@ -23,6 +24,10 @@ function Form() {
       role: extractSelect(values.role, 'value'),
       password: generatedPassword,
     };
+    if(isEdit){
+      dispatch(updateUser({ id: pid, payload : payload}));
+      return;
+    }
     dispatch(createUser({payload : payload}));
 
   };
@@ -36,6 +41,19 @@ function Form() {
     },
     onSubmit: onSubmit,
   });
+
+  React.useEffect(() => {
+    if (isEdit && detail) {
+      form.setValues({
+        name: detail.name || '',
+        phone: detail.phone || '',
+        jabatan: detail.jabatan || '',
+        username: detail.username || '',
+        role: {label: detail.role.toUpperCase(), value: detail.role} || '',
+      });
+    }
+  }, [isEdit, detail]);
+
   const handleGeneratePassword = () => {
     const newPassword = Math.random().toString(36).slice(-8);
     setGeneratedPassword(newPassword);

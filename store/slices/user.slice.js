@@ -1,5 +1,5 @@
 import { createSlice, current } from "@reduxjs/toolkit"
-import { createUser, deleteUser, getCurrentUser, getUsers } from "../actions/user.action"
+import { createUser, getDetailUser, deleteUser, getCurrentUser, getUsers, updateUser } from "../actions/user.action"
 
 export const initialState = {
   userSSO: null,
@@ -40,11 +40,22 @@ const authSlice = createSlice({
     })
     .addCase(getUsers.fulfilled, (state, actions) => {
       state.isLoading = false;
-      state.data = actions.payload;
-      state.meta = actions.meta;
+      state.data = actions.payload.data;
+      state.meta = actions.payload.meta;
     })
     .addCase(getUsers.rejected, (state) => {
       state.isLoading = false
+    })
+    
+    .addCase(getDetailUser.pending, (state) => {
+      state.isLoadingDetail = true
+    })
+    .addCase(getDetailUser.fulfilled, (state, actions) => {
+      state.isLoadingDetail = false;
+      state.detail = actions.payload.data;
+    })
+    .addCase(getDetailUser.rejected, (state) => {
+      state.isLoadingDetail = false
     })
     
     .addCase(deleteUser.pending, (state) => {
@@ -64,6 +75,16 @@ const authSlice = createSlice({
       state.isLoadingCreate = false;
     })
     .addCase(createUser.rejected, (state) => {
+      state.isLoadingCreate = false
+    })
+    
+    .addCase(updateUser.pending, (state) => {
+      state.isLoadingCreate = true
+    })
+    .addCase(updateUser.fulfilled, (state, actions) => {
+      state.isLoadingCreate = false;
+    })
+    .addCase(updateUser.rejected, (state) => {
       state.isLoadingCreate = false
     })
   }

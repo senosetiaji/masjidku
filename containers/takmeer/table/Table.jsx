@@ -1,6 +1,5 @@
 import TableNormal from '@/components/table/TableNormal';
 import { __renderValue, __renderValueDefaultZero } from '@/lib/helpers/helper';
-import moment from 'moment';
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import IconButton from '@mui/material/IconButton'
@@ -8,11 +7,13 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ModalConfirm from '@/components/modals/ModalConfirm';
 import { deleteUser } from '@/store/actions/user.action';
+import { useRouter } from 'next/router';
 
 function Table({ source, params, setParams, fetchData }) {
   const { data, isLoading, meta } = useSelector(state => state.user);
   const deleteModalRef = React.useRef();
   const dispatch = useDispatch();
+  const router = useRouter();
 
   const columns = [
     {
@@ -56,7 +57,7 @@ function Table({ source, params, setParams, fetchData }) {
       render: (val) => {
         return (
           <div className='flex gap-2 w-full justify-center'>
-            <IconButton aria-label="edit" className='bg-yellow-400! text-white! hover:bg-yellow-500!' onClick={() => {}}>
+            <IconButton aria-label="edit" className='bg-yellow-400! text-white! hover:bg-yellow-500!' onClick={() => { router.push(`/takmeer/edit/${val?.id}`) }}>
               <EditIcon fontSize="small" />
             </IconButton>
             <IconButton aria-label="delete" className='bg-red-400! text-white! hover:bg-red-500!' onClick={() => { deleteModalRef.current.open(val?.id); }}>
