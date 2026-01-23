@@ -2,14 +2,17 @@ import TableNormal from '@/components/table/TableNormal';
 import { __renderValue, __renderValueDefaultZero } from '@/lib/helpers/helper';
 import moment from 'moment';
 import React from 'react'
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import IconButton from '@mui/material/IconButton'
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import ModalConfirm from '@/components/modals/ModalConfirm';
+import { deleteUser } from '@/store/actions/user.action';
 
-function Table({ source, params, setParams }) {
+function Table({ source, params, setParams, fetchData }) {
   const { data, isLoading, meta } = useSelector(state => state.user);
-  const tipe = params?.tipe || 'kontrak';
+  const deleteModalRef = React.useRef();
+  const dispatch = useDispatch();
 
   const columns = [
     {
@@ -56,7 +59,7 @@ function Table({ source, params, setParams }) {
             <IconButton aria-label="edit" className='bg-yellow-400! text-white! hover:bg-yellow-500!' onClick={() => {}}>
               <EditIcon fontSize="small" />
             </IconButton>
-            <IconButton aria-label="delete" className='bg-red-400! text-white! hover:bg-red-500!' onClick={() => {}}>
+            <IconButton aria-label="delete" className='bg-red-400! text-white! hover:bg-red-500!' onClick={() => { deleteModalRef.current.open(val?.id); }}>
               <DeleteIcon fontSize="small" />
             </IconButton>
           </div>
@@ -64,6 +67,13 @@ function Table({ source, params, setParams }) {
       }
     },
   ]
+
+  async function handleDelete(id) {
+    // dispatch(deleteUserAction(id, params));
+    console.log("DELETE USER ID:", id);
+    const res = await dispatch(deleteUser({ id: id, params: {} }))
+    fetchData();
+  }
 
   return (
     <div>
@@ -76,6 +86,7 @@ function Table({ source, params, setParams }) {
         setParams={setParams}
         isLoading={isLoading}
       />
+      <ModalConfirm ref={deleteModalRef} description="Data yang sudah dihapus tidak dapat dikembalikan." onConfirm={(data) => handleDelete(data)} />
     </div>
   )
 }

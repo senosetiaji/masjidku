@@ -1,5 +1,5 @@
 import { createSlice, current } from "@reduxjs/toolkit"
-import { createUser, getCurrentUser, getUsers } from "../actions/user.action"
+import { createUser, deleteUser, getCurrentUser, getUsers } from "../actions/user.action"
 
 export const initialState = {
   userSSO: null,
@@ -45,6 +45,16 @@ const authSlice = createSlice({
     })
     .addCase(getUsers.rejected, (state) => {
       state.isLoading = false
+    })
+    
+    .addCase(deleteUser.pending, (state) => {
+      state.isLoadingDelete = true
+    })
+    .addCase(deleteUser.fulfilled, (state, actions) => {
+      state.isLoadingDelete = false;
+    })
+    .addCase(deleteUser.rejected, (state) => {
+      state.isLoadingDelete = false
     })
     
     .addCase(createUser.pending, (state) => {

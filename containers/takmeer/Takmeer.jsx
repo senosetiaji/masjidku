@@ -14,8 +14,12 @@ function Takmeer() {
     search: '',
   });
 
+  function fetchData() {
+    dispatch(getUsers({ params }));
+  }
+
   React.useEffect(() => {
-    dispatch(getUsers({ params: params }));
+    fetchData();
   }, [params]);
   return (
     <div>
@@ -26,7 +30,7 @@ function Takmeer() {
         </Button>
       </div>
       {/* Table Component Here */}
-      <Table params={params} setParams={setParams} />
+      <Table params={params} setParams={setParams} fetchData={fetchData} />
     </div>
   )
 }
