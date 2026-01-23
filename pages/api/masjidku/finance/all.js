@@ -82,6 +82,7 @@ export default async function handler(req, res) {
 			skip: (page - 1) * limit,
 			take: limit,
 			select: {
+        id: true,
 				date: true,
 				amount: true,
 				type: true,
@@ -90,6 +91,7 @@ export default async function handler(req, res) {
 		});
 
 		const data = rows.map((item) => ({
+      id: item.id,
 			date: item.date.toISOString(),
 			amount: item.amount,
 			type: item.type,

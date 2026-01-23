@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import React from 'react'
 import Table from './table/Table';
 
-function LaporanKeuangan({ params, setParams }) {
+function LaporanKeuangan({ fetchData, params, setParams }) {
   const router = useRouter();
   return (
     <div>
@@ -14,7 +14,7 @@ function LaporanKeuangan({ params, setParams }) {
         </Button>
       </div>
       <div className="">
-        <Table params={params} setParams={setParams} />
+        <Table params={params} setParams={setParams} fetchData={fetchData} />
       </div>
     </div>
   )

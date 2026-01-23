@@ -40,8 +40,8 @@ function Login() {
     },
   })
   return (
-    <div className='h-screen flex items-center justify-center'>
-      <div className="p-6 rounded-xl bg-white max-w-md w-full">
+    <div className='h-screen flex items-center justify-center landing-page'>
+      <div className="p-6 rounded-xl max-w-md w-full">
         <h2 className="text-[20px] font-bold mb-2 text-center text-gray-600">Masjid.ku</h2>
         <p className='text-sm text-center text-gray-400 mb-4'>Welcome back! Please login to your account.</p>
         <div className="grid grid-cols-1 gap-4">

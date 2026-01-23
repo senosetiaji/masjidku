@@ -8,8 +8,10 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import ModalConfirm from '@/components/modals/ModalConfirm';
 import { deleteUser } from '@/store/actions/user.action';
 import { useRouter } from 'next/router';
+import moment from 'moment';
+import { deleteData } from '@/store/actions/finance.action';
 
-function Table({ source, params, setParams, fetchData }) {
+function Table({ params, setParams, fetchData }) {
   const { data, isLoading, meta } = useSelector(state => state.finance);
   const deleteModalRef = React.useRef();
   const dispatch = useDispatch();
@@ -30,7 +32,7 @@ function Table({ source, params, setParams, fetchData }) {
       sx: {
         minWidth: 350,
       },
-      render: (val) => __renderValue(val.date)
+      render: (val) => val?.date ? moment(val.date).format('DD MMM YYYY') : '-'
     },
     {
       label:"Jumlah",
@@ -79,8 +81,7 @@ function Table({ source, params, setParams, fetchData }) {
 
   async function handleDelete(id) {
     // dispatch(deleteUserAction(id, params));
-    console.log("DELETE USER ID:", id);
-    const res = await dispatch(deleteUser({ id: id, params: {} }))
+    const res = await dispatch(deleteData({ id: id, params: {} }))
     fetchData();
   }
 

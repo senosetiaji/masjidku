@@ -11,9 +11,10 @@ import TextInputField from '@/components/fields/TextInputField'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useRouter } from 'next/router'
 import Button from '@mui/material/Button'
-import { useDispatch } from 'react-redux'
-import { createFinance } from '@/store/actions/finance.action'
+import { useDispatch, useSelector } from 'react-redux'
+import { createFinance, updateDataFinance } from '@/store/actions/finance.action'
 import { FormControl } from '@mui/material'
+import moment from 'moment'
 
 const typeOptions = [
   { label: 'Pemasukan', value: 'income' },
@@ -29,7 +30,9 @@ const createEmptyEntry = () => ({
 
 function Form({ isEdit = false }) {
   const router = useRouter();
+  const { pid } = router.query;
   const dispatch = useDispatch();
+  const { detail } = useSelector(state => state.finance);
   
   function onSubmit(values) {
     const payload = {
@@ -40,9 +43,13 @@ function Form({ isEdit = false }) {
         description: item.description,
       })),
     }
-    console.log('Submitting payload:', payload)
     // Example dispatch call
     // dispatch(saveFinanceData(payload));
+    if(isEdit) {
+      // dispatch update action here
+      dispatch(updateDataFinance({id: pid, payload: payload.data}));
+      return;
+    }
     dispatch(createFinance({payload: payload.data}));
   }
 
@@ -55,6 +62,19 @@ function Form({ isEdit = false }) {
       onSubmit(values)
     },
   })
+
+  React.useEffect(() => {
+    if (isEdit && detail) {
+      form.setValues({
+        data: [{
+          date: moment(detail.date).format('YYYY-MM-DD'),
+          nominal: detail.amount,
+          type: typeOptions.find(opt => opt.value === detail.type) || typeOptions[0],
+          description: detail.description,
+        }]
+      });
+    }
+  }, [isEdit, detail])
 
   const handleFieldChange = (name, value) => {
     form.setFieldValue(name, value)
@@ -83,7 +103,7 @@ function Form({ isEdit = false }) {
       <form onSubmit={form.handleSubmit} className="space-y-6">
         {form.values.data.map((item, idx) => (
           <div
-            key={item.id}
+            key={idx}
             className="relative rounded-xl border border-dashed border-gray-200 bg-[#fbfbfb] p-6 shadow-sm flex gap-4 w-full"
           >
             <div className="grid grid-cols-3 gap-2 w-full">
@@ -156,18 +176,19 @@ function Form({ isEdit = false }) {
             </div>
           </div>
         ))}
-
-        <div className="flex justify-center pt-2">
-          <MuiButton
-            type="button"
-            variant="outlined"
-            startIcon={<AddIcon />}
-            onClick={handleAddEntry}
-            className="min-w-55! rounded-lg! border-gray-200! bg-white! hover:bg-gray-50! text-[#3b3b3b]! shadow-sm"
-          >
-            Tambah Data Keuangan
-          </MuiButton>
-        </div>
+        {!isEdit && (
+          <div className="flex justify-center pt-2">
+            <MuiButton
+              type="button"
+              variant="outlined"
+              startIcon={<AddIcon />}
+              onClick={handleAddEntry}
+              className="min-w-55! rounded-lg! border-gray-200! bg-white! hover:bg-gray-50! text-[#3b3b3b]! shadow-sm"
+            >
+              Tambah Data Keuangan
+            </MuiButton>
+          </div>
+        )}
       </form>
       <div className="mt-6 flex justify-end pt-4 border-t border-gray-50">
         <Button variant="contained" color="primary" onClick={form.handleSubmit} className="mt-6">

@@ -1,5 +1,5 @@
 import { createSlice, current } from "@reduxjs/toolkit"
-import { createFinance, getFinance } from "../actions/finance.action"
+import { createFinance, deleteData, getDetail, getFinance, updateDataFinance } from "../actions/finance.action"
 
 export const initialState = {
 	data:[],
@@ -33,26 +33,26 @@ const financeSlice = createSlice({
       state.isLoading = false
     })
     
-    // .addCase(getDetailUser.pending, (state) => {
-    //   state.isLoadingDetail = true
-    // })
-    // .addCase(getDetailUser.fulfilled, (state, actions) => {
-    //   state.isLoadingDetail = false;
-    //   state.detail = actions.payload.data;
-    // })
-    // .addCase(getDetailUser.rejected, (state) => {
-    //   state.isLoadingDetail = false
-    // })
+    .addCase(getDetail.pending, (state) => {
+      state.isLoadingDetail = true
+    })
+    .addCase(getDetail.fulfilled, (state, actions) => {
+      state.isLoadingDetail = false;
+      state.detail = actions.payload.data;
+    })
+    .addCase(getDetail.rejected, (state) => {
+      state.isLoadingDetail = false
+    })
     
-    // .addCase(deleteUser.pending, (state) => {
-    //   state.isLoadingDelete = true
-    // })
-    // .addCase(deleteUser.fulfilled, (state, actions) => {
-    //   state.isLoadingDelete = false;
-    // })
-    // .addCase(deleteUser.rejected, (state) => {
-    //   state.isLoadingDelete = false
-    // })
+    .addCase(deleteData.pending, (state) => {
+      state.isLoadingDelete = true
+    })
+    .addCase(deleteData.fulfilled, (state, actions) => {
+      state.isLoadingDelete = false;
+    })
+    .addCase(deleteData.rejected, (state) => {
+      state.isLoadingDelete = false
+    })
     
     .addCase(createFinance.pending, (state) => {
       state.isLoadingCreate = true
@@ -64,15 +64,15 @@ const financeSlice = createSlice({
       state.isLoadingCreate = false
     })
     
-    // .addCase(updateUser.pending, (state) => {
-    //   state.isLoadingCreate = true
-    // })
-    // .addCase(updateUser.fulfilled, (state, actions) => {
-    //   state.isLoadingCreate = false;
-    // })
-    // .addCase(updateUser.rejected, (state) => {
-    //   state.isLoadingCreate = false
-    // })
+    .addCase(updateDataFinance.pending, (state) => {
+      state.isLoadingCreate = true
+    })
+    .addCase(updateDataFinance.fulfilled, (state, actions) => {
+      state.isLoadingCreate = false;
+    })
+    .addCase(updateDataFinance.rejected, (state) => {
+      state.isLoadingCreate = false
+    })
   }
 })
 

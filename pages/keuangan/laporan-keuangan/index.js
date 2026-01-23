@@ -15,13 +15,15 @@ function Index() {
     { label: 'Keuangan', href: '/keuangan/laporan-keuangan', disabled: true },
     { label: 'Laporan Keuangan', href: '/keuangan/laporan-keuangan' },
   ]
+  async function fetchData() {
+    await dispatch(getFinance({ params }));
+  }
   React.useEffect(() => {
-    // Fetch data when params change
-    dispatch(getFinance({ params: params }))
+    fetchData();
   }, [params])
   return (
     <RootLayout breadcrumbs={breadcrumbs}>
-      <LaporanKeuangan params={params} setParams={setParams} />
+      <LaporanKeuangan params={params} setParams={setParams} fetchData={fetchData} />
     </RootLayout>
   )
 }
