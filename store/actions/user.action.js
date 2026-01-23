@@ -13,9 +13,9 @@ export const getCurrentUser = createAsyncThunk('user/getCurrentUser', async ({pa
   }
 })
 
-export const getUsers = createAsyncThunk('user/getUsers', async ({payload}, { dispatch, rejectWithValue }) => {
+export const getUsers = createAsyncThunk('user/getUsers', async ({params}, { dispatch, rejectWithValue }) => {
   try {
-    const response = await API.get('/masjidku/user/users', payload)
+    const response = await API.get('/masjidku/user/users', { params: params })
     const data = await response.data.data
     return data
   } catch(err){

@@ -25,17 +25,27 @@ export default async function handler(req, res) {
 		const page = parsePositiveInt(req.query.page, 1);
 		const limit = Math.min(parsePositiveInt(req.query.limit, DEFAULT_LIMIT), MAX_LIMIT);
 		const search = (req.query.search || "").toString().trim();
+		const nameQuery = (req.query.name || "").toString().trim();
 
-		const where = search
-			? {
-				OR: [
-					{ name: { contains: search, mode: "insensitive" } },
-					{ username: { contains: search, mode: "insensitive" } },
-					{ phone: { contains: search, mode: "insensitive" } },
-					{ jabatan: { contains: search, mode: "insensitive" } },
-				],
+		const where = (() => {
+			const clauses = [];
+			if (search) {
+				clauses.push({
+					OR: [
+						{ name: { contains: search } },
+						{ username: { contains: search } },
+						{ phone: { contains: search } },
+						{ jabatan: { contains: search } },
+					],
+				});
 			}
-			: undefined;
+			if (nameQuery) {
+				clauses.push({ name: { contains: nameQuery } });
+			}
+			if (clauses.length === 0) return undefined;
+			if (clauses.length === 1) return clauses[0];
+			return { AND: clauses };
+		})();
 
 		const total = await prisma.user.count({ where });
 		const users = await prisma.user.findMany({

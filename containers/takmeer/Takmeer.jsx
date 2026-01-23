@@ -3,6 +3,7 @@ import React from 'react'
 import Button from '@mui/material/Button'
 import { useDispatch } from 'react-redux';
 import { getUsers } from '@/store/actions/user.action';
+import Table from './table/Table';
 
 function Takmeer() {
   const router = useRouter();
@@ -15,7 +16,7 @@ function Takmeer() {
 
   React.useEffect(() => {
     dispatch(getUsers({ params: params }));
-  }, []);
+  }, [params]);
   return (
     <div>
       <div className="flex justify-between items-center mb-4">
@@ -24,6 +25,8 @@ function Takmeer() {
           Daftarkan Takmeer
         </Button>
       </div>
+      {/* Table Component Here */}
+      <Table params={params} setParams={setParams} />
     </div>
   )
 }
