@@ -197,12 +197,12 @@ function TableNormal(
         <div className="">
           <TableContainer component={Paper} sx={{ width: '100%', overflowX: 'auto' }}>
             <Table stickyHeader size="small" sx={{ tableLayout: 'fixed', width: '100%' }}>
-              <TableHead className='!bg-gray-100'>
+              <TableHead className='bg-gray-100!'>
                 {headerRows.map((row, rowIdx) => (
-                  <TableRow className='!bg-gray-100'  key={`hr-${rowIdx}`}>
+                  <TableRow className='bg-gray-100!'  key={`hr-${rowIdx}`}>
                     {row.map((cell, cellIdx) => (
                       <TableCell
-                        className='!p-4'
+                        className='p-4!'
                         key={`hc-${rowIdx}-${cellIdx}`}
                         colSpan={cell.colSpan}
                         rowSpan={cell.rowSpan}
@@ -222,7 +222,7 @@ function TableNormal(
                 {isLoading ? (
                   <TableRow>
                     <TableCell
-                      className='!p-4' colSpan={effectiveLeafCount} align="center">
+                      className='p-4!' colSpan={effectiveLeafCount} align="center">
                       Memuat data...
                     </TableCell>
                   </TableRow>
@@ -236,7 +236,7 @@ function TableNormal(
                     >
                       {leafColumns.map((col, colIndex) => (
                         <TableCell
-                          className='!p-4'
+                          className='p-4!'
                           key={`c-${rowIndex}-${colIndex}`}
                           align={getAlignValue(col.align)}
                           sx={{ verticalAlign: 'top', textAlign: col.sx?.textAlign, ...col.sx, ...(col.ellipsis ? ellipsisSx : {}) }}
@@ -249,7 +249,7 @@ function TableNormal(
                 ) : (
                   <TableRow>
                     <TableCell
-                      className='!p-4' colSpan={effectiveLeafCount} align="center">
+                      className='p-4!' colSpan={effectiveLeafCount} align="center">
                       Tidak ada data
                     </TableCell>
                   </TableRow>
