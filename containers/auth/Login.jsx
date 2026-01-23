@@ -7,20 +7,31 @@ import TextInputField from '@/components/fields/TextInputField'
 import { useDispatch } from 'react-redux'
 import { loginUser } from '@/store/actions/auth.action'
 import Button from '@mui/material/Button'
-import { Divider } from '@mui/material'
+import { Divider, IconButton, InputAdornment } from '@mui/material'
+import Visibility from '@mui/icons-material/Visibility'
+import VisibilityOff from '@mui/icons-material/VisibilityOff'
+import ModalError from '@/components/modals/ModalError'
+import { useRouter } from 'next/router'
 
 function Login() {
   const dispatch = useDispatch();
-  const handleSubmit = (e) => {
+  const router = useRouter();
+  const [showPassword, setShowPassword] = React.useState(false);
+  const toggleShowPassword = () => setShowPassword((prev) => !prev);
+  const handleSubmit = async (e) => {
     const payload = {
-      username: e.email,
+      username: e.username,
       password: e.password,
     }
-    dispatch(loginUser({payload: payload}));
+    const res = await dispatch(loginUser({payload: payload}));
+    console.log('login response:', res);
+    if (res.meta.requestStatus === "fulfilled") { 
+      router.push('/dashboard');
+    }
   }
   const form = useFormik({
     initialValues: {
-      email: '',
+      username: '',
       password: '',
     },
     onSubmit: (values) => {
@@ -35,10 +46,10 @@ function Login() {
         <div className="grid grid-cols-1 gap-4">
           <FormControl fullWidth>
             <TextInputField
-              label="Email"
-              name="email"
-              type="email"
-              value={form.values.email}
+              label="Username"
+              name="username"
+              type="text"
+              value={form.values.username}
               onChange={(name, value) => form.setFieldValue(name, value)}
               onBlur={form.handleBlur}
               margin="normal"
@@ -49,12 +60,25 @@ function Login() {
             <TextInputField
               label="Password"
               name="password"
-              type="password"
+              type={showPassword ? 'text' : 'password'}
               value={form.values.password}
               onChange={(name, value) => form.setFieldValue(name, value)}
               onBlur={form.handleBlur}
               margin="normal"
               fontSize="14px"
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      aria-label={showPassword ? 'Hide password' : 'Show password'}
+                      onClick={toggleShowPassword}
+                      edge="end"
+                    >
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                )
+              }}
             />
           </FormControl>
           <Divider />
@@ -65,6 +89,7 @@ function Login() {
           </FormHelperText>
         </div>
       </div>
+      <ModalError />
     </div>
   )
 }

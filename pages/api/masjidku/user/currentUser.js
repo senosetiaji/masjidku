@@ -40,12 +40,12 @@ export default function handler(req, res) {
 
 	const token = getToken(req);
 	if (!token) {
-		return res.status(401).json({ message: "User not authenticated" });
+		return res.status(401).json({ message: "unauthorized" });
 	}
 
 	const user = verifyToken(token);
 	if (!user) {
-		return res.status(401).json({ message: "User not authenticated" });
+		return res.status(401).json({ message: "unauthorized" });
 	}
 
 	// Do not expose sensitive fields like password

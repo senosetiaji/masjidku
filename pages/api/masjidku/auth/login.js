@@ -30,7 +30,7 @@ export default async function handler(req, res) {
     const { username, password } = req.body;
 
     if (!username || !password) {
-      return res.status(400).json({ message: "Username dan password wajib diisi" });
+      return res.status(400).json({ message: "username_and_password_required" });
     }
 
     const user = await prisma.user.findUnique({
@@ -38,13 +38,13 @@ export default async function handler(req, res) {
     });
 
     if (!user) {
-      return res.status(401).json({ message: "User tidak ditemukan" });
+      return res.status(401).json({ message: "user_not_found" });
     }
 
     const isValid = await bcrypt.compare(password, user.password);
 
     if (!isValid) {
-      return res.status(401).json({ message: "Password salah" });
+      return res.status(401).json({ message: "invalid_password" });
     }
 
     // jangan kirim password ke frontend
@@ -62,7 +62,7 @@ export default async function handler(req, res) {
 
       return res.status(200).json({
         status: 200,
-        message: "Login berhasil",
+        message: "login_successful",
         data: {
           user: safeUser,
           token,
@@ -70,6 +70,6 @@ export default async function handler(req, res) {
       });
   } catch (error) {
     console.error("LOGIN ERROR:", error);
-    return res.status(500).json({ message: "Server error" });
+    return res.status(500).json({ message: "server_error" });
   }
 }

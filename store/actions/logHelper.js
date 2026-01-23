@@ -50,7 +50,7 @@ export const errorHelper = (err, message) => (dispatch) => {
     await dispatch(logout());
     window.location.href = '/';
   }
-  if((code == 401 || code == 403) && msg.toLowerCase() == 'unauthorized') {
+  if(code == 401 && msg.toLowerCase() == 'unauthorized') {
     logoutHandler();
   }
 }

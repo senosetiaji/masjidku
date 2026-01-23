@@ -4,9 +4,8 @@ import { errorHelper, successHelper } from "./logHelper"
 
 export const loginUser = createAsyncThunk('auth/loginUser', async ({payload}, { dispatch, rejectWithValue }) => {
   try {
-    const response = await API.post('/auth/login', payload)
+    const response = await API.post('/masjidku/auth/login', payload)
     const data = await response.data.data
-    window.location.href='/dashboard'
     return data
   } catch(err){
     dispatch(errorHelper(err))
@@ -16,7 +15,7 @@ export const loginUser = createAsyncThunk('auth/loginUser', async ({payload}, { 
 
 export const logout = createAsyncThunk('auth/logout', async ({payload}, { dispatch, rejectWithValue }) => {
   try {
-    const response = await API.post('/auth/logout', payload)
+    const response = await API.post('/masjidku/auth/logout', payload)
     const data = await response.data.data
     window.location.href='/'
     return data

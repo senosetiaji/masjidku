@@ -23,10 +23,10 @@ function RootLayout({ breadcrumbs, children }) {
       <div className="mt-16 flex">
         <SideNav />
         <div className="p-12 pl-6 flex-1 bg-gray-100 min-h-[calc(100vh-4rem)]">
-          <nav aria-label="Breadcrumb" className="mb-6 text-sm text-gray-600">
+          <nav aria-label="Breadcrumb" className="mb-4 ml-4 text-sm text-gray-600">
             <ol className="flex items-center gap-2">
               <li>
-                <Link href="/" className="font-medium text-gray-700 hover:text-gray-900">
+                <Link href="/dashboard" className="font-medium text-gray-700 hover:text-gray-900">
                   Home <span>/</span>
                 </Link>
               </li>

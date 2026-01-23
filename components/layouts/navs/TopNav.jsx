@@ -13,7 +13,7 @@ function TopNav() {
   }
   return (
     <div className="w-full h-16 bg-emerald-800 shadow-md flex items-center px-6 justify-between fixed top-0 z-10">
-      <div className="logo text-white">Masjid.ku</div>
+      <div className="logo text-yellow-400 font-bold text-[18px]">Masjid.ku</div>
       <div className="nav-items relative">
         {/* Navigation items can be added here */}
         <IconButton aria-label="settings" onClick={() => setOpenMenu(!openMenu)}>
