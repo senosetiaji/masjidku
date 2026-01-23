@@ -4,7 +4,7 @@ import FormControl from '@mui/material/FormControl'
 import FormLabel from '@mui/material/FormLabel'
 import FormHelperText from '@mui/material/FormHelperText'
 import TextInputField from '@/components/fields/TextInputField'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { loginUser } from '@/store/actions/auth.action'
 import Button from '@mui/material/Button'
 import { Divider, IconButton, InputAdornment } from '@mui/material'
@@ -17,6 +17,7 @@ function Login() {
   const dispatch = useDispatch();
   const router = useRouter();
   const [showPassword, setShowPassword] = React.useState(false);
+  const { isLoading } = useSelector((state) => state.auth);
   const toggleShowPassword = () => setShowPassword((prev) => !prev);
   const handleSubmit = async (e) => {
     const payload = {
@@ -83,7 +84,7 @@ function Login() {
           </FormControl>
           <Divider />
           <FormHelperText>
-            <Button variant="contained" className='w-full' color="primary" size='large' onClick={form.handleSubmit}>
+            <Button variant="contained" className='w-full' color="primary" size='large' onClick={form.handleSubmit} disabled={isLoading} loading={isLoading}>
               Login
             </Button>
           </FormHelperText>

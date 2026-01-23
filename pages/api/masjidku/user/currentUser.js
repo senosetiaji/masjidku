@@ -40,12 +40,14 @@ export default function handler(req, res) {
 
 	const token = getToken(req);
 	if (!token) {
-		return res.status(401).json({ message: "unauthorized" });
+    const meta = { message: "unauthorized", status: 401 };
+		return res.status(401).json({...meta});
 	}
 
 	const user = verifyToken(token);
 	if (!user) {
-		return res.status(401).json({ message: "unauthorized" });
+    const meta = { message: "unauthorized", status: 401 };
+		return res.status(401).json({...meta});
 	}
 
 	// Do not expose sensitive fields like password
