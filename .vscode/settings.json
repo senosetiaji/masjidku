@@ -1,5 +1,7 @@
 {
     "WillLuke.nextjs.addTypesOnSave": true,
     "WillLuke.nextjs.hasPrompted": true,
-    "prisma.pinToPrisma6": true
+    "prisma.pinToPrisma6": true,
+    "editor.tabSize": 2,
+    "editor.insertSpaces": true
 }
