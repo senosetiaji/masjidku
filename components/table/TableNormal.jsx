@@ -116,7 +116,7 @@ function TableNormal(
 
     return (
       <>
-        <span className="text-sm text-gray-600">
+        <span className="text-[13px] text-gray-600">
           {totalData > 0 ? `Menampilkan ${start}-${end} dari ${totalData}` : 'Tidak ada data'}
         </span>
         <Pagination
@@ -202,7 +202,7 @@ function TableNormal(
                   <TableRow className='bg-gray-100!'  key={`hr-${rowIdx}`}>
                     {row.map((cell, cellIdx) => (
                       <TableCell
-                        className='p-4!'
+                        className='p-2! text-[13px]!'
                         key={`hc-${rowIdx}-${cellIdx}`}
                         colSpan={cell.colSpan}
                         rowSpan={cell.rowSpan}
@@ -222,7 +222,7 @@ function TableNormal(
                 {isLoading ? (
                   <TableRow>
                     <TableCell
-                      className='p-4!' colSpan={effectiveLeafCount} align="center">
+                      className='p-2! text-[13px]!' colSpan={effectiveLeafCount} align="center">
                       Memuat data...
                     </TableCell>
                   </TableRow>
@@ -236,7 +236,7 @@ function TableNormal(
                     >
                       {leafColumns.map((col, colIndex) => (
                         <TableCell
-                          className='p-4!'
+                          className='p-2! text-[13px]!'
                           key={`c-${rowIndex}-${colIndex}`}
                           align={getAlignValue(col.align)}
                           sx={{ verticalAlign: 'top', textAlign: col.sx?.textAlign, ...col.sx, ...(col.ellipsis ? ellipsisSx : {}) }}
@@ -249,7 +249,7 @@ function TableNormal(
                 ) : (
                   <TableRow>
                     <TableCell
-                      className='p-4!' colSpan={effectiveLeafCount} align="center">
+                      className='p-2! text-[13px]!' colSpan={effectiveLeafCount} align="center">
                       Tidak ada data
                     </TableCell>
                   </TableRow>

@@ -53,13 +53,13 @@ const ModalError = (props) => {
 
   return (
     <Box className={`animate__faster ${open?'block':'hidden'} bg-[#ff1d1d25] filter backdrop-blur-[4px] fixed left-0 right-0 top-0 bottom-0 z-[999]`}>
-      <div className={`modal-box p-6 bg-[#ffffffb2] border-[12px] border-white rounded-lg max-w-md animate__animated ${animation} animate__faster absolute left-0 right-0 m-auto top-1/4`}>
+      <div className={`modal-box p-6 bg-[#ffffffb2] border-[13px] border-white rounded-lg max-w-md animate__animated ${animation} animate__faster absolute left-0 right-0 m-auto top-1/4`}>
         <div className="">
           <div className="text-center">
             <div className={`animate-pulse text-[#FB6E6E] text-[40px] font-semibold font-bebas-neue pb-2 mb-4 border-b border-dashed border-gray-200`}>
               Error!
             </div>
-            <div className="text-[12px] !text-slate-300">
+            <div className="text-[13px] !text-slate-300">
               {errorMessage}
             </div>
             <div className='mt-4'>

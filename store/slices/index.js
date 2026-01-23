@@ -3,6 +3,7 @@ import { combineReducers } from '@reduxjs/toolkit'
 import authReducer from './auth.slice'
 import userReducer from './user.slice'
 import modalReducer from './modal.slice'
+import financeReducer from './finance.slice'
 
 const rootReducer = combineReducers({
   // Add your slice reducers here
@@ -11,6 +12,7 @@ const rootReducer = combineReducers({
   auth: authReducer,
   user: userReducer,
   modal: modalReducer,
+  finance: financeReducer,
 })
 
 export default rootReducer

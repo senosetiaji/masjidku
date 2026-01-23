@@ -49,7 +49,7 @@ const ModalSuccess = (props) => {
             <div className={` animate-pulse text-[#0FA958] title text-[40px] font-semibold font-bebas-neue pb-2 mb-4 border-b border-dashed border-gray-200`}>
               Success!
             </div>
-            <div className="text-[12px] text-slate-600">
+            <div className="text-[13px] text-slate-600">
               {meta?.message || 'Data telah berhasil disimpan.'}
             </div>
             <div className='mt-4'>

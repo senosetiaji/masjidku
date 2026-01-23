@@ -34,10 +34,10 @@ const Label = styled(FormLabel)((props) => {
   return {
     '&.MuiFormLabel-root': {
       color:'#4F4F4F',
-      fontFamily:'Poppins',
+      fontFamily:"Inter",
       fontWeight:500,
       marginBottom:props.mb?props.mb:'9px',
-      fontSize:fontSize || '12px'
+      fontSize:fontSize || '13px'
     },
     '&.MuiFormLabel-root.Mui-error': {
       color:'#d32f2f'

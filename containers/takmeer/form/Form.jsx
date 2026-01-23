@@ -65,7 +65,7 @@ function Form({ isEdit = false }) {
           <ArrowBackIcon />
         </IconButton>
         <div>
-          <div className="text-2xl font-bold text-[#333]">Formulir Takmeer</div>
+          <div className="text-[20px] font-bold text-[#333]">Formulir Takmeer</div>
           <div className="text-[#666] tinos-regular">Lengkapi data takmeer dengan benar.</div>
         </div>
       </div>

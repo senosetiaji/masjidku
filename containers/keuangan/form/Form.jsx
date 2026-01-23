@@ -11,6 +11,9 @@ import TextInputField from '@/components/fields/TextInputField'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useRouter } from 'next/router'
 import Button from '@mui/material/Button'
+import { useDispatch } from 'react-redux'
+import { createFinance } from '@/store/actions/finance.action'
+import { FormControl } from '@mui/material'
 
 const typeOptions = [
   { label: 'Pemasukan', value: 'income' },
@@ -26,6 +29,22 @@ const createEmptyEntry = () => ({
 
 function Form({ isEdit = false }) {
   const router = useRouter();
+  const dispatch = useDispatch();
+  
+  function onSubmit(values) {
+    const payload = {
+      data: values.data.map((item) => ({
+        date: item.date,
+        amount: Number(item.nominal.toString().replace(/[^0-9,-]+/g, '').replace(',', '.')),
+        type: item.type.value,
+        description: item.description,
+      })),
+    }
+    console.log('Submitting payload:', payload)
+    // Example dispatch call
+    // dispatch(saveFinanceData(payload));
+    dispatch(createFinance({payload: payload.data}));
+  }
 
   const form = useFormik({
     initialValues: {
@@ -33,7 +52,7 @@ function Form({ isEdit = false }) {
     },
     onSubmit: (values) => {
       // Hook this up to API/dispatch when ready
-      console.log(values)
+      onSubmit(values)
     },
   })
 
@@ -57,8 +76,8 @@ function Form({ isEdit = false }) {
           <ArrowBackIcon />
         </IconButton>
         <div>
-          <div className="text-xl font-bold text-[#333]">Formulir Keuangan</div>
-          <div className="text-[#666] tinos-regular">Lengkapi data keuangan dengan benar.</div>
+          <div className="text-[20px] font-bold text-[#333]">Formulir Keuangan</div>
+          <div className="text-[#666] text-[13px]">Lengkapi data keuangan dengan benar.</div>
         </div>
       </div>
       <form onSubmit={form.handleSubmit} className="space-y-6">
@@ -67,54 +86,62 @@ function Form({ isEdit = false }) {
             key={item.id}
             className="relative rounded-xl border border-dashed border-gray-200 bg-[#fbfbfb] p-6 shadow-sm flex gap-4 w-full"
           >
-            <div className="grid gap-2 w-full">
-              <DatePickerField
-                label="Tanggal"
-                name={`data[${idx}].date`}
-                value={item.date}
-                onChange={handleFieldChange}
-                size="medium"
-                labelfontsize="13px"
-                fontSize="13px"
-                labelMb="6px"
-              />
-              <NumericInputField
-                label="Nominal"
-                name={`data[${idx}].nominal`}
-                value={item.nominal}
-                onChange={handleFieldChange}
-                placeholder="Rp."
-                prefix="Rp. "
-                thousandSeparator="."
-                decimalSeparator="," 
-                size="small"
-                labelfontsize="13px"
-                fontSize="13px"
-                labelMb="6px"
-              />
-              <SelectField
-                label="Jenis"
-                name={`data[${idx}].type`}
-                placeholder="Pilih jenis"
-                options={typeOptions}
-                value={item.type}
-                onChange={handleFieldChange}
-                size="small"
-                labelfontsize="13px"
-                fontSize="13px"
-                labelMb="6px"
-              />
-              <TextInputField
-                label="Keterangan"
-                name={`data[${idx}].description`}
-                value={item.description}
-                onChange={handleFieldChange}
-                placeholder="Tuliskan keterangan"
-                size="small"
-                labelfontsize="13px"
-                fontSize="13px"
-                labelMb="6px"
-              />
+            <div className="grid grid-cols-3 gap-2 w-full">
+              <FormControl fullWidth>
+                <DatePickerField
+                  label="Tanggal"
+                  name={`data[${idx}].date`}
+                  value={item.date}
+                  onChange={handleFieldChange}
+                  size="medium"
+                  labelfontsize="13px"
+                  fontSize="13px"
+                  labelMb="6px"
+                />
+              </FormControl>
+              <FormControl fullWidth>
+                <NumericInputField
+                  label="Nominal"
+                  name={`data[${idx}].nominal`}
+                  value={item.nominal}
+                  onChange={handleFieldChange}
+                  placeholder="Rp."
+                  prefix="Rp. "
+                  thousandSeparator="."
+                  decimalSeparator="," 
+                  size="small"
+                  labelfontsize="13px"
+                  fontSize="13px"
+                  labelMb="6px"
+                />
+              </FormControl>
+              <FormControl fullWidth>
+                <SelectField
+                  label="Jenis"
+                  name={`data[${idx}].type`}
+                  placeholder="Pilih jenis"
+                  options={typeOptions}
+                  value={item.type}
+                  onChange={handleFieldChange}
+                  size="small"
+                  labelfontsize="13px"
+                  fontSize="13px"
+                  labelMb="6px"
+                />
+              </FormControl>
+              <FormControl fullWidth className="col-span-3">
+                <TextInputField
+                  label="Keterangan"
+                  name={`data[${idx}].description`}
+                  value={item.description}
+                  onChange={handleFieldChange}
+                  placeholder="Tuliskan keterangan"
+                  size="small"
+                  labelfontsize="13px"
+                  fontSize="13px"
+                  labelMb="6px"
+                />
+              </FormControl>
             </div>
 
             <div className="">

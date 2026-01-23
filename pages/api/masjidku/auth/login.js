@@ -49,7 +49,7 @@ export default async function handler(req, res) {
 
     // jangan kirim password ke frontend
       const safeUser = {
-        id: user.id,
+        id: String(user.id),
         name: user.name,
         role: user.role,
         username: user.username,

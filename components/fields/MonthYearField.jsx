@@ -9,15 +9,15 @@ import 'moment/locale/id';
 const Input = styled(DatePicker)((props) => ({
   '.MuiPickersInputBase-root':{
     maxHeight: '37px !important',
-    fontSize:'14px',
+    fontSize:'13px',
   },
   '.Mui-focused .MuiOutlinedInput-notchedOutline':{
     borderColor:'#14A2BA!important'
   },
   '.MuiInputBase-input':{
     color:'#4F4F4F',
-    fontFamily:'Poppins',
-    fontSize: '12px',
+    fontFamily:"Inter",
+    fontSize: '13px',
     maxHeight: '37px',
   },
 }))
@@ -26,10 +26,10 @@ const Label = styled(FormLabel)((props) => {
   return {
     '&.MuiFormLabel-root': {
       color:'#4F4F4F',
-      fontFamily:'Poppins',
+      fontFamily:"Inter",
       fontWeight:500,
       marginBottom:props.mb?props.mb:'9px',
-      fontSize: '14px !important'
+      fontSize: '13px !important'
     },
     '&.MuiFormLabel-root.Mui-error': {
       color:'#d32f2f'

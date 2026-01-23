@@ -42,7 +42,7 @@ function Login() {
   return (
     <div className='h-screen flex items-center justify-center'>
       <div className="p-6 rounded-xl bg-white max-w-md w-full">
-        <h2 className="text-2xl font-bold mb-2 text-center text-gray-600">Masjid.ku</h2>
+        <h2 className="text-[20px] font-bold mb-2 text-center text-gray-600">Masjid.ku</h2>
         <p className='text-sm text-center text-gray-400 mb-4'>Welcome back! Please login to your account.</p>
         <div className="grid grid-cols-1 gap-4">
           <FormControl fullWidth>
@@ -54,7 +54,7 @@ function Login() {
               onChange={(name, value) => form.setFieldValue(name, value)}
               onBlur={form.handleBlur}
               margin="normal"
-              fontSize="14px"
+              fontSize="13px"
             />
           </FormControl>
           <FormControl fullWidth>
@@ -66,7 +66,7 @@ function Login() {
               onChange={(name, value) => form.setFieldValue(name, value)}
               onBlur={form.handleBlur}
               margin="normal"
-              fontSize="14px"
+              fontSize="13px"
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="end">

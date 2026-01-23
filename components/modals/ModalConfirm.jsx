@@ -66,12 +66,12 @@ const ModalConfirm = forwardRef((props, ref) => {
 
   return (
     <Box className={`${open?'block':'hidden'} animate__animated ${backdropAnimation} animate__faster bg-[#dfab003f] filter backdrop-blur-[4px] fixed left-0 right-0 top-0 bottom-0 !z-[99]`}>
-      <div className={`w-fit rounded-xl bg-[#ffffffc2] border-[12px] border-white absolute top-0 bottom-0 left-0 right-0 m-auto h-fit animate__animated  animate__faster shadow-lg min-w-[300px] max-w-[90%] md:max-w-[400px] lg:max-w-[500px] 2xl:max-w-[600px] 3xl:max-w-[700px] 4xl:max-w-[800px] 5xl:max-w-[900px] animate__faster p-6 ${animation}`}>
+      <div className={`w-fit rounded-xl bg-[#ffffffc2] border-[13px] border-white absolute top-0 bottom-0 left-0 right-0 m-auto h-fit animate__animated  animate__faster shadow-lg min-w-[300px] max-w-[90%] md:max-w-[400px] lg:max-w-[500px] 2xl:max-w-[600px] 3xl:max-w-[700px] 4xl:max-w-[800px] 5xl:max-w-[900px] animate__faster p-6 ${animation}`}>
         <div className={`text-[#f1cd00ea] title text-[40px] text-center font-semibold font-bebas-neue`}>
           Peringatan!
         </div>
         <div className="text-center text-gray-400 mt-2 text-[15px]">{message || 'Apakah anda yakin ingin melanjutkan aksi ini?'}</div>
-        {description && <div className="text-center text-gray-400 mt-1 text-[12px]">{description}</div>}
+        {description && <div className="text-center text-gray-400 mt-1 text-[13px]">{description}</div>}
         <div className="flex items-center justify-center gap-4 mt-6">
           {!noConfirmation && (
             <>

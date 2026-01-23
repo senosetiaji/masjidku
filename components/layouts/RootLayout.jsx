@@ -23,7 +23,7 @@ function RootLayout({ breadcrumbs, children }) {
       <TopNav />
       <div className="mt-16 flex">
         <SideNav />
-        <div className="p-12 pl-6 flex-1 bg-gray-100 min-h-[calc(100vh-4rem)]">
+        <div className="p-12 pl-6 flex-1 bg-[#f0f4f8] min-h-[calc(100vh-4rem)]">
           <nav aria-label="Breadcrumb" className="mb-4 ml-4 text-sm text-gray-600">
             <ol className="flex items-center gap-2">
               <li>

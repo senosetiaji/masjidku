@@ -101,7 +101,7 @@ function SideNav() {
     },
   ];
   return (
-    <div className="w-64 h-[calc(100vh-4rem)] bg-white pt-4">
+    <div className="w-56 h-[calc(100vh-4rem)] bg-white pt-4">
       <div className="p-2 grid grid-cols-1 gap-4">
         {menu.filter(item => item.show).map((item, index) => {
           const hasSub = item.subMenu && item.subMenu.length > 0;
@@ -113,11 +113,11 @@ function SideNav() {
                 <button
                   type="button"
                   onClick={() => toggleSubMenu(item.alias)}
-                  className={`w-full px-4 py-2 text-[#333333] flex items-center justify-between hover:bg-gray-100 rounded-md cursor-pointer ${isActive(item.link) ? 'bg-gray-100 font-semibold' : ''}`}
+                  className={`w-full px-4 py-2 text-[#333333] flex items-center justify-between hover:bg-[#003844]/25 rounded-md cursor-pointer ${isActive(item.link) ? 'bg-[#003844]/90 text-white! font-semibold' : ''}`}
                 >
                   <span className="flex items-center">
-                    <span className="mr-3">{item.icon}</span>
-                    <span className="text-[#333333] text-[14px]">{item.name}</span>
+                    <span className={`mr-3 ${isActive(item.link) ? 'text-[#ffb100]' : ''}`}>{item.icon}</span>
+                    <span className={`text-[#333333] ${isActive(item.link) ? 'text-white!' : ''} text-[13px]`}>{item.name}</span>
                   </span>
                   <span className={`text-xs transition-transform duration-200 ${isOpen ? 'rotate-90' : ''}`}>
                     <IconSubmenu />
@@ -130,7 +130,7 @@ function SideNav() {
                       return (
                         <div
                           key={subIndex}
-                          className={`px-4 py-2 hover:bg-gray-100 cursor-pointer text-[#333333] pl-6 text-[14px] ${subActive ? 'bg-gray-100 font-semibold' : ''}`}
+                          className={`px-4 py-2 hover:bg-[#003844]/25 cursor-pointer text-[#333333] pl-6 text-[13px] ${subActive ? 'bg-[#003844]/75 text-white! font-semibold' : ''}`}
                           onClick={() => router.push(subItem.link)}
                         >
                           {subItem.name}
@@ -147,11 +147,11 @@ function SideNav() {
           return (
             <div
               key={index}
-              className={`px-4 py-2 hover:bg-gray-100 cursor-pointer flex items-center text-[#333333] rounded-md ${active ? 'bg-emerald-50 text-yellow-400! font-semibold' : ''}`}
+              className={`px-4 py-2 hover:bg-[#003844]/25 cursor-pointer flex items-center text-[#333333] rounded-md ${active ? 'bg-[#003844]/75 text-[#ffb100]! font-semibold' : ''}`}
               onClick={() => router.push(item.link)}
             >
               <div className="mr-3">{item.icon}</div>
-              <div className="text-[#333333] text-[14px]">{item.name}</div>
+              <div className={`text-[#333333] ${active ? 'text-white!' : ''} text-[13px]`}>{item.name}</div>
             </div>
           );
         })}

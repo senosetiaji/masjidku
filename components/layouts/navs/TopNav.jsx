@@ -4,6 +4,7 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import { Button } from '@mui/material';
 import { logout } from '@/store/actions/auth.action';
 import { useDispatch } from 'react-redux';
+import Image from 'next/image';
 
 function TopNav() {
   const [openMenu, setOpenMenu] = React.useState(false);
@@ -12,8 +13,10 @@ function TopNav() {
     dispatch(logout({}));
   }
   return (
-    <div className="w-full h-16 bg-emerald-800 shadow-md flex items-center px-6 justify-between fixed top-0 z-10">
-      <div className="logo text-yellow-400 font-bold text-[18px]">Masjid.ku</div>
+    <div className="w-full h-16 bg-[#003844] shadow-md flex items-center px-6 justify-between fixed top-0 z-10">
+      <div className="logo text-[#ffb100] font-bold text-[18px]">
+        <Image src="/assets/logo-main.png" alt="Logo" width={140} height={70} className="inline-block mr-2 align-middle" />
+      </div>
       <div className="nav-items relative">
         {/* Navigation items can be added here */}
         <IconButton aria-label="settings" onClick={() => setOpenMenu(!openMenu)}>

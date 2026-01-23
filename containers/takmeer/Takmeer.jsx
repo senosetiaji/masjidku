@@ -23,8 +23,8 @@ function Takmeer() {
   }, [params]);
   return (
     <div>
-      <div className="flex justify-between items-center mb-4">
-        <div className="title text-2xl font-bold text-[#333]">Takmeer Masjid</div>
+      <div className="flex justify-between items-center mb-8">
+        <div className="title text-[20px] font-bold text-[#333]">Takmeer Masjid</div>
         <Button variant="contained" color="primary" onClick={() => router.push('/takmeer/create')}>
           Daftarkan Takmeer
         </Button>

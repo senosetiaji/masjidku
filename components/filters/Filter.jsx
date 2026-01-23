@@ -51,8 +51,8 @@ function Filter({closeFilter, filters, onSubmit, filterState, ...props}) {
                   placeholder="Pilih Tahun"
                   name="year"
                   id="year"
-                  fontSize="14px"
-                  labelfontsize="14px"
+                  fontSize="13px"
+                  labelfontsize="13px"
                   size="small" 
                   value={selectedFilters.year || ''}
                   onChange={(name, value) => handleChange(name, value)}
@@ -79,8 +79,8 @@ function Filter({closeFilter, filters, onSubmit, filterState, ...props}) {
                   placeholder="Pilih Periode"
                   name="periode"
                   id="periode"
-                  fontSize="14px"
-                  labelfontsize="14px"
+                  fontSize="13px"
+                  labelfontsize="13px"
                   size="small" 
                   value={selectedFilters.periode || ''}
                   onChange={(name, value) => handleChange(name, value)}
@@ -94,8 +94,8 @@ function Filter({closeFilter, filters, onSubmit, filterState, ...props}) {
                   placeholder="Pilih Entitas"
                   name="entitas"
                   id="entitas"
-                  fontSize="14px"
-                  labelfontsize="14px"
+                  fontSize="13px"
+                  labelfontsize="13px"
                   size="small" 
                   value={selectedFilters.entitas || ''}
                   onChange={(name, value) => handleChange(name, value)}
@@ -135,8 +135,8 @@ function Filter({closeFilter, filters, onSubmit, filterState, ...props}) {
                   placeholder="Pilih Unit"
                   name="unit"
                   id="unit"
-                  fontSize="14px"
-                  labelfontsize="14px"
+                  fontSize="13px"
+                  labelfontsize="13px"
                   size="small" 
                   value={selectedFilters.unit || ''}
                   onChange={(name, value) => handleChange(name, value)}

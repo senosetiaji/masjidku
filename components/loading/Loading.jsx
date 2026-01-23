@@ -28,7 +28,7 @@ function Loading(props) {
           className=' animate__animated animate__fadeInUp animate__fast'
         />
         <h3 className="text-[24px] font-semibold">Mengolah Informasi</h3>
-        <div className="animate-pulse text-[14px] text-slate-600 mt-4">Data sedang kami siapkan. Mohon tunggu.</div>
+        <div className="animate-pulse text-[13px] text-slate-600 mt-4">Data sedang kami siapkan. Mohon tunggu.</div>
       </Box>
     </Box>
   )

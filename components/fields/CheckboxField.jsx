@@ -7,7 +7,7 @@ import PropTypes from 'prop-types'
 const ControlLabel = styled(FormControlLabel)(() => ({
   '.MuiTypography-root':{
     color:'#333333',
-    fontFamily:'Poppins',
+    fontFamily:"Inter",
     fontSize:'1rem'
   }
 }))
