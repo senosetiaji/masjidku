@@ -1,11 +1,10 @@
 import { useState} from 'react'
 import Box from '@mui/material/Box'
-import { ReactSVG } from 'react-svg'
 import Button from '../buttons/Button'
 import { useDispatch, useSelector } from 'react-redux'
 import { modalError } from '@/store/actions/modal.action'
 import { func } from 'prop-types'
-import { dataNotAvailable } from '@/helpers/emptyDataHandler'
+import { dataNotAvailable } from '@/lib/helpers/emptyDataHandler'
 
 const ModalError = (props) => {
   const {
@@ -13,7 +12,7 @@ const ModalError = (props) => {
   } = props
   const [animation, setAnimation] = useState('animate__fadeInUp')
   const dispatch = useDispatch()
-  const {isModalError:open, metaError:meta} = useSelector(state => state.modalReducer)
+  const {isModalError:open, metaError:meta} = useSelector(state => state.modal)
 
   const closeModal = () => {
     setAnimation('animate__fadeOutDown')

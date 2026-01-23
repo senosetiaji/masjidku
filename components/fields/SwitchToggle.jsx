@@ -8,7 +8,7 @@ import PropTypes from 'prop-types'
 const ControlLabel = styled(FormControlLabel)(() => ({
   '.MuiTypography-root':{
     color:"#828282",
-    fontFamily:'Nunito',
+    fontFamily:'Poppins',
     fontWeight:400,
     fontSize:'10px',
   },
@@ -73,7 +73,7 @@ const CustomSwitch = styled((props) => (
 const Label = styled(FormLabel)((props) => ({
   '&.MuiFormLabel-root': {
     color:'#4F4F4F',
-    fontFamily:'Nunito',
+    fontFamily:'Poppins',
     fontWeight:500,
     fontSize:props.fontSize?props.fontSize:'14px'
   },

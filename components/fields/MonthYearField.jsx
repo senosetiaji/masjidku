@@ -16,7 +16,7 @@ const Input = styled(DatePicker)((props) => ({
   },
   '.MuiInputBase-input':{
     color:'#4F4F4F',
-    fontFamily:'Nunito',
+    fontFamily:'Poppins',
     fontSize: '12px',
     maxHeight: '37px',
   },
@@ -26,7 +26,7 @@ const Label = styled(FormLabel)((props) => {
   return {
     '&.MuiFormLabel-root': {
       color:'#4F4F4F',
-      fontFamily:'Nunito',
+      fontFamily:'Poppins',
       fontWeight:500,
       marginBottom:props.mb?props.mb:'9px',
       fontSize: '14px !important'

@@ -6,6 +6,8 @@ import FormHelperText from '@mui/material/FormHelperText'
 import TextInputField from '@/components/fields/TextInputField'
 import { useDispatch } from 'react-redux'
 import { loginUser } from '@/store/actions/auth.action'
+import Button from '@mui/material/Button'
+import { Divider } from '@mui/material'
 
 function Login() {
   const dispatch = useDispatch();
@@ -26,38 +28,42 @@ function Login() {
     },
   })
   return (
-    <div>
-      <div className="p-6 rounded-xl shadow-lg bg-white max-w-md mx-auto mt-20">
-        <h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
-        <FormControl fullWidth>
-          <TextInputField
-            label="Email"
-            name="email"
-            type="email"
-            value={form.values.email}
-            onChange={(name, value) => form.setFieldValue(name, value)}
-            onBlur={form.handleBlur}
-            margin="normal"
-          />
-          <TextInputField
-            label="Password"
-            name="password"
-            type="password"
-            value={form.values.password}
-            onChange={(name, value) => form.setFieldValue(name, value)}
-            onBlur={form.handleBlur}
-            margin="normal"
-          />
+    <div className='h-screen flex items-center justify-center'>
+      <div className="p-6 rounded-xl bg-white max-w-md w-full">
+        <h2 className="text-2xl font-bold mb-2 text-center text-gray-600">Masjid.ku</h2>
+        <p className='text-sm text-center text-gray-400 mb-4'>Welcome back! Please login to your account.</p>
+        <div className="grid grid-cols-1 gap-4">
+          <FormControl fullWidth>
+            <TextInputField
+              label="Email"
+              name="email"
+              type="email"
+              value={form.values.email}
+              onChange={(name, value) => form.setFieldValue(name, value)}
+              onBlur={form.handleBlur}
+              margin="normal"
+              fontSize="14px"
+            />
+          </FormControl>
+          <FormControl fullWidth>
+            <TextInputField
+              label="Password"
+              name="password"
+              type="password"
+              value={form.values.password}
+              onChange={(name, value) => form.setFieldValue(name, value)}
+              onBlur={form.handleBlur}
+              margin="normal"
+              fontSize="14px"
+            />
+          </FormControl>
+          <Divider />
           <FormHelperText>
-            <button
-              onClick={form.handleSubmit}
-              className="mt-4 w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700"
-              type="button"
-            >
+            <Button variant="contained" className='w-full' color="primary" size='large' onClick={form.handleSubmit}>
               Login
-            </button>
+            </Button>
           </FormHelperText>
-        </FormControl>
+        </div>
       </div>
     </div>
   )
