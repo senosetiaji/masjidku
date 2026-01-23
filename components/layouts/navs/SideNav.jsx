@@ -70,6 +70,10 @@ function IconAnalitik() {
 function SideNav() {
   const [openAlias, setOpenAlias] = React.useState(null);
   const router = useRouter();
+  const isActive = (link) => {
+    if (!router?.pathname) return false;
+    return router.pathname === link || router.pathname.startsWith(`${link}/`);
+  };
   const toggleSubMenu = (alias) => {
     setOpenAlias((prev) => (prev === alias ? null : alias));
   };
@@ -101,7 +105,7 @@ function SideNav() {
       <div className="p-2 grid grid-cols-1 gap-4">
         {menu.filter(item => item.show).map((item, index) => {
           const hasSub = item.subMenu && item.subMenu.length > 0;
-          const isOpen = openAlias === item.alias;
+          const isOpen = openAlias === item.alias || isActive(item.link);
 
           if (hasSub) {
             return (
@@ -109,7 +113,7 @@ function SideNav() {
                 <button
                   type="button"
                   onClick={() => toggleSubMenu(item.alias)}
-                  className="w-full px-4 py-2 text-[#333333] flex items-center justify-between hover:bg-gray-100 rounded-md cursor-pointer"
+                  className={`w-full px-4 py-2 text-[#333333] flex items-center justify-between hover:bg-gray-100 rounded-md cursor-pointer ${isActive(item.link) ? 'bg-gray-100 font-semibold' : ''}`}
                 >
                   <span className="flex items-center">
                     <span className="mr-3">{item.icon}</span>
@@ -121,19 +125,31 @@ function SideNav() {
                 </button>
                 {isOpen && (
                   <div className="mt-4 border-t border-gray-200">
-                    {item.subMenu.filter(sub => sub.show).map((subItem, subIndex) => (
-                      <div key={subIndex} className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-[#333333] pl-6 text-[14px]" onClick={() => router.push(subItem.link)}>
-                        {subItem.name}
-                      </div>
-                    ))}
+                    {item.subMenu.filter(sub => sub.show).map((subItem, subIndex) => {
+                      const subActive = isActive(subItem.link);
+                      return (
+                        <div
+                          key={subIndex}
+                          className={`px-4 py-2 hover:bg-gray-100 cursor-pointer text-[#333333] pl-6 text-[14px] ${subActive ? 'bg-gray-100 font-semibold' : ''}`}
+                          onClick={() => router.push(subItem.link)}
+                        >
+                          {subItem.name}
+                        </div>
+                      );
+                    })}
                   </div>
                 )}
               </div>
             );
           }
 
+          const active = isActive(item.link);
           return (
-            <div key={index} className="px-4 py-2 hover:bg-gray-100 cursor-pointer flex items-center text-[#333333] rounded-md" onClick={() => router.push(item.link)}>
+            <div
+              key={index}
+              className={`px-4 py-2 hover:bg-gray-100 cursor-pointer flex items-center text-[#333333] rounded-md ${active ? 'bg-emerald-50 text-yellow-400! font-semibold' : ''}`}
+              onClick={() => router.push(item.link)}
+            >
               <div className="mr-3">{item.icon}</div>
               <div className="text-[#333333] text-[14px]">{item.name}</div>
             </div>
