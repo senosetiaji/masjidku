@@ -10,7 +10,7 @@ import 'moment/locale/id';
 const Input = styled(DatePicker)((props) => ({
   '.MuiPickersInputBase-root':{
     maxHeight: '37px !important',
-    fontSize:'14px',
+    fontSize:'13px',
   },
   '.Mui-focused .MuiOutlinedInput-notchedOutline':{
     borderColor:'#14A2BA!important'
@@ -18,7 +18,7 @@ const Input = styled(DatePicker)((props) => ({
   '.MuiInputBase-input':{
     color:'#4F4F4F',
     fontFamily:'Poppins',
-    fontSize:props.fontSize?props.fontSize:'14px'
+    fontSize:props.fontSize?props.fontSize:'13px'
   }
 }))
 
@@ -28,7 +28,7 @@ const Label = styled(FormLabel)((props) => ({
     fontFamily:'Poppins',
     fontWeight:500,
     marginBottom:props.mb? props.mb:'8px',
-    fontSize:props.fontSize?props.fontSize:'14px'
+    fontSize:props.fontSize?props.fontSize:'13px'
   },
   '&.MuiFormLabel-root.Mui-error': {
     color:'#d32f2f'
