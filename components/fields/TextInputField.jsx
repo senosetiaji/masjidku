@@ -17,7 +17,7 @@ const Input = styled(TextField)((props) => ({
   '& .MuiInputBase-input':{
     color:'#4F4F4F',
     fontFamily:'Poppins',
-    fontSize:props.fontSize?props.fontSize:'14px',
+    fontSize:props.fontSize?props.fontSize:'13px',
     maxHeight: '48px',
   }
 }))
@@ -28,7 +28,7 @@ const Label = styled(FormLabel)((props) => ({
     fontFamily:'Poppins',
     fontWeight:500,
     marginBottom:props.mb? props.mb:'9px',
-    fontSize:props.fontSize?props.fontSize:'14px'
+    fontSize:props.fontSize?props.fontSize:'13px'
   },
   '&.MuiFormLabel-root.Mui-error': {
     color:'#d32f2f'

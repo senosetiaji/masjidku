@@ -20,6 +20,7 @@ async function main() {
     data: {
       name: "Super Admin",
       phone: "08123456789",
+      jabatan: "Administrator",
       username: "admin",
       password: passwordHash,
       role: "superadmin",

@@ -7,7 +7,7 @@ const Input = styled(TextField)((props) => {
   const { disabled } = props
   return {
     '.MuiFormLabel-root':{
-      fontSize:props.fontSize?props.fontSize:'16px',
+      fontSize:props.fontSize?props.fontSize:'13px',
     },
     '.MuiOutlinedInput-notchedOutline':{
       borderColor: '#E0E0E0'
@@ -20,7 +20,7 @@ const Input = styled(TextField)((props) => {
     },
     '.MuiInputBase-input':{
       color:'#4F4F4F',
-      fontSize:props.fontSize?props.fontSize:'14px',
+      fontSize:props.fontSize?props.fontSize:'13px',
       cursor:disabled?'not-allowed':'pointer',
     },
     '.MuiOutlinedInput-root' : {
@@ -107,7 +107,7 @@ const SelectField = ({
     {label && (
       <Label
         error={isError}
-        fontSize={labelfontsize || '14px'}
+        fontSize={labelfontsize || '13px'}
         mb={labelMb}
         sx={{display: 'flex', alignItems: 'center', height: '20px'}}
         >

@@ -1,5 +1,5 @@
 import RootLayout from '@/components/layouts/RootLayout'
-import Takmeer from '@/containers/takmeer/Takmeer'
+import Form from '@/containers/takmeer/form/Form'
 import React from 'react'
 
 function Index() {
@@ -10,10 +10,16 @@ function Index() {
       link: '/takmeer',
       isDisabled: false
     },
+    {
+      label: 'Formulir',
+      alias: 'formulir',
+      link: '/takmeer/create',
+      isDisabled: true
+    }
   ]
   return (
     <RootLayout breadcrumbs={breadcrumb}>
-      <Takmeer />
+      <Form />
     </RootLayout>
   )
 }

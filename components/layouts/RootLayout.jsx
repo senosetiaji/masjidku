@@ -5,6 +5,7 @@ import SideNav from './navs/SideNav'
 import { useDispatch, useSelector } from 'react-redux';
 import { getCurrentUser } from '@/store/actions/user.action';
 import ModalError from '../modals/ModalError';
+import ModalSuccess from '../modals/ModalSuccess';
 
 function RootLayout({ breadcrumbs, children }) {
   const items = Array.isArray(breadcrumbs) ? breadcrumbs : [];
@@ -57,6 +58,7 @@ function RootLayout({ breadcrumbs, children }) {
         </div>
       </div>
       <ModalError />
+      <ModalSuccess />
     </div>
   )
 }

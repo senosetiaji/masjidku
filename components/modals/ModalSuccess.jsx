@@ -12,7 +12,7 @@ const ModalSuccess = (props) => {
   } = props
   const dispatch = useDispatch();
   const router = useRouter();
-  const {isModalSuccess:open, metaSuccess:meta} = useSelector(state => state.modalReducer)
+  const {isModalSuccess:open, metaSuccess:meta} = useSelector(state => state.modal)
   const [animation, setAnimation] = useState('animate__fadeInUp')
   const [backdropAnimation, setBackdropAnimation] = useState('animate__fadeIn')
 
