@@ -1,6 +1,6 @@
 import RootLayout from '@/components/layouts/RootLayout'
-import LaporanKeuangan from '@/containers/keuangan/LaporanKeuangan'
-import { getFinance } from '@/store/actions/finance.action';
+import Inventaris from '@/containers/inventaris/Inventaris';
+import { getInventaris } from '@/store/actions/inventaris.action';
 import React from 'react'
 import { useDispatch } from 'react-redux';
 
@@ -12,18 +12,18 @@ function Index() {
     search: '',
   });
   const breadcrumbs = [
-    { label: 'Keuangan', href: '/keuangan/laporan-keuangan', disabled: true },
-    { label: 'Laporan Keuangan', href: '/keuangan/laporan-keuangan' },
+    { label: 'Inventaris', href: '/inventaris/laporan-inventaris', disabled: true },
+    { label: 'Laporan Inventaris', href: '/inventaris/laporan-inventaris' },
   ]
   async function fetchData() {
-    await dispatch(getFinance({ params }));
+    await dispatch(getInventaris({ params }));
   }
   React.useEffect(() => {
     fetchData();
   }, [params]);
   return (
     <RootLayout breadcrumbs={breadcrumbs}>
-      <LaporanKeuangan params={params} setParams={setParams} fetchData={fetchData} />
+      <Inventaris params={params} setParams={setParams} fetchData={fetchData} />
     </RootLayout>
   )
 }

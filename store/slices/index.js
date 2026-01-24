@@ -4,6 +4,7 @@ import authReducer from './auth.slice'
 import userReducer from './user.slice'
 import modalReducer from './modal.slice'
 import financeReducer from './finance.slice'
+import inventarisReducer from './inventaris.slice'
 
 const rootReducer = combineReducers({
   // Add your slice reducers here
@@ -13,6 +14,7 @@ const rootReducer = combineReducers({
   user: userReducer,
   modal: modalReducer,
   finance: financeReducer,
+  inventaris: inventarisReducer,
 })
 
 export default rootReducer

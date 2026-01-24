@@ -1,7 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import crypto from "crypto";
 
-// Prisma singleton (avoid new clients per hot-reload)
+// Prisma singleton to avoid exhausting connections during dev reloads
 const globalForPrisma = globalThis;
 let prisma = globalForPrisma.prisma;
 if (!prisma) {
@@ -10,7 +10,7 @@ if (!prisma) {
 }
 
 const SECRET = process.env.APP_SECRET || "dev-secret";
-const VALID_TYPES = new Set(["income", "expense", "transfer"]);
+const VALID_CONDITIONS = new Set(["baik", "perlu_perbaikan", "rusak"]);
 
 const verifyToken = (token) => {
 	if (!token) return null;
@@ -32,7 +32,6 @@ export default async function handler(req, res) {
 	}
 
 	try {
-		// derive user from cookie (set on login)
 		const cookieHeader = req.headers.cookie || "";
 		const sessionCookie = cookieHeader.split(";").find((c) => c.trim().startsWith("session="));
 		const token = sessionCookie ? sessionCookie.trim().replace("session=", "") : null;
@@ -41,10 +40,8 @@ export default async function handler(req, res) {
 			return res.status(401).json({ message: "unauthorized" });
 		}
 
-		// normalize user id to string (schema uses String/UUID)
 		const userId = String(session.id);
 
-		// ensure user still exists (token could be stale)
 		const userExists = await prisma.user.findUnique({
 			where: { id: userId },
 			select: { id: true },
@@ -59,50 +56,43 @@ export default async function handler(req, res) {
 			return res.status(400).json({ message: "payload_must_be_array" });
 		}
 
-		// basic validation & normalization
 		const records = [];
 		for (const item of payload) {
-			const { date, amount, type, description = "" } = item || {};
-			if (!date || typeof amount === "undefined" || amount === null || !type) {
+			const { name, quantity, condition, description = "" } = item || {};
+			const cleanName = (name || "").toString().trim();
+			if (!cleanName || typeof quantity === "undefined" || quantity === null || !condition) {
 				return res.status(400).json({ message: "missing_fields" });
 			}
 
-			if (!VALID_TYPES.has(type)) {
-				return res.status(400).json({ message: "invalid_type" });
+			const parsedQty = Number(quantity);
+			if (!Number.isFinite(parsedQty) || parsedQty < 0) {
+				return res.status(400).json({ message: "invalid_quantity" });
 			}
 
-			const parsedAmount = Number(amount);
-			if (!Number.isFinite(parsedAmount)) {
-				return res.status(400).json({ message: "invalid_amount" });
-			}
-
-			const parsedDate = new Date(date);
-			if (Number.isNaN(parsedDate.getTime())) {
-				return res.status(400).json({ message: "invalid_date" });
+			if (!VALID_CONDITIONS.has(condition)) {
+				return res.status(400).json({ message: "invalid_condition" });
 			}
 
 			records.push({
-				date: parsedDate,
-				amount: Math.trunc(parsedAmount),
-				type,
-				description,
+				name: cleanName,
+				quantity: Math.trunc(parsedQty),
+				condition,
+				description: description || "",
 				userId,
 			});
 		}
 
-		// createMany not available for this model setup; use transaction of creates
 		const created = await prisma.$transaction(
-			records.map((data) => prisma.keuangan.create({ data }))
+			records.map((data) => prisma.inventaris.create({ data }))
 		);
 
 		return res.status(201).json({
 			status: 201,
-			message: "finance_created",
+			message: "inventaris_created",
 			count: created.length,
 		});
 	} catch (error) {
-		console.error("CREATE FINANCE ERROR:", error);
-		// surface known Prisma errors as 400-series
+		console.error("CREATE INVENTARIS ERROR:", error);
 		if (error?.code === "P2003") {
 			return res.status(400).json({ message: "foreign_key_constraint_failed" });
 		}

@@ -10,7 +10,6 @@ if (!prisma) {
 }
 
 const SECRET = process.env.APP_SECRET || "dev-secret";
-const VALID_TYPES = new Set(["income", "expense", "transfer"]);
 
 const verifyToken = (token) => {
 	if (!token) return null;
@@ -27,7 +26,7 @@ const verifyToken = (token) => {
 };
 
 export default async function handler(req, res) {
-	if (req.method !== "POST") {
+	if (req.method !== "GET") {
 		return res.status(405).json({ message: "Method not allowed" });
 	}
 
@@ -41,7 +40,6 @@ export default async function handler(req, res) {
 			return res.status(401).json({ message: "unauthorized" });
 		}
 
-		// normalize user id to string (schema uses String/UUID)
 		const userId = String(session.id);
 
 		// ensure user still exists (token could be stale)
@@ -54,58 +52,75 @@ export default async function handler(req, res) {
 			return res.status(401).json({ message: "invalid_session_user" });
 		}
 
-		const payload = Array.isArray(req.body) ? req.body : [];
-		if (!payload.length) {
-			return res.status(400).json({ message: "payload_must_be_array" });
-		}
+		const DEFAULT_LIMIT = 10;
+		const MAX_LIMIT = 100;
 
-		// basic validation & normalization
-		const records = [];
-		for (const item of payload) {
-			const { date, amount, type, description = "" } = item || {};
-			if (!date || typeof amount === "undefined" || amount === null || !type) {
-				return res.status(400).json({ message: "missing_fields" });
-			}
+		const parsePositiveInt = (val, fallback) => {
+			const n = parseInt(val, 10);
+			return Number.isFinite(n) && n > 0 ? n : fallback;
+		};
 
-			if (!VALID_TYPES.has(type)) {
-				return res.status(400).json({ message: "invalid_type" });
-			}
+		const page = parsePositiveInt(req.query.page, 1);
+		const limit = Math.min(parsePositiveInt(req.query.limit, DEFAULT_LIMIT), MAX_LIMIT);
+		const search = (req.query.search || "").toString().trim();
 
-			const parsedAmount = Number(amount);
-			if (!Number.isFinite(parsedAmount)) {
-				return res.status(400).json({ message: "invalid_amount" });
-			}
+		const where = {
+			userId,
+			...(search
+				? {
+					OR: [
+						{ name: { contains: search } },
+						{ description: { contains: search } },
+						{ condition: { contains: search } },
+					],
+				}
+				: {}),
+		};
 
-			const parsedDate = new Date(date);
-			if (Number.isNaN(parsedDate.getTime())) {
-				return res.status(400).json({ message: "invalid_date" });
-			}
+		const total = await prisma.inventaris.count({ where });
 
-			records.push({
-				date: parsedDate,
-				amount: Math.trunc(parsedAmount),
-				type,
-				description,
-				userId,
-			});
-		}
+		const rows = await prisma.inventaris.findMany({
+			where,
+			orderBy: [{ createdAt: "desc" }, { name: "asc" }],
+			skip: (page - 1) * limit,
+			take: limit,
+			select: {
+				id: true,
+				name: true,
+				quantity: true,
+				condition: true,
+				description: true,
+				createdAt: true,
+				updatedAt: true,
+			},
+		});
 
-		// createMany not available for this model setup; use transaction of creates
-		const created = await prisma.$transaction(
-			records.map((data) => prisma.keuangan.create({ data }))
-		);
+		const data = rows.map((item) => ({
+			id: item.id,
+			name: item.name,
+			quantity: item.quantity,
+			condition: item.condition,
+			description: item.description,
+			createdAt: item.createdAt.toISOString(),
+			updatedAt: item.updatedAt.toISOString(),
+		}));
 
-		return res.status(201).json({
-			status: 201,
-			message: "finance_created",
-			count: created.length,
+		const totalPage = total === 0 ? 0 : Math.ceil(total / limit);
+
+		return res.status(200).json({
+			status: 200,
+			message: "inventaris_fetched",
+			data,
+			meta: {
+				total_row: total,
+				total_page: totalPage,
+				page,
+				limit,
+				search,
+			},
 		});
 	} catch (error) {
-		console.error("CREATE FINANCE ERROR:", error);
-		// surface known Prisma errors as 400-series
-		if (error?.code === "P2003") {
-			return res.status(400).json({ message: "foreign_key_constraint_failed" });
-		}
+		console.error("GET INVENTARIS ERROR:", error);
 		return res.status(500).json({ message: "server_error" });
 	}
 }

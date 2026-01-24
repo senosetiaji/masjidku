@@ -6,7 +6,6 @@ import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
 import AddIcon from '@mui/icons-material/Add'
 import DatePickerField from '@/components/fields/DatePickerField'
 import NumericInputField from '@/components/fields/NumericInputField'
-import SelectField from '@/components/fields/SelectField'
 import TextInputField from '@/components/fields/TextInputField'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useRouter } from 'next/router'
@@ -15,6 +14,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { createFinance, updateDataFinance } from '@/store/actions/finance.action'
 import { FormControl } from '@mui/material'
 import moment from 'moment'
+import SelectTipeKeuangan from '@/components/forms/SelectTipeKeuangan'
 
 const typeOptions = [
   { label: 'Pemasukan', value: 'income' },
@@ -136,11 +136,10 @@ function Form({ isEdit = false }) {
                 />
               </FormControl>
               <FormControl fullWidth>
-                <SelectField
+                <SelectTipeKeuangan
                   label="Jenis"
                   name={`data[${idx}].type`}
                   placeholder="Pilih jenis"
-                  options={typeOptions}
                   value={item.type}
                   onChange={handleFieldChange}
                   size="small"
