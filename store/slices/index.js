@@ -6,6 +6,7 @@ import modalReducer from './modal.slice'
 import financeReducer from './finance.slice'
 import inventarisReducer from './inventaris.slice'
 import masterReducer from './master.slice'
+import filterReducer from './filter.slice'
 
 const rootReducer = combineReducers({
   // Add your slice reducers here
@@ -17,6 +18,7 @@ const rootReducer = combineReducers({
   finance: financeReducer,
   inventaris: inventarisReducer,
   master: masterReducer,
+  filter: filterReducer,
 })
 
 export default rootReducer

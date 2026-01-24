@@ -9,6 +9,8 @@ import moment from 'moment';
 import { useDispatch, useSelector } from 'react-redux';
 import { setFilter, clearFilter } from '@/store/slices/filter.slice';
 import SelectTipeKeuangan from '../forms/SelectTipeKeuangan';
+import SelectBulan from '../forms/SelectBulan';
+import SelectYear from '../forms/SelectYear';
 
 function Filter({ filters, multipleFilters, onSubmit, filterState, requiredField = [], keyName = '', loading = false }) {
   const [className, setClassName] = React.useState('');
@@ -16,7 +18,7 @@ function Filter({ filters, multipleFilters, onSubmit, filterState, requiredField
 
   // ===== Read saved filter from Redux by keyName =====
   const dispatch = useDispatch();
-  const { values : savedRedux } = keyName ? useSelector(state => state.filterReducer[keyName]) : { values: null };
+  const { values : savedRedux } = keyName ? useSelector(state => state.filter[keyName]) : { values: null };
 
   // State lokal untuk menampung perubahan filter sebelum ditekan "Terapkan"
   const [localFilterState, setLocalFilterState] = React.useState(
@@ -176,6 +178,35 @@ function Filter({ filters, multipleFilters, onSubmit, filterState, requiredField
             />
           </FormControl>
         );
+        case 'tahun':
+        return (
+          <FormControl key={keyIdx}>
+            <SelectYear
+              label={overrideLabel || 'Tahun'}
+              placeholder="Pilih Tahun"
+              name={name}
+              id={name}
+              size="small"
+              onlyYear={true}
+              value={localFilterState?.[name]}
+              onChange={handleChange}
+            />
+          </FormControl>
+        );
+        case 'bulan':
+        return (
+          <FormControl key={keyIdx}>
+            <SelectBulan
+              label={overrideLabel || 'Bulan'}
+              placeholder="Pilih Bulan"
+              name={name}
+              id={name}
+              size="small"
+              value={localFilterState?.[name]}
+              onChange={handleChange}
+            />
+          </FormControl>
+        );
         case 'tipe-transaksi':
         return (
           <FormControl key={keyIdx}>
@@ -190,7 +221,6 @@ function Filter({ filters, multipleFilters, onSubmit, filterState, requiredField
             />
           </FormControl>
         );
-        
       default:
         return null;
     }
@@ -218,7 +248,7 @@ function Filter({ filters, multipleFilters, onSubmit, filterState, requiredField
   });
 
   return (
-    <div className="relative z-50 animate__animated animate__fadeIn">
+    <div className="relative z-50 animate__animated animate__fadeIn p-4 mb-6 bg-white border border-dashed border-gray-200 rounded-lg shadow-sm">
       <Box component={'div'} className='relative' borderRadius="8px">
         <div className="flex justify-between gap-4">
           <div className={`w-6/6 grid ${className} gap-4 mb-6`}>
@@ -229,7 +259,7 @@ function Filter({ filters, multipleFilters, onSubmit, filterState, requiredField
             <Button
               label="Terapkan"
               icon={'/assets/icons/icon-util-filter.svg'}
-              className="border border-gray-300 !min-w-full bg-white text-gray-700 hover:bg-gray-100 hover:shadow-md"
+              className="border border-gray-300 min-w-full! bg-white text-gray-700 hover:bg-gray-100 hover:shadow-md"
               onClick={() => {
                 // Simpan ke Redux berdasarkan keyName (wajib isi keyName di halaman pemakai)
                 if (keyName) {
