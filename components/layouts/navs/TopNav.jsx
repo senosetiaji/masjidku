@@ -13,7 +13,7 @@ function TopNav() {
     dispatch(logout({}));
   }
   return (
-    <div className="w-full h-16 bg-[#003844] shadow-md flex items-center px-6 justify-between fixed top-0 z-10">
+    <div className="w-full h-16 bg-[#003844] shadow-md flex items-center px-6 justify-between fixed top-0 z-9999">
       <div className="logo text-[#ffb100] font-bold text-[18px]">
         <Image src="/assets/logo-main.png" alt="Logo" width={140} height={70} className="inline-block mr-2 align-middle" />
       </div>

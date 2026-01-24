@@ -131,7 +131,7 @@ function SideNav() {
     },
   ];
   return (
-    <div className="w-56 h-[calc(100vh-4rem)] overflow-auto bg-white pt-4">
+    <div className="fixed w-56 h-[calc(100vh-4rem)] overflow-auto bg-white pt-4">
       <div className="p-2 grid grid-cols-1 gap-4">
         {menu.filter(item => item.show).map((item, index) => {
           const hasSub = item.subMenu && item.subMenu.length > 0;

@@ -12,7 +12,7 @@ import moment from 'moment';
 import { deleteData } from '@/store/actions/finance.action';
 
 function Table({ params, setParams, fetchData }) {
-  const { data, isLoading, meta } = useSelector(state => state.finance);
+  const { rutinan: data, isLoading, meta } = useSelector(state => state.pam);
   const deleteModalRef = React.useRef();
   const dispatch = useDispatch();
   const router = useRouter();
@@ -27,12 +27,20 @@ function Table({ params, setParams, fetchData }) {
       render: (val, index) => index + 1 + ((params.page - 1) * params.limit),
     },
     {
+      label:"Nama Pelanggan",
+      align:"left",
+      sx: {
+        minWidth: 350,
+      },
+      render: (val) => __renderValue(val.pelangganName)
+    },
+    {
       label:"Tanggal",
       align:"left",
       sx: {
         minWidth: 350,
       },
-      render: (val) => val?.date ? moment(val.date).format('DD MMM YYYY') : '-'
+      render: (val) => val?.paymentDate ? moment(val.paymentDate).format('DD MMM YYYY') : '-'
     },
     {
       label:"Penggunaan",
@@ -47,7 +55,7 @@ function Table({ params, setParams, fetchData }) {
           sx: {
             minWidth: 200,
           },
-          render: (val) => __renderValueDefaultZero(val.previous_month)
+          render: (val) => __renderValueDefaultZero(val.previous_used)
         },
         {
           label: "Bulan Ini (B)",
@@ -55,7 +63,7 @@ function Table({ params, setParams, fetchData }) {
           sx: {
             minWidth: 200,
           },
-          render: (val) => __renderValueDefaultZero(val.current_month)
+          render: (val) => __renderValueDefaultZero(val.current_used)
         },
         {
           label: "Total Penggunaan (B-A)",
@@ -63,7 +71,7 @@ function Table({ params, setParams, fetchData }) {
           sx: {
             minWidth: 200,
           },
-          render: (val) => __renderValueDefaultZero(val.current_month - val.previous_month)
+          render: (val) => __renderValueDefaultZero(val.water_bill)
         },
       ],
     },
@@ -73,15 +81,23 @@ function Table({ params, setParams, fetchData }) {
       sx: {
         minWidth: 350,
       },
-      render: (val) => __renderValue(val.amount)
+      render: (val) => __renderValueDefaultZero(val.billAmount)
     },
     {
-      label:"Keterangan",
+      label:"Status",
       align:"left",
       sx: {
         minWidth: 150,
       },
-      render: (val) => __renderValue(val.description)
+      render: (val) => __renderValue(val.status)
+    },
+    {
+      label:"Catatan",
+      align:"left",
+      sx: {
+        minWidth: 150,
+      },
+      render: (val) => __renderValue(val.notes)
     },
     {
       label:"Aksi",
@@ -92,7 +108,7 @@ function Table({ params, setParams, fetchData }) {
       render: (val) => {
         return (
           <div className='flex gap-2 w-full justify-center'>
-            <IconButton aria-label="edit" className='bg-yellow-400! text-white! hover:bg-yellow-500!' onClick={() => { router.push(`/keuangan/edit/${val?.id}`) }}>
+            <IconButton aria-label="edit" className='bg-yellow-400! text-white! hover:bg-yellow-500!' onClick={() => { router.push(`/pam/biaya-rutinan/edit/${val?.id}`) }}>
               <EditIcon fontSize="small" />
             </IconButton>
             <IconButton aria-label="delete" className='bg-red-400! text-white! hover:bg-red-500!' onClick={() => { deleteModalRef.current.open(val?.id); }}>

@@ -1,10 +1,11 @@
 import React from 'react'
 import SelectField from '../fields/SelectField'
 
-function SelectTipeKeuangan({...props}) {
+function SelectPaymentStatus({...props}) {
   const options = [
-    { label: 'Pemasukan', value: 'income' },
-    { label: 'Pengeluaran', value: 'expense' },
+    { label: 'Paid', value: 'paid' },
+    { label: 'Half Paid', value: 'half_paid' },
+    { label: 'Unpaid', value: 'unpaid' },
   ]
 
   return (
@@ -17,4 +18,4 @@ function SelectTipeKeuangan({...props}) {
   )
 }
 
-export default SelectTipeKeuangan
+export default SelectPaymentStatus

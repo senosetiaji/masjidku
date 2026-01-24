@@ -58,3 +58,20 @@ model MasterDataPelanggan {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
+
+model PamRutin {
+  id            String   @id @default(uuid())
+  pelangganId   String
+  month         Int
+  year          Int
+  previous_used Int
+  current_used  Int
+  water_bill    Int
+  billAmount    Int
+  paidAmount    Int
+  paymentDate   DateTime?
+  status        String // paid | half_paid | unpaid
+  notes         String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}

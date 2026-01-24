@@ -11,6 +11,7 @@ import { setFilter, clearFilter } from '@/store/slices/filter.slice';
 import SelectTipeKeuangan from '../forms/SelectTipeKeuangan';
 import SelectBulan from '../forms/SelectBulan';
 import SelectYear from '../forms/SelectYear';
+import SelectPaymentStatus from '../forms/SelectPaymentStatus';
 
 function Filter({ filters, multipleFilters, onSubmit, filterState, requiredField = [], keyName = '', loading = false }) {
   const [className, setClassName] = React.useState('');
@@ -200,6 +201,20 @@ function Filter({ filters, multipleFilters, onSubmit, filterState, requiredField
               label={overrideLabel || 'Bulan'}
               placeholder="Pilih Bulan"
               name={name}
+              id={name}
+              size="small"
+              value={localFilterState?.[name]}
+              onChange={handleChange}
+            />
+          </FormControl>
+        );
+        case 'payment_status':
+        return (
+          <FormControl key={keyIdx}>
+            <SelectPaymentStatus
+              label={overrideLabel || 'Status Pembayaran'}
+              placeholder="Pilih Status Pembayaran"
+              name={name} 
               id={name}
               size="small"
               value={localFilterState?.[name]}
