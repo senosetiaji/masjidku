@@ -15,14 +15,14 @@ export default async function handler(req, res) {
 
   try {
     const { id: idParam } = req.query;
-    const id = Array.isArray(idParam) ? parseInt(idParam[0], 10) : parseInt(idParam, 10);
+    const id = Array.isArray(idParam) ? idParam[0] : idParam;
 
-    if (!Number.isInteger(id) || id <= 0) {
+    if (!id || typeof id !== "string" || id.trim().length === 0) {
       return res.status(400).json({ message: "invalid_id" });
     }
 
     const user = await prisma.user.findUnique({
-      where: { id },
+      where: { id: id.trim() },
       select: {
         id: true,
         name: true,

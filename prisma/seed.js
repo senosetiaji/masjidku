@@ -16,6 +16,7 @@ async function main() {
   } else {
     await prisma.user.create({
       data: {
+        id: "00000000-0000-0000-0000-000000000001",
         name: "Super Admin",
         phone: "08123456789",
         jabatan: "Administrator",

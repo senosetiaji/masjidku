@@ -85,7 +85,7 @@ function MasterDataIcon() {
 
 
 
-function SideNav() {
+function SideNav({ isToggled }) {
   const [openAlias, setOpenAlias] = React.useState(null);
   const router = useRouter();
   const isActive = (link) => {
@@ -131,7 +131,7 @@ function SideNav() {
     },
   ];
   return (
-    <div className="fixed w-56 h-[calc(100vh-4rem)] overflow-auto bg-white pt-4">
+    <div className={`${isToggled ? '-left-full' : 'left-0'} w-56 fixed top-16 bottom-0 transition-all overflow-auto bg-white pt-4 transition-width duration-300`}>
       <div className="p-2 grid grid-cols-1 gap-4">
         {menu.filter(item => item.show).map((item, index) => {
           const hasSub = item.subMenu && item.subMenu.length > 0;

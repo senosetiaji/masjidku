@@ -8,11 +8,16 @@ import ModalError from '../modals/ModalError';
 import ModalSuccess from '../modals/ModalSuccess';
 
 function RootLayout({ breadcrumbs, children }) {
+  const [isToggled, setIsToggled] = React.useState(false);
   const items = Array.isArray(breadcrumbs) ? breadcrumbs : [];
   
   const dispatch = useDispatch();
   const { currentUser } = useSelector((state) => state.user);
   
+  function toggleHandler() {
+    setIsToggled(!isToggled);
+  }
+
   React.useEffect(() => {
     if (!currentUser) {
       dispatch(getCurrentUser({params: {}}));
@@ -20,10 +25,10 @@ function RootLayout({ breadcrumbs, children }) {
   }, [currentUser]);
   return (
     <div>
-      <TopNav />
+      <TopNav toggleHandler={toggleHandler} isToggled={isToggled} />
       <div className="mt-16 flex">
-        <SideNav />
-        <div className="ml-56 p-12 pl-6 flex-1 bg-[#f0f4f8] min-h-[calc(100vh-4rem)]">
+        <SideNav isToggled={isToggled} />
+        <div className={`${isToggled ? 'ml-0' : 'ml-56'} p-12 pl-6 flex-1 bg-[#f0f4f8] min-h-[calc(100vh-4rem)]`}>
           <nav aria-label="Breadcrumb" className="mb-4 ml-4 text-sm text-gray-600">
             <ol className="flex items-center gap-2">
               <li>
