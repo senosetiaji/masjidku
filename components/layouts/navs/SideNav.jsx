@@ -60,12 +60,30 @@ function IconMeeting() {
 
 function IconAnalitik() {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-4">
       <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 6a7.5 7.5 0 1 0 7.5 7.5h-7.5V6Z" />
       <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 10.5H21A7.5 7.5 0 0 0 13.5 3v7.5Z" />
     </svg>
   )
 }
+
+function IconCalendar() {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-4">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5m-9-6h.008v.008H12v-.008ZM12 15h.008v.008H12V15Zm0 2.25h.008v.008H12v-.008ZM9.75 15h.008v.008H9.75V15Zm0 2.25h.008v.008H9.75v-.008ZM7.5 15h.008v.008H7.5V15Zm0 2.25h.008v.008H7.5v-.008Zm6.75-4.5h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V15Zm0 2.25h.008v.008h-.008v-.008Zm2.25-4.5h.008v.008H16.5v-.008Zm0 2.25h.008v.008H16.5V15Z" />
+    </svg>
+  )
+}
+
+function MasterDataIcon() {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-4">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M6.429 9.75 2.25 12l4.179 2.25m0-4.5 5.571 3 5.571-3m-11.142 0L2.25 7.5 12 2.25l9.75 5.25-4.179 2.25m0 0L21.75 12l-4.179 2.25m0 0 4.179 2.25L12 21.75 2.25 16.5l4.179-2.25m11.142 0-5.571 3-5.571-3" />
+    </svg>
+  )
+}
+
+
 
 function SideNav() {
   const [openAlias, setOpenAlias] = React.useState(null);
@@ -79,6 +97,11 @@ function SideNav() {
   };
   const menu = [
     { name: 'Dashboard', icon: <IconDashboard />, alias: 'dashboard', link: '/dashboard', show: true, subMenu: [] },
+    { name: 'Master Data', icon: <MasterDataIcon />, alias: 'master_data', link: '/master-data', show: true, 
+      subMenu: [
+        { name: 'Pelnggan PAM', alias: 'pelanggan_pam', link: '/master-data/pelanggan-pam', show: true },
+      ]
+    },
     { name: 'Takmeer', icon: <IconTakmeer />, alias: 'takmeer', link: '/takmeer', show: true, subMenu: [] },
     { name: 'Keuangan', icon: <IconMonetization />, alias: 'keuangan', link: '/keuangan', show: true, 
       subMenu: [
@@ -92,6 +115,13 @@ function SideNav() {
     },
     { name: 'Musyawarah', icon: <IconMeeting />, alias: 'musyawarah', link: '/musyawarah', show: true, subMenu: [] },
     { name: 'Analitik', icon: <IconAnalitik />, alias: 'analitik', link: '/analitik', show: true, subMenu: [] },
+    { name: 'PAM', icon: <IconCalendar />, alias: 'pam', link: '/pam', show: true, 
+      subMenu: [
+        { name: 'Pemasangan', alias: 'laporan_pemasangan', link: '/pam/laporan-pemasangan', show: true },
+        { name: 'Biaya Rutinan', alias: 'rutinan', link: '/pam/biaya-rutinan', show: true },
+        { name: 'Kas PAM', alias: 'kas_pam', link: '/pam/kas-pam', show: true },
+      ]
+    },
     { name: 'Settings', icon: <IconSettings />, alias: 'settings', link: '/settings', show: true, 
       subMenu: [
         { name: 'Role Access', alias: 'role_access', link: '/settings/role-access', show: true },
@@ -101,7 +131,7 @@ function SideNav() {
     },
   ];
   return (
-    <div className="w-56 h-[calc(100vh-4rem)] bg-white pt-4">
+    <div className="w-56 h-[calc(100vh-4rem)] overflow-auto bg-white pt-4">
       <div className="p-2 grid grid-cols-1 gap-4">
         {menu.filter(item => item.show).map((item, index) => {
           const hasSub = item.subMenu && item.subMenu.length > 0;

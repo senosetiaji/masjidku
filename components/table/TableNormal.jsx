@@ -195,7 +195,7 @@ function TableNormal(
       </div>
       {isLoading ? <SkeletonTable rows={10} /> : (
         <div className="">
-          <TableContainer component={Paper} sx={{ width: '100%', overflowX: 'auto' }}>
+          <TableContainer component={Paper} sx={{ width: '100%', overflow: 'auto' }}>
             <Table stickyHeader size="small" sx={{ tableLayout: 'fixed', width: '100%' }}>
               <TableHead className='bg-gray-100!'>
                 {headerRows.map((row, rowIdx) => (
