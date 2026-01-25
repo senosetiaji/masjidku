@@ -6,10 +6,10 @@ import IconButton from '@mui/material/IconButton'
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ModalConfirm from '@/components/modals/ModalConfirm';
-import { deleteUser } from '@/store/actions/user.action';
 import { useRouter } from 'next/router';
 import moment from 'moment';
 import { deleteData } from '@/store/actions/finance.action';
+import { deleteDataPamKas } from '@/store/actions/pam.action';
 
 function Table({ params, setParams, fetchData }) {
   const { finance, isLoading } = useSelector(state => state.pam);
@@ -82,7 +82,7 @@ function Table({ params, setParams, fetchData }) {
 
   async function handleDelete(id) {
     // dispatch(deleteUserAction(id, params));
-    const res = await dispatch(deleteData({ id: id, params: {} }))
+    const res = await dispatch(deleteDataPamKas({ id: id, params: {} }))
     fetchData();
   }
 

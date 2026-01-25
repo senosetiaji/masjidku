@@ -125,9 +125,9 @@ function Table({ params, setParams, fetchData }) {
             }) }}>
               <EditIcon fontSize="small" />
             </IconButton>
-            <IconButton aria-label="delete" className='bg-red-400! text-white! hover:bg-red-500!' onClick={() => { deleteModalRef.current.open(val?.id); }}>
+            {/* <IconButton aria-label="delete" className='bg-red-400! text-white! hover:bg-red-500!' onClick={() => { deleteModalRef.current.open(val?.id); }}>
               <DeleteIcon fontSize="small" />
-            </IconButton>
+            </IconButton> */}
           </div>
         )
       }
