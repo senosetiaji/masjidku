@@ -119,7 +119,7 @@ function SideNav({ isToggled }) {
       subMenu: [
         { name: 'Pemasangan', alias: 'laporan_pemasangan', link: '/pam/laporan-pemasangan', show: true },
         { name: 'Biaya Rutinan', alias: 'rutinan', link: '/pam/biaya-rutinan', show: true },
-        { name: 'Kas PAM', alias: 'kas_pam', link: '/pam/kas-pam', show: true },
+        { name: 'Kas PAM', alias: 'kas_pam', link: '/pam/kas', show: true },
       ]
     },
     { name: 'Settings', icon: <IconSettings />, alias: 'settings', link: '/settings', show: true, 

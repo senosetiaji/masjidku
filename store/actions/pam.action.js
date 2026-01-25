@@ -80,3 +80,61 @@ export const updateDataPamRutin = createAsyncThunk('pamRutinan/updateDataPamRuti
     return rejectWithValue(err?.response?.data)
   }
 })
+
+// pam kas actions
+export const getPamKas = createAsyncThunk('pamKas/getPamKas', async ({params}, { dispatch, rejectWithValue }) => {
+  try {
+    const response = await API.get('/masjidku/pam/finance/all', { params: params })
+    const data = await response.data
+    return data
+  } catch(err){
+    dispatch(errorHelper(err))
+    return rejectWithValue(err?.response?.data)
+  }
+})
+
+export const getDetailPamKas = createAsyncThunk('pamKas/getDetailPamKas', async ({id, params}, { dispatch, rejectWithValue }) => {
+  try {
+    const response = await API.get(`/masjidku/pam/finance/${id}/detail`, { params: params })
+    const data = await response.data
+    return data
+  } catch(err){
+    dispatch(errorHelper(err))
+    return rejectWithValue(err?.response?.data)
+  }
+})
+
+export const deleteDataPamKas = createAsyncThunk('pamKas/deleteDataPamKas', async ({id, params}, { dispatch, rejectWithValue }) => {
+  try {
+    const response = await API.delete(`/masjidku/pam/finance/${id}/delete`, { params: params })
+    const data = await response.data.data
+    return data
+  } catch(err){
+    dispatch(errorHelper(err))
+    return rejectWithValue(err?.response?.data)
+  }
+})
+
+export const createPamKas = createAsyncThunk('pamKas/createPamKas', async ({payload}, { dispatch, rejectWithValue }) => {
+  try {
+    const response = await API.post('/masjidku/pam/finance/create', payload)
+    const data = await response.data.data
+    dispatch(successHelper('Pam Kas created successfully', '/pam/kas'))
+    return data
+  } catch(err){
+    dispatch(errorHelper(err))
+    return rejectWithValue(err?.response?.data)
+  }
+})
+
+export const updateDataPamKas = createAsyncThunk('pamKas/updateDataPamKas', async ({id, payload}, { dispatch, rejectWithValue }) => {
+  try {
+    const response = await API.post(`/masjidku/pam/finance/${id}/update`, payload)
+    const data = await response.data.data
+    dispatch(successHelper('Pam Kas updated successfully', '/pam/kas'))
+    return data
+  } catch(err){
+    dispatch(errorHelper(err))
+    return rejectWithValue(err?.response?.data)
+  }
+})

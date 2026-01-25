@@ -1,5 +1,5 @@
 import { createSlice, current } from "@reduxjs/toolkit"
-import { createPamRutinan, getDetailPamRutin, getPamRutinan, getPamSummary, getPreviousUsed, updateDataPamRutin } from "../actions/pam.action"
+import { createPamKas, createPamRutinan, deleteDataPamKas, getDetailPamKas, getDetailPamRutin, getPamKas, getPamRutinan, getPamSummary, getPreviousUsed, updateDataPamKas, updateDataPamRutin } from "../actions/pam.action"
 
 export const initialState = {
 	data:[],
@@ -7,6 +7,11 @@ export const initialState = {
 	detailRutinan:null,
   summaryPam:{},
   previousUsed:null,
+  finance: {
+    data: [],
+    detail: null,
+    meta: {},
+  },
   meta: {
     total_row: 0,
     total_page: 0
@@ -98,6 +103,60 @@ const pamSlice = createSlice({
       state.isLoadingCreate = false;
     })
     .addCase(updateDataPamRutin.rejected, (state) => {
+      state.isLoadingCreate = false
+    })
+    // pam kas
+    
+    .addCase(getPamKas.pending, (state) => {
+      state.isLoading = true
+    })
+    .addCase(getPamKas.fulfilled, (state, actions) => {
+      state.isLoading = false;
+      state.finance.data = actions.payload.data;
+      state.finance.meta = actions.payload.meta;
+    })
+    .addCase(getPamKas.rejected, (state) => {
+      state.isLoading = false
+    })
+    
+    .addCase(getDetailPamKas.pending, (state) => {
+      state.isLoadingDetail = true
+    })
+    .addCase(getDetailPamKas.fulfilled, (state, actions) => {
+      state.isLoadingDetail = false;
+      state.finance.detail = actions.payload.data;
+    })
+    .addCase(getDetailPamKas.rejected, (state) => {
+      state.isLoadingDetail = false
+    })
+    
+    .addCase(deleteDataPamKas.pending, (state) => {
+      state.isLoadingDelete = true
+    })
+    .addCase(deleteDataPamKas.fulfilled, (state, actions) => {
+      state.isLoadingDelete = false;
+    })
+    .addCase(deleteDataPamKas.rejected, (state) => {
+      state.isLoadingDelete = false
+    })
+    
+    .addCase(createPamKas.pending, (state) => {
+      state.isLoadingCreate = true
+    })
+    .addCase(createPamKas.fulfilled, (state, actions) => {
+      state.isLoadingCreate = false;
+    })
+    .addCase(createPamKas.rejected, (state) => {
+      state.isLoadingCreate = false
+    })
+    
+    .addCase(updateDataPamKas.pending, (state) => {
+      state.isLoadingCreate = true
+    })
+    .addCase(updateDataPamKas.fulfilled, (state, actions) => {
+      state.isLoadingCreate = false;
+    })
+    .addCase(updateDataPamKas.rejected, (state) => {
       state.isLoadingCreate = false
     })
   }

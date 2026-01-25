@@ -24,6 +24,7 @@ model User {
   role     String // superadmin | staff | user
   keuangan Keuangan[]
   inventaris Inventaris[]
+  pamKas PamKas[]
 }
 
 model Keuangan {
@@ -74,4 +75,16 @@ model PamRutin {
   notes         String
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+}
+
+model PamKas {
+  id          String   @id @default(uuid())
+  date        DateTime
+  type        String // income | expense
+  amount      Int
+  description String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
 }
