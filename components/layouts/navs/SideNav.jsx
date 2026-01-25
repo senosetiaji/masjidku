@@ -131,7 +131,7 @@ function SideNav({ isToggled }) {
     },
   ];
   return (
-    <div className={`${isToggled ? '-left-full' : 'left-0'} w-56 fixed top-16 bottom-0 transition-all overflow-auto bg-white pt-4 transition-width duration-300`}>
+    <div className={`${isToggled ? '-left-full' : 'left-0'} w-56 fixed top-16 bottom-0 z-999 transition-all overflow-auto bg-white pt-4 transition-width duration-300`}>
       <div className="p-2 grid grid-cols-1 gap-4">
         {menu.filter(item => item.show).map((item, index) => {
           const hasSub = item.subMenu && item.subMenu.length > 0;

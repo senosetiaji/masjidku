@@ -1,10 +1,12 @@
 import { createSlice, current } from "@reduxjs/toolkit"
-import { getPamRutinan } from "../actions/pam.action"
+import { createPamRutinan, getDetailPamRutin, getPamRutinan, getPamSummary, getPreviousUsed, updateDataPamRutin } from "../actions/pam.action"
 
 export const initialState = {
 	data:[],
   rutinan:[],
-	detail:null,
+	detailRutinan:null,
+  summaryPam:{},
+  previousUsed:null,
   meta: {
     total_row: 0,
     total_page: 0
@@ -34,16 +36,40 @@ const pamSlice = createSlice({
       state.isLoading = false
     })
     
-    // .addCase(getDetail.pending, (state) => {
-    //   state.isLoadingDetail = true
-    // })
-    // .addCase(getDetail.fulfilled, (state, actions) => {
-    //   state.isLoadingDetail = false;
-    //   state.detail = actions.payload.data;
-    // })
-    // .addCase(getDetail.rejected, (state) => {
-    //   state.isLoadingDetail = false
-    // })
+    .addCase(getPreviousUsed.pending, (state) => {
+      state.isLoading = true
+    })
+    .addCase(getPreviousUsed.fulfilled, (state, actions) => {
+      state.isLoading = false;
+      state.previousUsed = actions.payload.data;
+      state.meta = actions.payload.meta;
+    })
+    .addCase(getPreviousUsed.rejected, (state) => {
+      state.isLoading = false
+    })
+    
+    .addCase(getPamSummary.pending, (state) => {
+      state.isLoading = true
+    })
+    .addCase(getPamSummary.fulfilled, (state, actions) => {
+      state.isLoading = false;
+      state.summaryPam = actions.payload.data;
+      state.meta = actions.payload.meta;
+    })
+    .addCase(getPamSummary.rejected, (state) => {
+      state.isLoading = false
+    })
+    
+    .addCase(getDetailPamRutin.pending, (state) => {
+      state.isLoadingDetail = true
+    })
+    .addCase(getDetailPamRutin.fulfilled, (state, actions) => {
+      state.isLoadingDetail = false;
+      state.detailRutinan = actions.payload.data;
+    })
+    .addCase(getDetailPamRutin.rejected, (state) => {
+      state.isLoadingDetail = false
+    })
     
     // .addCase(deleteData.pending, (state) => {
     //   state.isLoadingDelete = true
@@ -55,25 +81,25 @@ const pamSlice = createSlice({
     //   state.isLoadingDelete = false
     // })
     
-    // .addCase(createFinance.pending, (state) => {
-    //   state.isLoadingCreate = true
-    // })
-    // .addCase(createFinance.fulfilled, (state, actions) => {
-    //   state.isLoadingCreate = false;
-    // })
-    // .addCase(createFinance.rejected, (state) => {
-    //   state.isLoadingCreate = false
-    // })
+    .addCase(createPamRutinan.pending, (state) => {
+      state.isLoadingCreate = true
+    })
+    .addCase(createPamRutinan.fulfilled, (state, actions) => {
+      state.isLoadingCreate = false;
+    })
+    .addCase(createPamRutinan.rejected, (state) => {
+      state.isLoadingCreate = false
+    })
     
-    // .addCase(updateDataFinance.pending, (state) => {
-    //   state.isLoadingCreate = true
-    // })
-    // .addCase(updateDataFinance.fulfilled, (state, actions) => {
-    //   state.isLoadingCreate = false;
-    // })
-    // .addCase(updateDataFinance.rejected, (state) => {
-    //   state.isLoadingCreate = false
-    // })
+    .addCase(updateDataPamRutin.pending, (state) => {
+      state.isLoadingCreate = true
+    })
+    .addCase(updateDataPamRutin.fulfilled, (state, actions) => {
+      state.isLoadingCreate = false;
+    })
+    .addCase(updateDataPamRutin.rejected, (state) => {
+      state.isLoadingCreate = false
+    })
   }
 })
 

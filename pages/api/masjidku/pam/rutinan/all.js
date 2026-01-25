@@ -76,19 +76,36 @@ export default async function handler(req, res) {
 		const month = monthCandidate && monthCandidate >= 1 && monthCandidate <= 12 ? monthCandidate : null;
 		const year = parsePositiveInt(rawYear, null);
 
+
+		// Build search filters (notes, status, pelanggan name)
+		let pelangganIdsFromSearch = [];
+		if (search) {
+			const matchedPelanggan = await prisma.masterDataPelanggan.findMany({
+				where: {
+					// Rely on DB collation for case-insensitive contains
+					name: { contains: search },
+				},
+				select: { id: true },
+			});
+			pelangganIdsFromSearch = matchedPelanggan.map((p) => p.id);
+		}
+
+		const searchOR = search
+			? [
+				{ notes: { contains: search } },
+				{ status: { contains: search } },
+				...(pelangganIdsFromSearch.length
+					? [{ pelangganId: { in: pelangganIdsFromSearch } }]
+					: []),
+			]
+			: [];
+
 		const where = {
 			...(pelangganId ? { pelangganId } : {}),
 			...(status ? { status } : {}),
 			...(month ? { month } : {}),
 			...(year ? { year } : {}),
-			...(search
-				? {
-						OR: [
-							{ notes: { contains: search, mode: "insensitive" } },
-							{ status: { contains: search, mode: "insensitive" } },
-						],
-					}
-				: {}),
+			...(searchOR.length ? { OR: searchOR } : {}),
 		};
 
 		const total = await prisma.pamRutin.count({ where });

@@ -84,6 +84,14 @@ function Table({ params, setParams, fetchData }) {
       render: (val) => __renderValueDefaultZero(val.billAmount)
     },
     {
+      label:"Total Bayar (Rp)",
+      align:"left",
+      sx: {
+        minWidth: 350,
+      },
+      render: (val) => __renderValueDefaultZero(val.paidAmount)
+    },
+    {
       label:"Status",
       align:"left",
       sx: {
@@ -108,7 +116,13 @@ function Table({ params, setParams, fetchData }) {
       render: (val) => {
         return (
           <div className='flex gap-2 w-full justify-center'>
-            <IconButton aria-label="edit" className='bg-yellow-400! text-white! hover:bg-yellow-500!' onClick={() => { router.push(`/pam/biaya-rutinan/edit/${val?.id}`) }}>
+            <IconButton aria-label="edit" className='bg-yellow-400! text-white! hover:bg-yellow-500!' onClick={() => { router.push({
+              pathname: `/pam/biaya-rutinan/edit/${val?.id}`,
+              query: {
+                tahun: params.tahun,
+                bulan: params.bulan
+              }
+            }) }}>
               <EditIcon fontSize="small" />
             </IconButton>
             <IconButton aria-label="delete" className='bg-red-400! text-white! hover:bg-red-500!' onClick={() => { deleteModalRef.current.open(val?.id); }}>
@@ -132,6 +146,7 @@ function Table({ params, setParams, fetchData }) {
         columns={columns}
         data={data}
         totalData={meta?.total_row}
+        pageCount={meta?.total_page}
         page={params.page}
         params={params}
         setParams={setParams}

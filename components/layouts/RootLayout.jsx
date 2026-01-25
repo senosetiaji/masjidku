@@ -28,7 +28,7 @@ function RootLayout({ breadcrumbs, children }) {
       <TopNav toggleHandler={toggleHandler} isToggled={isToggled} />
       <div className="mt-16 flex">
         <SideNav isToggled={isToggled} />
-        <div className={`${isToggled ? 'ml-0' : 'ml-56'} p-12 pl-6 flex-1 bg-[#f0f4f8] min-h-[calc(100vh-4rem)]`}>
+        <div className={`${isToggled ? 'ml-0' : 'ml-56'} p-12 pl-6 pr-6 flex-1 bg-[#f0f4f8] min-h-[calc(100vh-4rem)]`}>
           <nav aria-label="Breadcrumb" className="mb-4 ml-4 text-sm text-gray-600">
             <ol className="flex items-center gap-2">
               <li>
