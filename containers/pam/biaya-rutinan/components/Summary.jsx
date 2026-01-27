@@ -12,11 +12,11 @@ function Summary({ params }) {
     dispatch(getPamSummary({ params : { tahun: params.tahun, bulan: params.bulan }}));
   }, [params])
   return (
-    <div className='p-4 mb-4 bg-white border border-gray-200 rounded-md text-lg font-semibold'>
+    <div className='p-4 my-12 bg-white border border-gray-200 rounded-md text-lg font-semibold'>
       <div className="flex justify-between">
         <div className="">
           <div className="">Summary PAM Biaya Rutinan</div>
-          <div className="text-[14px] font-light mt-2">
+          <div className="text-[13px] text-gray-400 font-light mt-2">
             Bulan {moment(params.bulan).format('MMMM')}, Tahun {params.tahun}
           </div>
         </div>

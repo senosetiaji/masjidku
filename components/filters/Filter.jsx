@@ -274,7 +274,7 @@ function Filter({ filters, multipleFilters, onSubmit, filterState, requiredField
             <Button
               label="Terapkan"
               icon={'/assets/icons/icon-util-filter.svg'}
-              className="border border-gray-300 min-w-full! bg-white text-gray-700 hover:bg-gray-100 hover:shadow-md"
+              className="border border-gray-300 w-full! bg-white text-gray-700 hover:bg-gray-100 hover:shadow-md"
               onClick={() => {
                 // Simpan ke Redux berdasarkan keyName (wajib isi keyName di halaman pemakai)
                 if (keyName) {

@@ -88,3 +88,13 @@ model PamKas {
   userId      String
   user        User     @relation(fields: [userId], references: [id])
 }
+
+model PamPemasangan {
+  id          String   @id @default(uuid())
+  pelangganId String
+  date        DateTime
+  amount      Int
+  notes       String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

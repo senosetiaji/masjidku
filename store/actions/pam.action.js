@@ -138,3 +138,62 @@ export const updateDataPamKas = createAsyncThunk('pamKas/updateDataPamKas', asyn
     return rejectWithValue(err?.response?.data)
   }
 })
+
+// kas pemasangan
+
+export const getPamPemasangan = createAsyncThunk('pamPemasangan/getPamPemasangan', async ({params}, { dispatch, rejectWithValue }) => {
+  try {
+    const response = await API.get('/masjidku/pam/pemasangan/all', { params: params })
+    const data = await response.data
+    return data
+  } catch(err){
+    dispatch(errorHelper(err))
+    return rejectWithValue(err?.response?.data)
+  }
+})
+
+export const getDetailPamPemasangan = createAsyncThunk('pamPemasangan/getDetailPamPemasangan', async ({id, params}, { dispatch, rejectWithValue }) => {
+  try {
+    const response = await API.get(`/masjidku/pam/pemasangan/${id}/detail`, { params: params })
+    const data = await response.data
+    return data
+  } catch(err){
+    dispatch(errorHelper(err))
+    return rejectWithValue(err?.response?.data)
+  }
+})
+
+export const deleteDataPamPemasangan = createAsyncThunk('pamPemasangan/deleteDataPamPemasangan', async ({id, params}, { dispatch, rejectWithValue }) => {
+  try {
+    const response = await API.delete(`/masjidku/pam/pemasangan/${id}/delete`, { params: params })
+    const data = await response.data.data
+    return data
+  } catch(err){
+    dispatch(errorHelper(err))
+    return rejectWithValue(err?.response?.data)
+  }
+})
+
+export const createPamPemasangan = createAsyncThunk('pamPemasangan/createPamPemasangan', async ({payload}, { dispatch, rejectWithValue }) => {
+  try {
+    const response = await API.post('/masjidku/pam/pemasangan/create', payload)
+    const data = await response.data.data
+    dispatch(successHelper('Pam Pemasangan created successfully', '/pam/pemasangan'))
+    return data
+  } catch(err){
+    dispatch(errorHelper(err))
+    return rejectWithValue(err?.response?.data)
+  }
+})
+
+export const updateDataPamPemasangan = createAsyncThunk('pamPemasangan/updateDataPamPemasangan', async ({id, payload}, { dispatch, rejectWithValue }) => {
+  try {
+    const response = await API.post(`/masjidku/pam/pemasangan/${id}/update`, payload)
+    const data = await response.data.data
+    dispatch(successHelper('Pam Pemasangan updated successfully', '/pam/pemasangan'))
+    return data
+  } catch(err){
+    dispatch(errorHelper(err))
+    return rejectWithValue(err?.response?.data)
+  }
+})

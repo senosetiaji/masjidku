@@ -117,7 +117,7 @@ function SideNav({ isToggled }) {
     { name: 'Analitik', icon: <IconAnalitik />, alias: 'analitik', link: '/analitik', show: true, subMenu: [] },
     { name: 'PAM', icon: <IconCalendar />, alias: 'pam', link: '/pam', show: true, 
       subMenu: [
-        { name: 'Pemasangan', alias: 'laporan_pemasangan', link: '/pam/laporan-pemasangan', show: true },
+        { name: 'Pemasangan', alias: 'laporan_pemasangan', link: '/pam/pemasangan', show: true },
         { name: 'Biaya Rutinan', alias: 'rutinan', link: '/pam/biaya-rutinan', show: true },
         { name: 'Kas PAM', alias: 'kas_pam', link: '/pam/kas', show: true },
       ]
