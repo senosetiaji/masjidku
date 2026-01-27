@@ -1,5 +1,5 @@
 import RootLayout from '@/components/layouts/RootLayout'
-import Form from '@/containers/pam/biaya-rutinan/form/Form'
+import Form from '@/containers/pam/pemasangan/form/Form'
 import { getDetailPamRutin } from '@/store/actions/pam.action';
 import { useRouter } from 'next/router';
 import React from 'react'

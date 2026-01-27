@@ -28,7 +28,7 @@ function Index() {
         <div className="title text-[20px] font-bold text-[#333]">Biaya Rutinan</div>
         <Button variant="contained" color="primary"
           onClick={() => router.push({
-            pathname: '/pam/biaya-rutinan/create',
+            pathname: '/pam/pemasangan/create',
           })}>
           Masukan Biaya Pemasangan
         </Button>

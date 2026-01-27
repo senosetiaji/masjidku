@@ -3,49 +3,56 @@ import { useRouter } from 'next/router';
 import React from 'react'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useFormik } from 'formik';
-import DatePickerField from '@/components/fields/DatePickerField';
-import NumericInputField from '@/components/fields/NumericInputField';
 import TextAreaField from '@/components/fields/TextAreaField';
 import SelectConsumer from '@/components/forms/SelectConsumer';
 import SelectPaymentStatus from '@/components/forms/SelectPaymentStatus';
-import { extractSelect } from '@/lib/helpers/helper';
-import { useDispatch, useSelector } from 'react-redux';
-import { createPamRutinan, getPreviousUsed, updateDataPamRutin } from '@/store/actions/pam.action';
+import { useSelector } from 'react-redux';
+import TextInputField from '@/components/fields/TextInputField';
+import DatePickerField from '@/components/fields/DatePickerField';
+
+export function iconCollapse() {
+  return(
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M3 4.5h14.25M3 9h9.75M3 13.5h5.25m5.25-.75L17.25 9m0 0L21 12.75M17.25 9v12" />
+    </svg>
+  )
+}
+
+export function iconExpand() {
+  return(
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M3 4.5h14.25M3 9h9.75M3 13.5h9.75m4.5-4.5v12m0 0-3.75-3.75M17.25 21 21 17.25" />
+    </svg>
+  )
+}
+
+export function iconDelete() {
+  return(
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
+      <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+    </svg>
+  )
+}
 
 function Form({ isEdit = false}) {
   const router = useRouter();
-  const dispatch = useDispatch();
-  const { tahun, bulan } = router.query;
-  const { detailRutinan, previousUsed, isLoadingCreate } = useSelector((state) => state.pam);
-
+  const { isLoadingCreate } = useSelector((state) => state.pam);
+  
   async function onSubmit(values) {
     // form submission logic here
-    const payoad = {
-      ...values,
-      pelangganId: extractSelect(values.pelangganId, 'value'),
-      status: extractSelect(values.status, 'value'),
-      tahun: tahun ? parseInt(tahun, 10) : null,
-      bulan: bulan ? parseInt(bulan, 10) : null,
-    };
-    if (isEdit) {
-      await dispatch(updateDataPamRutin({ id: detailRutinan.id, payload: payoad }));
-      return;
-    }
-    await dispatch(createPamRutinan({ payload: payoad }));
-    console.log('submit payload:', payoad);
-
   }
   const form = useFormik({
     initialValues: {
       // form initial values here
       pelangganId: '',
-      paymentDate: '',
-      previous_used: '',
-      current_used: '',
-      billAmount: '',
-      paidAmount: '',
-      status: '',
-      notes: '',
+      credit_payments: [
+        {
+          paymentDate: '',
+          paidAmount: '',
+          isCollapsed: false,
+          notes: '',
+        }
+      ]
     },
     onSubmit: async (values) => {
       // form submission logic here
@@ -55,43 +62,31 @@ function Form({ isEdit = false}) {
   React.useEffect(() => {
     form.resetForm();
   },[]);
-  React.useEffect(() => {
-    if(isEdit) return;
-    if (!form.values.pelangganId) return;
-    const newParams = {
-      pelangganId: extractSelect(form.values.pelangganId, 'value'),
-      tahun: tahun ? parseInt(tahun, 10) : null,
-      bulan: bulan ? parseInt(bulan, 10) : null,
+  function addCreditPayment() {
+    const newPayment = {
+      paymentDate: '',
+      paidAmount: '',
+      notes: '',
+      isCollapsed: false,
     };
-    dispatch(getPreviousUsed({ params: newParams }))
-  }, [form.values.pelangganId]);
-  React.useEffect(() => {
-    if(isEdit) return;
-    if(previousUsed) {
-      form.setFieldValue('previous_used', previousUsed.current_used || 0);
-    }
-  }, [previousUsed]);
-  React.useEffect(() => {
-    if (isEdit && detailRutinan) {
-      form.setValues({
-        pelangganId: detailRutinan.pelangganId ? { label: detailRutinan.pelangganName, value: detailRutinan.pelangganId } : '',
-        paymentDate: detailRutinan.paymentDate ? new Date(detailRutinan.paymentDate) : '',
-        previous_used: detailRutinan.previous_used || '',
-        current_used: detailRutinan.current_used || '',
-        billAmount: detailRutinan.billAmount || '',
-        paidAmount: detailRutinan.paidAmount || '',
-        status: detailRutinan.status ? { label: detailRutinan.status.charAt(0).toUpperCase() + detailRutinan.status.slice(1), value: detailRutinan.status } : '',
-        notes: detailRutinan.notes || '',
-      });
-    }
-  }, [isEdit, detailRutinan]);
-  function calculateBillAmount() {
-    const currentUsed = parseFloat(form.values.current_used) || 0;
-    const previousUsed = parseFloat(form.values.previous_used) || 0;
-    const usage = currentUsed - previousUsed;
-    const ratePerUnit = 4000;
-    const totalBill = usage * ratePerUnit;
-    form.setFieldValue('billAmount', totalBill >= 0 ? totalBill : 0);
+    form.setFieldValue('credit_payments', [...form.values.credit_payments, newPayment]);
+  }
+  function removeCreditPayment(index) {
+    const updatedPayments = form.values.credit_payments.filter((_, i) => i !== index);
+    form.setFieldValue('credit_payments', updatedPayments);
+  }
+  function toggleCollapsePayment(index) {
+    // toggle collapse logic here
+    const updatedPayments = form.values.credit_payments.map((payment, i) => {
+      if (i === index) {
+        return {
+          ...payment,
+          isCollapsed: !payment.isCollapsed,
+        };
+      }
+      return payment;
+    });
+    form.setFieldValue('credit_payments', updatedPayments);
   }
   return (
     <div>
@@ -117,97 +112,73 @@ function Form({ isEdit = false}) {
               disabled={isEdit}
             />
           </FormControl>
-          <div className="col-span-3 p-4 bg-[#f9f9f9] rounded-lg border border-dashed border-gray-200">
-            <div className="grid grid-cols-3 gap-4">
-              <FormControl fullWidth>
-                <NumericInputField
-                  label="Bulan Ini"
-                  name="current_used"
-                  value={form.values.current_used}
-                  onChange={(name,value) => form.setFieldValue('current_used', value)}
-                  size={'small'}
-                  placeholder={'Masukkan penggunaan bulan ini'}
-                />
-              </FormControl>
-              <FormControl fullWidth>
-                <NumericInputField
-                  label="Bulan Sebelumnya"
-                  name="previous_used"
-                  value={form.values.previous_used}
-                  onChange={(name,value) => form.setFieldValue('previous_used', value)}
-                  size={'small'}
-                  disabled
-                />
-              </FormControl>
-              <FormControl fullWidth>
-                <NumericInputField
-                  label="Total Biaya (Rp)"
-                  name="billAmount"
-                  value={form.values.billAmount}
-                  onChange={(name,value) => form.setFieldValue('billAmount', value)}
-                  size={'small'}
-                  disabled={true}
-                />
-              </FormControl>
-              <div className="col-span-3 flex justify-end mt-2">
-                <Button
-                  variant="contained"
-                  size="medium"
-                  onClick={calculateBillAmount}
-                  className='bg-yellow-500!'
-                >
-                  Hitung Total Biaya
-                </Button>
+          {/* Credit Payments Section */}
+          {form.values.credit_payments.map((payment, index) => (
+            <div className="p-6 rounded-xl border border-dashed border-gray-400 col-span-3" key={index}>
+              <div className="flex justify-between items-center mb-4">
+                <div className="">
+                  <div className="text-gray-500">Angsuran ke-{index + 1}</div>
+                  {payment.isCollapsed ? <div className="text-[12px] mt-2" >{form.values.credit_payments[index].paidAmount ? `Rp. ${form.values.credit_payments[index].paidAmount}` : 'Data Pembayaran Belum diisi.'}</div> : null}
+                </div>
+                <div className="flex gap-2">
+                  <IconButton aria-label="" className='text-red-500' disabled={form.values.credit_payments.length === 1} onClick={()=> removeCreditPayment(index)}>
+                    {iconDelete()}
+                  </IconButton>
+                  <IconButton aria-label="" onClick={()=> toggleCollapsePayment(index)}>
+                    {payment.isCollapsed ? iconExpand() : iconCollapse()}
+                  </IconButton>
+                </div>
               </div>
+              {
+                !payment.isCollapsed && (
+                  <div className="grid grid-cols-1 gap-4 pt-4 border-b border-gray-300">
+                    <FormControl fullWidth className=''>
+                      <DatePickerField
+                        label="Tanggal Pembayaran"
+                        name="paymentDate"
+                        value={form.values.credit_payments[index].paymentDate}
+                        onChange={(name,value) => form.setFieldValue(`credit_payments[${index}].paymentDate`, value)}
+                        size={'small'}
+                        row={3}
+                      />
+                    </FormControl>
+                    <FormControl fullWidth className=''>
+                      <TextInputField
+                        label="Jumlah Yang Dibayar"
+                        name="paidAmount"
+                        value={form.values.credit_payments[index].paidAmount}
+                        onChange={(name,value) => form.setFieldValue(`credit_payments[${index}].paidAmount`, value)}
+                        size={'small'}
+                        row={3}
+                      />
+                    </FormControl>
+                    <FormControl fullWidth className=''>
+                      <TextAreaField
+                        label="Keterangan"
+                        name="notes"
+                        value={form.values.credit_payments[index].notes}
+                        onChange={(name,value) => form.setFieldValue(`credit_payments[${index}].notes`, value)}
+                        size={'small'}
+                        row={3}
+                      />
+                    </FormControl>
+                  </div>
+                )
+              }
             </div>
+          ))}
+          <div className="w-full flex justify-center mt-4 col-span-3">
+            <Button
+              variant="outlined"
+              size="medium"
+              onClick={() => {
+                // add new installment logic here
+                addCreditPayment();
+              }}
+            >
+              Tambah Angsuran
+            </Button>
           </div>
-          <FormControl fullWidth className='col-span-3'>
-            <SelectPaymentStatus
-              label="Status Pembayaran"
-              name="status"
-              value={form.values.status}
-              onChange={(name,value) => form.setFieldValue('status', value)}
-              size={'small'}
-              placeholder={'Pilih Status Pembayaran'}
-            />
-          </FormControl>
-          {
-            (form.values.status?.value === 'paid' || form.values.status?.value === 'half_paid') && (
-            <FormControl fullWidth className='col-span-3'>
-              <DatePickerField
-                label="Tanggal"
-                name="paymentDate"
-                value={form.values.paymentDate}
-                size={'small'}
-                onChange={(name,value) => form.setFieldValue('paymentDate', value)}
-              />
-            </FormControl>
-            )
-          }
-          {
-            (form.values.status?.value === 'half_paid' || form.values.status?.value === 'paid') && (
-            <FormControl fullWidth className='col-span-3'>
-              <NumericInputField
-                label="Jumlah Bayar (Rp)"
-                name="paidAmount"
-                value={form.values.paidAmount}
-                onChange={(name,value) => form.setFieldValue('paidAmount', value)}
-                size={'small'}
-                placeholder={'Masukkan jumlah bayar'}
-              />
-            </FormControl>
-            )
-          }
-          <FormControl fullWidth className='col-span-3'>
-            <TextAreaField
-              label="Keterangan"
-              name="notes"
-              value={form.values.notes}
-              onChange={(name,value) => form.setFieldValue('notes', value)}
-              size={'small'}
-              row={3}
-            />
-          </FormControl>
         </div>
         <div className="flex justify-end pt-6">
           <Button
