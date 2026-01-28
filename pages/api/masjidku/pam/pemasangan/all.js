@@ -116,40 +116,77 @@ export default async function handler(req, res) {
 				: {}),
 		};
 
-		const total = await prisma.pamPemasangan.count({ where });
-
-		const rows = await prisma.pamPemasangan.findMany({
+		const distinctPelanggan = await prisma.pamPemasangan.findMany({
 			where,
-			orderBy: [{ date: "desc" }, { createdAt: "desc" }],
-			skip: (page - 1) * limit,
-			take: limit,
+			select: { pelangganId: true },
+			distinct: ["pelangganId"],
 		});
-
-		const pelangganIds = Array.from(new Set(rows.map((r) => r.pelangganId).filter(Boolean)));
-		const pelangganMap = pelangganIds.length
-			? (
-					await prisma.masterDataPelanggan.findMany({
-						where: { id: { in: pelangganIds } },
-						select: { id: true, name: true },
-					})
-				).reduce((acc, cur) => {
-					acc[cur.id] = cur.name;
-					return acc;
-				}, {})
-			: {};
-
-		const data = rows.map((item) => ({
-			id: item.id,
-			pelangganId: item.pelangganId,
-			pelangganName: pelangganMap[item.pelangganId] || null,
-			date: item.date.toISOString(),
-			amount: item.amount,
-			notes: item.notes,
-			createdAt: item.createdAt.toISOString(),
-			updatedAt: item.updatedAt.toISOString(),
-		}));
-
+		const total = distinctPelanggan.length;
 		const totalPage = total === 0 ? 0 : Math.ceil(total / limit);
+		const offset = (page - 1) * limit;
+
+		let groupedPage = [];
+		if (total) {
+			groupedPage = await prisma.pamPemasangan.groupBy({
+				by: ["pelangganId"],
+				where,
+				_max: { createdAt: true, updatedAt: true, date: true },
+				orderBy: [
+					{ _max: { date: "desc" } },
+					{ pelangganId: "asc" },
+				],
+				skip: offset,
+				take: limit,
+			});
+		}
+
+		const pagePelangganIds = groupedPage.map((group) => group.pelangganId).filter(Boolean);
+
+		let pelangganMap = {};
+		if (pagePelangganIds.length) {
+			const pelangganList = await prisma.masterDataPelanggan.findMany({
+				where: { id: { in: pagePelangganIds } },
+				select: { id: true, name: true, installationBill: true },
+			});
+			pelangganMap = pelangganList.reduce((acc, cur) => {
+				acc[cur.id] = cur;
+				return acc;
+			}, {});
+		}
+
+		let paymentsMap = {};
+		if (pagePelangganIds.length) {
+			const paymentsWhere = { ...where, pelangganId: { in: pagePelangganIds } };
+			const paymentsRows = await prisma.pamPemasangan.findMany({
+				where: paymentsWhere,
+				orderBy: [{ date: "asc" }, { createdAt: "asc" }],
+			});
+			paymentsMap = paymentsRows.reduce((acc, payment) => {
+				if (!acc[payment.pelangganId]) acc[payment.pelangganId] = [];
+				acc[payment.pelangganId].push(payment);
+				return acc;
+			}, {});
+		}
+
+		const data = groupedPage.map((group) => {
+			const pelangganData = pelangganMap[group.pelangganId] || {};
+			const payments = paymentsMap[group.pelangganId] || [];
+			const formattedPayments = payments.map((payment, index) => ({
+				creditIndex: `Pembayaran ke - ${index + 1}`,
+				amount: payment.amount,
+			}));
+			const totalPaid = payments.reduce((sum, payment) => sum + payment.amount, 0);
+			const installationBill = pelangganData.installationBill ?? 0;
+			return {
+				id: group.pelangganId,
+				pelangganName: pelangganData.name ?? null,
+				payments: formattedPayments,
+        installationBill: installationBill,
+				billsToPay: installationBill - totalPaid,
+				createdAt: (group._max?.createdAt || new Date()).toISOString(),
+				updateAt: (group._max?.updatedAt || group._max?.createdAt || new Date()).toISOString(),
+			};
+		});
 
 		return res.status(200).json({
 			status: 200,

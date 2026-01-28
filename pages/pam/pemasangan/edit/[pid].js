@@ -1,6 +1,6 @@
 import RootLayout from '@/components/layouts/RootLayout'
 import Form from '@/containers/pam/pemasangan/form/Form'
-import { getDetailPamRutin } from '@/store/actions/pam.action';
+import { getDetailPamPemasangan, getDetailPamRutin } from '@/store/actions/pam.action';
 import { useRouter } from 'next/router';
 import React from 'react'
 import { useDispatch } from 'react-redux';
@@ -17,7 +17,7 @@ function Index() {
 
   React.useEffect(() => {
     if (pid) {
-      dispatch(getDetailPamRutin({ id: pid }) );
+      dispatch(getDetailPamPemasangan({ id: pid }) );
     }
   }, [pid]);  
   return (

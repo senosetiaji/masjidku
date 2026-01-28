@@ -56,6 +56,7 @@ model MasterDataPelanggan {
   name        String
   address     String
   phone       String
+  installationBill Int
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }

@@ -5,10 +5,12 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useFormik } from 'formik';
 import TextAreaField from '@/components/fields/TextAreaField';
 import SelectConsumer from '@/components/forms/SelectConsumer';
-import SelectPaymentStatus from '@/components/forms/SelectPaymentStatus';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import TextInputField from '@/components/fields/TextInputField';
 import DatePickerField from '@/components/fields/DatePickerField';
+import { createPamPemasangan, updateDataPamPemasangan } from '@/store/actions/pam.action';
+import { extractSelect } from '@/lib/helpers/helper';
+import NumericInputField from '@/components/fields/NumericInputField';
 
 export function iconCollapse() {
   return(
@@ -36,10 +38,32 @@ export function iconDelete() {
 
 function Form({ isEdit = false}) {
   const router = useRouter();
-  const { isLoadingCreate } = useSelector((state) => state.pam);
+  const { isLoadingCreate, installation } = useSelector((state) => state.pam);
+  const { detail: detailPemasangan } = installation;
+  const { pelanggan: dataPelanggan } = useSelector(state => state.master);
+  const [totalInstallationBill, setTotalInstallationBill] = React.useState(0);
+  
+  const dispatch = useDispatch();
   
   async function onSubmit(values) {
+    const payload = {
+      ...values,
+      pelangganId: extractSelect(values.pelangganId, 'value'),
+    }
+
+    console.log('Submitting payload:', payload);
     // form submission logic here
+    if (isEdit) {
+      const { pid } = router.query;
+      await dispatch(updateDataPamPemasangan({
+        id: pid,
+        payload: payload
+      }));
+      return;
+    }
+    dispatch(createPamPemasangan({
+      payload: payload
+    }));
   }
   const form = useFormik({
     initialValues: {
@@ -88,6 +112,35 @@ function Form({ isEdit = false}) {
     });
     form.setFieldValue('credit_payments', updatedPayments);
   }
+  React.useEffect(() => {
+    if(!form.values.pelangganId || dataPelanggan.length === 0) return;
+    const selectedPelanggan = dataPelanggan.find(item => item.id === extractSelect(form.values.pelangganId, 'value'));
+    setTotalInstallationBill(selectedPelanggan ? selectedPelanggan.installationBill : 0);
+  }, [form.values.pelangganId, dataPelanggan]);
+  React.useEffect(() => {
+    if (isEdit && detailPemasangan) {
+      const formattedPayments = detailPemasangan.payments.map(payment => ({
+        paymentDate: payment.date,
+        paidAmount: payment.amount,
+        notes: payment.notes || '',
+        isCollapsed: false,
+      }));
+      form.setValues({
+        pelangganId: {
+          label: detailPemasangan.pelangganName,
+          value: detailPemasangan.pelangganId,
+        },
+        credit_payments: formattedPayments.length > 0 ? formattedPayments : [
+          {
+            paymentDate: '',
+            paidAmount: '',
+            isCollapsed: false,
+            notes: '',
+          }
+        ],
+      });
+    }
+  }, [isEdit, detailPemasangan]);
   return (
     <div>
       <div className="flex items-center mb-6 gap-4">
@@ -112,6 +165,9 @@ function Form({ isEdit = false}) {
               disabled={isEdit}
             />
           </FormControl>
+          <div className="col-span-3">
+            <div className='text-[13px] text-gray-400'>Total Biaya Pemasangan: Rp. {isEdit ? detailPemasangan.installationBill : totalInstallationBill}</div>
+          </div>
           {/* Credit Payments Section */}
           {form.values.credit_payments.map((payment, index) => (
             <div className="p-6 rounded-xl border border-dashed border-gray-400 col-span-3" key={index}>
@@ -143,7 +199,7 @@ function Form({ isEdit = false}) {
                       />
                     </FormControl>
                     <FormControl fullWidth className=''>
-                      <TextInputField
+                      <NumericInputField
                         label="Jumlah Yang Dibayar"
                         name="paidAmount"
                         value={form.values.credit_payments[index].paidAmount}

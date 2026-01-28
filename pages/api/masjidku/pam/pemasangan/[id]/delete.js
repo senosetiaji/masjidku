@@ -48,27 +48,40 @@ export default async function handler(req, res) {
     }
 
     const { id: idParam } = req.query;
-    const id = Array.isArray(idParam) ? idParam[0] : idParam;
-    if (!id || typeof id !== "string" || id.trim().length === 0) {
+    const pelangganIdParam = Array.isArray(idParam) ? idParam[0] : idParam;
+    if (!pelangganIdParam || typeof pelangganIdParam !== "string" || pelangganIdParam.trim().length === 0) {
       return res.status(400).json({ message: "invalid_id" });
     }
+    const pelangganId = pelangganIdParam.trim();
 
-    const existing = await prisma.pamPemasangan.findUnique({
-      where: { id: id.trim() },
+    const pelanggan = await prisma.masterDataPelanggan.findUnique({
+      where: { id: pelangganId },
+      select: { id: true, name: true },
+    });
+    if (!pelanggan) {
+      return res.status(404).json({ message: "pelanggan_not_found" });
+    }
+
+    const existingPayments = await prisma.pamPemasangan.findMany({
+      where: { pelangganId },
       select: { id: true },
     });
-    if (!existing) {
+    if (!existingPayments.length) {
       return res.status(404).json({ message: "pam_pemasangan_not_found" });
     }
 
-    await prisma.pamPemasangan.delete({
-      where: { id: id.trim() },
+    await prisma.pamPemasangan.deleteMany({
+      where: { pelangganId },
     });
 
     return res.status(200).json({
       status: 200,
       message: "pam_pemasangan_deleted",
-      data: { id: id.trim() },
+      data: {
+        pelangganId,
+        pelangganName: pelanggan.name ?? null,
+        deletedPayments: existingPayments.length,
+      },
     });
   } catch (error) {
     console.error("DELETE PAM PEMASANGAN ERROR:", error);

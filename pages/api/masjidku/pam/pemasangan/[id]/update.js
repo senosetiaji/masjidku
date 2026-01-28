@@ -31,11 +31,10 @@ const toIntOrNull = (val) => {
   return Number.isFinite(n) ? n : null;
 };
 
-const parseDateOrNull = (val) => {
-  if (val === undefined) return undefined; // allow skip
+const parsePaymentDate = (val) => {
   if (!val) return null;
   const d = new Date(val);
-  return isNaN(d.getTime()) ? null : d;
+  return Number.isNaN(d.getTime()) ? null : d;
 };
 
 export default async function handler(req, res) {
@@ -61,63 +60,112 @@ export default async function handler(req, res) {
     }
 
     const { id: idParam } = req.query;
-    const id = Array.isArray(idParam) ? idParam[0] : idParam;
-    if (!id || typeof id !== "string" || id.trim().length === 0) {
+    const pelangganIdParam = Array.isArray(idParam) ? idParam[0] : idParam;
+    if (!pelangganIdParam || typeof pelangganIdParam !== "string" || pelangganIdParam.trim().length === 0) {
       return res.status(400).json({ message: "invalid_id" });
     }
+    const pelangganId = pelangganIdParam.trim();
 
-    const existing = await prisma.pamPemasangan.findUnique({
-      where: { id: id.trim() },
+    const pelanggan = await prisma.masterDataPelanggan.findUnique({
+      where: { id: pelangganId },
+      select: { id: true, name: true, installationBill: true },
     });
-    if (!existing) {
+    if (!pelanggan) {
+      return res.status(404).json({ message: "pelanggan_not_found" });
+    }
+
+    const existingPayments = await prisma.pamPemasangan.findMany({
+      where: { pelangganId },
+      select: { id: true },
+    });
+    if (!existingPayments.length) {
       return res.status(404).json({ message: "pam_pemasangan_not_found" });
     }
 
-    const { pelangganId, date, amount, notes } = req.body || {};
-
-    const amountVal = amount === undefined ? undefined : toIntOrNull(amount);
-    if (amountVal !== undefined && (amountVal === null || amountVal < 0)) {
-      return res.status(400).json({ message: "invalid_amount" });
+    const { pelangganId: bodyPelangganId, credit_payments } = req.body || {};
+    if (bodyPelangganId) {
+      const normalizedBodyId = typeof bodyPelangganId === "string" ? bodyPelangganId.trim() : String(bodyPelangganId);
+      if (normalizedBodyId && normalizedBodyId !== pelangganId) {
+        return res.status(400).json({ message: "pelanggan_id_mismatch" });
+      }
     }
 
-    const dateVal = parseDateOrNull(date);
-    if (dateVal === null) {
-      // explicit invalid date string
-      return res.status(400).json({ message: "invalid_date" });
+    const paymentsSource = Array.isArray(credit_payments)
+      ? credit_payments
+      : Array.isArray(req.body)
+        ? req.body
+        : [];
+
+    if (!paymentsSource.length) {
+      return res.status(400).json({ message: "invalid_credit_payments" });
     }
 
-    const data = {};
-    if (pelangganId) data.pelangganId = String(pelangganId);
-    if (amountVal !== undefined) data.amount = amountVal;
-    if (dateVal !== undefined) data.date = dateVal; // can be null or Date
-    if (typeof notes === "string") data.notes = notes;
+    const sanitizedPayments = [];
+    for (let idx = 0; idx < paymentsSource.length; idx += 1) {
+      const entry = paymentsSource[idx] ?? {};
+      const dateVal = parsePaymentDate(entry.paymentDate ?? entry.date);
+      if (!dateVal) {
+        return res.status(400).json({ message: "invalid_paymentDate", index: idx });
+      }
 
-    const updated = await prisma.pamPemasangan.update({
-      where: { id: id.trim() },
-      data,
+      const amountVal = toIntOrNull(entry.paidAmount ?? entry.amount);
+      if (amountVal === null || amountVal < 0) {
+        return res.status(400).json({ message: "invalid_paidAmount", index: idx });
+      }
+
+      const notesVal = typeof entry.notes === "string" ? entry.notes : "";
+      sanitizedPayments.push({ date: dateVal, amount: amountVal, notes: notesVal });
+    }
+
+    const seenDates = new Set();
+    for (let idx = 0; idx < sanitizedPayments.length; idx += 1) {
+      const key = sanitizedPayments[idx].date.getTime();
+      if (seenDates.has(key)) {
+        return res.status(400).json({ message: "duplicate_payment_date", index: idx });
+      }
+      seenDates.add(key);
+    }
+
+    const updatedRecords = await prisma.$transaction(async (tx) => {
+      await tx.pamPemasangan.deleteMany({ where: { pelangganId } });
+      const created = await Promise.all(
+        sanitizedPayments.map((payment) =>
+          tx.pamPemasangan.create({
+            data: {
+              pelangganId,
+              date: payment.date,
+              amount: payment.amount,
+              notes: payment.notes,
+            },
+          })
+        )
+      );
+      return created;
     });
 
-    let pelangganName = null;
-    if (updated.pelangganId) {
-      const pelanggan = await prisma.masterDataPelanggan.findUnique({
-        where: { id: updated.pelangganId },
-        select: { name: true },
-      });
-      pelangganName = pelanggan?.name ?? null;
-    }
+    const totalPaid = updatedRecords.reduce((sum, record) => sum + record.amount, 0);
+    const installationBill = pelanggan.installationBill ?? 0;
+    const responsePayload = updatedRecords.map((record) => ({
+      id: record.id,
+      pelangganId: record.pelangganId,
+      pelangganName: pelanggan.name ?? null,
+      date: record.date.toISOString(),
+      amount: record.amount,
+      notes: record.notes,
+      createdAt: record.createdAt.toISOString(),
+      updatedAt: record.updatedAt.toISOString(),
+    }));
 
     return res.status(200).json({
       status: 200,
       message: "pam_pemasangan_updated",
-      data: {
-        id: updated.id,
-        pelangganId: updated.pelangganId,
-        pelangganName,
-        date: updated.date.toISOString(),
-        amount: updated.amount,
-        notes: updated.notes,
-        createdAt: updated.createdAt.toISOString(),
-        updatedAt: updated.updatedAt.toISOString(),
+      data: responsePayload,
+      meta: {
+        pelangganId,
+        pelangganName: pelanggan.name ?? null,
+        installationBill,
+        totalPaid,
+        billsToPay: installationBill - totalPaid,
       },
     });
   } catch (error) {

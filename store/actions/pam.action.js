@@ -165,7 +165,7 @@ export const getDetailPamPemasangan = createAsyncThunk('pamPemasangan/getDetailP
 
 export const deleteDataPamPemasangan = createAsyncThunk('pamPemasangan/deleteDataPamPemasangan', async ({id, params}, { dispatch, rejectWithValue }) => {
   try {
-    const response = await API.delete(`/masjidku/pam/pemasangan/${id}/delete`, { params: params })
+    const response = await API.post(`/masjidku/pam/pemasangan/${id}/delete`, { params: params })
     const data = await response.data.data
     return data
   } catch(err){

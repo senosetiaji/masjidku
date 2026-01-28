@@ -53,35 +53,43 @@ export default async function handler(req, res) {
       return res.status(400).json({ message: "invalid_id" });
     }
 
-    const pemasangan = await prisma.pamPemasangan.findUnique({
-      where: { id: id.trim() },
+    const pemasanganRecords = await prisma.pamPemasangan.findMany({
+      where: { pelangganId: id.trim() },
+      orderBy: [{ date: "asc" }, { createdAt: "asc" }],
     });
 
-    if (!pemasangan) {
+    if (!pemasanganRecords.length) {
       return res.status(404).json({ message: "pam_pemasangan_not_found" });
     }
 
-    let pelangganName = null;
-    if (pemasangan.pelangganId) {
-      const pelanggan = await prisma.masterDataPelanggan.findUnique({
-        where: { id: pemasangan.pelangganId },
-        select: { name: true },
-      });
-      pelangganName = pelanggan?.name ?? null;
-    }
+    const pelanggan = await prisma.masterDataPelanggan.findUnique({
+      where: { id: id.trim() },
+      select: { name: true, installationBill: true },
+    });
+
+    const payments = pemasanganRecords.map((record, index) => ({
+      creditIndex: `Pembayaran ke - ${index + 1}`,
+      date: record.date.toISOString(),
+      notes: record.notes,
+      amount: record.amount,
+    }));
+
+    const totalPaid = pemasanganRecords.reduce((sum, record) => sum + record.amount, 0);
+    const installationBill = pelanggan?.installationBill ?? 0;
+    const createdAtRef = pemasanganRecords[0]?.createdAt ?? new Date();
+    const updatedAtRef = pemasanganRecords[pemasanganRecords.length - 1]?.updatedAt ?? createdAtRef;
 
     return res.status(200).json({
       status: 200,
       message: "pam_pemasangan_detail",
       data: {
-        id: pemasangan.id,
-        pelangganId: pemasangan.pelangganId,
-        pelangganName,
-        date: pemasangan.date.toISOString(),
-        amount: pemasangan.amount,
-        notes: pemasangan.notes,
-        createdAt: pemasangan.createdAt.toISOString(),
-        updatedAt: pemasangan.updatedAt.toISOString(),
+        id: id.trim(),
+        pelangganName: pelanggan?.name ?? null,
+        payments,
+        billsToPay: installationBill - totalPaid,
+        installationBill: installationBill,
+        createdAt: createdAtRef.toISOString(),
+        updateAt: updatedAtRef.toISOString(),
       },
     });
   } catch (error) {

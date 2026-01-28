@@ -60,64 +60,109 @@ export default async function handler(req, res) {
 			return res.status(401).json({ message: "invalid_session_user" });
 		}
 
-		// Extract body
-		const { pelangganId, date, amount, notes } = req.body || {};
+		// Extract body and normalize payload shape (supports object or array body)
+		const { pelangganId: rawPelangganId, credit_payments } = req.body || {};
+		const pelangganId = typeof rawPelangganId === "string" ? rawPelangganId.trim() : "";
+		const paymentsSource = Array.isArray(credit_payments)
+			? credit_payments
+			: Array.isArray(req.body)
+				? req.body
+				: [];
 
-		// Basic validation
-		if (!pelangganId || typeof pelangganId !== "string" || pelangganId.trim().length === 0) {
+		if (!pelangganId) {
 			return res.status(400).json({ message: "invalid_pelangganId" });
 		}
 
-		const dateVal = parseDateOrNull(date);
-		if (!dateVal) {
-			return res.status(400).json({ message: "invalid_date" });
+		if (!paymentsSource.length) {
+			return res.status(400).json({ message: "invalid_credit_payments" });
 		}
 
-		const amountVal = toIntOrNull(amount);
-		if (amountVal === null || amountVal < 0) {
-			return res.status(400).json({ message: "invalid_amount" });
+		const sanitizedPayments = [];
+		for (let idx = 0; idx < paymentsSource.length; idx += 1) {
+			const entry = paymentsSource[idx] ?? {};
+			const dateVal = parseDateOrNull(entry.paymentDate ?? entry.date);
+			if (!dateVal) {
+				return res.status(400).json({ message: "invalid_paymentDate", index: idx });
+			}
+
+			const amountVal = toIntOrNull(entry.paidAmount ?? entry.amount);
+			if (amountVal === null || amountVal < 0) {
+				return res.status(400).json({ message: "invalid_paidAmount", index: idx });
+			}
+
+			const notesVal = typeof entry.notes === "string" ? entry.notes : "";
+			sanitizedPayments.push({ date: dateVal, amount: amountVal, notes: notesVal });
 		}
 
-		// Optional: prevent exact duplicate (same pelangganId and identical date timestamp)
-		const existing = await prisma.pamPemasangan.findFirst({
-			where: { pelangganId: pelangganId.trim(), date: dateVal },
+		const seenDates = new Set();
+		for (let idx = 0; idx < sanitizedPayments.length; idx += 1) {
+			const key = sanitizedPayments[idx].date.getTime();
+			if (seenDates.has(key)) {
+				return res.status(400).json({ message: "duplicate_payment_date", index: idx });
+			}
+			seenDates.add(key);
+		}
+
+		const existingCustomer = await prisma.pamPemasangan.findFirst({
+			where: { pelangganId },
 			select: { id: true },
 		});
-		if (existing) {
-			return res.status(400).json({ message: "pemasangan_already_exist" });
+		if (existingCustomer) {
+			return res.status(400).json({ message: "installation_customer_already_exist" });
 		}
 
-		const created = await prisma.pamPemasangan.create({
-			data: {
-				pelangganId: pelangganId.trim(),
-				date: dateVal,
-				amount: amountVal,
-				notes: typeof notes === "string" ? notes : "",
+		const targetDates = sanitizedPayments.map((payment) => payment.date);
+		const existingEntries = await prisma.pamPemasangan.findMany({
+			where: {
+				pelangganId,
+				date: { in: targetDates },
 			},
+			select: { id: true, date: true },
 		});
+		if (existingEntries.length) {
+			return res.status(400).json({
+				message: "pemasangan_already_exist",
+				dates: existingEntries.map((entry) => entry.date.toISOString()),
+			});
+		}
+
+		const createdRecords = await prisma.$transaction(
+			sanitizedPayments.map((payment) =>
+				prisma.pamPemasangan.create({
+					data: {
+						pelangganId,
+						date: payment.date,
+						amount: payment.amount,
+						notes: payment.notes,
+					},
+				})
+			)
+		);
 
 		let pelangganName = null;
-		if (created.pelangganId) {
+		if (pelangganId) {
 			const pelanggan = await prisma.masterDataPelanggan.findUnique({
-				where: { id: created.pelangganId },
+				where: { id: pelangganId },
 				select: { name: true },
 			});
 			pelangganName = pelanggan?.name ?? null;
 		}
 
+		const responsePayload = createdRecords.map((record) => ({
+			id: record.id,
+			pelangganId: record.pelangganId,
+			pelangganName,
+			date: record.date.toISOString(),
+			amount: record.amount,
+			notes: record.notes,
+			createdAt: record.createdAt.toISOString(),
+			updatedAt: record.updatedAt.toISOString(),
+		}));
+
 		return res.status(200).json({
 			status: 200,
 			message: "pam_pemasangan_created",
-			data: {
-				id: created.id,
-				pelangganId: created.pelangganId,
-				pelangganName,
-				date: created.date.toISOString(),
-				amount: created.amount,
-				notes: created.notes,
-				createdAt: created.createdAt.toISOString(),
-				updatedAt: created.updatedAt.toISOString(),
-			},
+			data: responsePayload,
 		});
 	} catch (error) {
 		console.error("CREATE PAM PEMASANGAN ERROR:", error);

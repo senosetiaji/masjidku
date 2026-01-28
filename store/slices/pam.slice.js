@@ -12,6 +12,11 @@ export const initialState = {
     detail: null,
     meta: {},
   },
+  installation: {
+    data: [],
+    detail: null,
+    meta: {},
+  },
   meta: {
     total_row: 0,
     total_page: 0
@@ -166,8 +171,8 @@ const pamSlice = createSlice({
     })
     .addCase(getPamPemasangan.fulfilled, (state, actions) => {
       state.isLoading = false;
-      state.finance.data = actions.payload.data;
-      state.finance.meta = actions.payload.meta;
+      state.installation.data = actions.payload.data;
+      state.installation.meta = actions.payload.meta;
     })
     .addCase(getPamPemasangan.rejected, (state) => {
       state.isLoading = false
@@ -178,7 +183,7 @@ const pamSlice = createSlice({
     })
     .addCase(getDetailPamPemasangan.fulfilled, (state, actions) => {
       state.isLoadingDetail = false;
-      state.finance.detail = actions.payload.data;
+      state.installation.detail = actions.payload.data;
     })
     .addCase(getDetailPamPemasangan.rejected, (state) => {
       state.isLoadingDetail = false
