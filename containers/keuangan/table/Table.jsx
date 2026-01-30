@@ -1,12 +1,11 @@
 import TableNormal from '@/components/table/TableNormal';
-import { __renderValue, __renderValueDefaultZero } from '@/lib/helpers/helper';
+import { __renderValue, __renderValueDefaultZero, formatRupiah } from '@/lib/helpers/helper';
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import IconButton from '@mui/material/IconButton'
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ModalConfirm from '@/components/modals/ModalConfirm';
-import { deleteUser } from '@/store/actions/user.action';
 import { useRouter } from 'next/router';
 import moment from 'moment';
 import { deleteData } from '@/store/actions/finance.action';
@@ -40,7 +39,7 @@ function Table({ params, setParams, fetchData }) {
       sx: {
         minWidth: 350,
       },
-      render: (val) => __renderValue(val.amount)
+      render: (val) => formatRupiah(val.amount, { zeroAsDash: true })
     },
     {
       label:"Tipe",
@@ -57,6 +56,15 @@ function Table({ params, setParams, fetchData }) {
         minWidth: 350,
       },
       render: (val) => __renderValue(val.description)
+    },
+    {
+      label:"Saldo Saat Ini",
+      align:"left",
+      sx: {
+        minWidth: 350,
+      },
+      hide: params?.bulan,
+      render: (val) => formatRupiah(val?.saldo, { zeroAsDash: true })
     },
     {
       label:"Aksi",

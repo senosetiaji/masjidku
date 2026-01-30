@@ -58,11 +58,33 @@ export default async function handler(req, res) {
 			return Number.isFinite(n) && n > 0 ? n : fallback;
 		};
 
-		const page = parsePositiveInt(req.query.page, 1);
-		const limit = Math.min(parsePositiveInt(req.query.limit, DEFAULT_LIMIT), MAX_LIMIT);
-		const search = (req.query.search || "").toString().trim();
+		const normalizeQueryValue = (val) => {
+			if (Array.isArray(val)) return val[0];
+			return val;
+		};
 
-		const where = {
+		const page = parsePositiveInt(normalizeQueryValue(req.query.page), 1);
+		const limit = Math.min(parsePositiveInt(normalizeQueryValue(req.query.limit), DEFAULT_LIMIT), MAX_LIMIT);
+		const search = (normalizeQueryValue(req.query.search) || "").toString().trim();
+		const monthCandidate = parsePositiveInt(normalizeQueryValue(req.query.month ?? req.query.bulan), null);
+		const yearCandidate = parsePositiveInt(normalizeQueryValue(req.query.year ?? req.query.tahun), null);
+		const typeCandidate = (normalizeQueryValue(req.query.tipe_transaksi ?? req.query.type) || "").toString().trim().toLowerCase();
+
+		let dateFilter = null;
+		if (monthCandidate && monthCandidate >= 1 && monthCandidate <= 12 && yearCandidate) {
+			const from = new Date(yearCandidate, monthCandidate - 1, 1);
+			const to = new Date(yearCandidate, monthCandidate, 1);
+			dateFilter = { gte: from, lt: to };
+		} else if (yearCandidate) {
+			const from = new Date(yearCandidate, 0, 1);
+			const to = new Date(yearCandidate + 1, 0, 1);
+			dateFilter = { gte: from, lt: to };
+		}
+
+		const allowedTypes = ["income", "expense"];
+		const typeFilter = allowedTypes.includes(typeCandidate) ? typeCandidate : null;
+
+		const baseWhere = {
 			userId,
 			...(search
 				? {
@@ -72,6 +94,12 @@ export default async function handler(req, res) {
 					],
 				}
 				: {}),
+			...(dateFilter ? { date: dateFilter } : {}),
+		};
+
+		const where = {
+			...baseWhere,
+			...(typeFilter ? { type: typeFilter } : {}),
 		};
 
 		const total = await prisma.pamKas.count({ where });
@@ -82,7 +110,7 @@ export default async function handler(req, res) {
 			skip: (page - 1) * limit,
 			take: limit,
 			select: {
-        id: true,
+	        id: true,
 				date: true,
 				amount: true,
 				type: true,
@@ -90,13 +118,33 @@ export default async function handler(req, res) {
 			},
 		});
 
-		const data = rows.map((item) => ({
-      id: item.id,
-			date: item.date.toISOString(),
-			amount: item.amount,
-			type: item.type,
-			description: item.description,
-		}));
+		let runningSaldo = 0;
+		const data = rows.map((item) => {
+			runningSaldo += item.type === "income" ? item.amount : -item.amount;
+			return {
+	      id: item.id,
+				date: item.date.toISOString(),
+				amount: item.amount,
+				type: item.type,
+				description: item.description,
+				saldo: runningSaldo,
+			};
+		});
+
+		const [sumIncome, sumExpense] = await Promise.all([
+			prisma.pamKas.aggregate({
+				where: { ...baseWhere, type: "income" },
+				_sum: { amount: true },
+			}),
+			prisma.pamKas.aggregate({
+				where: { ...baseWhere, type: "expense" },
+				_sum: { amount: true },
+			}),
+		]);
+
+		const incomeSum = sumIncome._sum.amount || 0;
+		const expenseSum = sumExpense._sum.amount || 0;
+		const totalSaldo = incomeSum - expenseSum;
 
 		const totalPage = total === 0 ? 0 : Math.ceil(total / limit);
 
@@ -104,12 +152,16 @@ export default async function handler(req, res) {
 			status: 200,
 			message: "finance_fetched",
 			data,
+			totalSaldo,
 			meta: {
 				total_row: total,
 				total_page: totalPage,
 				page,
 				limit,
 				search,
+				month: monthCandidate || null,
+				year: yearCandidate || null,
+				type: typeFilter,
 			},
 		});
 	} catch (error) {

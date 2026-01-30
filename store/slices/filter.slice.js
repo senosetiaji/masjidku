@@ -5,6 +5,10 @@ const initialState = {
     values: null,
     appliedAt: null,
   },
+  kas: {
+    values: null,
+    appliedAt: null,
+  },
 };
 
 const filterSlice = createSlice({

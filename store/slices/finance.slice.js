@@ -8,6 +8,7 @@ export const initialState = {
     total_row: 0,
     total_page: 0
   },
+  totalSaldo:0,
   isLoading:false,
   isLoadingCreate:false,
   isLoadingDelete:false,
@@ -27,6 +28,7 @@ const financeSlice = createSlice({
     .addCase(getFinance.fulfilled, (state, actions) => {
       state.isLoading = false;
       state.data = actions.payload.data;
+      state.totalSaldo = actions.payload.totalSaldo;
       state.meta = actions.payload.meta;
     })
     .addCase(getFinance.rejected, (state) => {

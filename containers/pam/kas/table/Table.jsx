@@ -1,5 +1,5 @@
 import TableNormal from '@/components/table/TableNormal';
-import { __renderValue, __renderValueDefaultZero } from '@/lib/helpers/helper';
+import { __renderValue, __renderValueDefaultZero, formatRupiah } from '@/lib/helpers/helper';
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import IconButton from '@mui/material/IconButton'
@@ -50,6 +50,15 @@ function Table({ params, setParams, fetchData }) {
         minWidth: 350,
       },
       render: (val) => __renderValue(val.type)
+    },
+    {
+      label:"Saldo",
+      align:"left",
+      hide: params?.bulan,
+      sx: {
+        minWidth: 350,
+      },
+      render: (val) => formatRupiah(val.saldo) 
     },
     {
       label:"Keterangan",

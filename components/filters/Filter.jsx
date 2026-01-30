@@ -222,7 +222,7 @@ function Filter({ filters, multipleFilters, onSubmit, filterState, requiredField
             />
           </FormControl>
         );
-        case 'tipe-transaksi':
+        case 'tipe_transaksi':
         return (
           <FormControl key={keyIdx}>
             <SelectTipeKeuangan

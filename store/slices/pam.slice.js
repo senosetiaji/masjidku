@@ -9,6 +9,7 @@ export const initialState = {
   previousUsed:null,
   finance: {
     data: [],
+    totalSaldo:0,
     detail: null,
     meta: {},
   },
@@ -118,6 +119,7 @@ const pamSlice = createSlice({
     .addCase(getPamKas.fulfilled, (state, actions) => {
       state.isLoading = false;
       state.finance.data = actions.payload.data;
+      state.finance.totalSaldo = actions.payload.totalSaldo;
       state.finance.meta = actions.payload.meta;
     })
     .addCase(getPamKas.rejected, (state) => {

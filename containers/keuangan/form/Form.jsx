@@ -167,8 +167,9 @@ function Form({ isEdit = false }) {
               <IconButton
                 aria-label="hapus baris"
                 onClick={() => handleRemoveEntry(idx)}
-                className="bg-[#ff4d4f]! text-white! shadow-lg hover:bg-[#e04343]!"
                 size="large"
+                color='error'
+                disabled={idx === 0 && form.values.data.length === 1}
               >
                 <DeleteOutlineIcon />
               </IconButton>
