@@ -1,0 +1,88 @@
+import { createSlice, current } from "@reduxjs/toolkit"
+import { createPelanggan, deleteData, getAllPelanggan, getDetail, updateDataPelanggan } from "../actions/master.action"
+
+export const initialState = {
+	data:[],
+  pelanggan:{
+    data: [],
+    detail: null,
+    meta: {
+      total_row: 0,
+      total_page: 0
+    },
+    isLoading:false,
+  },
+	detail:null,
+  meta: {
+    total_row: 0,
+    total_page: 0
+  },
+  isLoading:false,
+  isLoadingCreate:false,
+  isLoadingDelete:false,
+  isLoadingDetail:false,
+}
+
+const masterSlice = createSlice({
+	name:"master",
+	initialState:initialState,
+  reducers:{},
+  extraReducers:(builder) => {
+    builder
+    
+    .addCase(getAllPelanggan.pending, (state) => {
+      state.isLoading = true
+    })
+    .addCase(getAllPelanggan.fulfilled, (state, actions) => {
+      state.isLoading = false;
+      state.pelanggan.data = actions.payload.data;
+      state.pelanggan.meta = actions.payload.meta;
+    })
+    .addCase(getAllPelanggan.rejected, (state) => {
+      state.isLoading = false
+    })
+    
+    .addCase(getDetail.pending, (state) => {
+      state.isLoadingDetail = true
+    })
+    .addCase(getDetail.fulfilled, (state, actions) => {
+      state.isLoadingDetail = false;
+      state.pelanggan.detail = actions.payload.data;
+    })
+    .addCase(getDetail.rejected, (state) => {
+      state.isLoadingDetail = false
+    })
+    
+    .addCase(deleteData.pending, (state) => {
+      state.isLoadingDelete = true
+    })
+    .addCase(deleteData.fulfilled, (state, actions) => {
+      state.isLoadingDelete = false;
+    })
+    .addCase(deleteData.rejected, (state) => {
+      state.isLoadingDelete = false
+    })
+    
+    .addCase(createPelanggan.pending, (state) => {
+      state.isLoadingCreate = true
+    })
+    .addCase(createPelanggan.fulfilled, (state, actions) => {
+      state.isLoadingCreate = false;
+    })
+    .addCase(createPelanggan.rejected, (state) => {
+      state.isLoadingCreate = false
+    })
+    
+    .addCase(updateDataPelanggan.pending, (state) => {
+      state.isLoadingCreate = true
+    })
+    .addCase(updateDataPelanggan.fulfilled, (state, actions) => {
+      state.isLoadingCreate = false;
+    })
+    .addCase(updateDataPelanggan.rejected, (state) => {
+      state.isLoadingCreate = false
+    })
+  }
+})
+
+export default masterSlice.reducer

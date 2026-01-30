@@ -1,0 +1,111 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  // Path is relative to the `prisma/` folder, so keep it inside that folder
+  url      = "file:./dev.db"
+}
+
+model User {
+  id       String     @id @default(uuid())
+  name     String
+  phone    String
+  jabatan  String
+  username String     @unique
+  password String
+  role     String // superadmin | staff | user
+  keuangan Keuangan[]
+  inventaris Inventaris[]
+  pamKas PamKas[]
+}
+
+model Keuangan {
+  id          String   @id @default(uuid())
+  date        DateTime
+  type        String // income | expense
+  amount      Int
+  description String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+}
+
+model Inventaris {
+  id          String   @id @default(uuid())
+  name        String
+  quantity    Int
+  condition   String
+  description String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+}
+
+model MasterDataPelanggan {
+  id          String   @id @default(uuid())
+  name        String
+  address     String
+  phone       String
+  installationBill Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model PamRutin {
+  id            String   @id @default(uuid())
+  pelangganId   String
+  month         Int
+  year          Int
+  previous_used Int
+  current_used  Int
+  water_bill    Int
+  billAmount    Int
+  paidAmount    Int
+  paymentDate   DateTime?
+  status        String // paid | half_paid | unpaid
+  notes         String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model PamKas {
+  id          String   @id @default(uuid())
+  date        DateTime
+  type        String // income | expense
+  amount      Int
+  description String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+}
+
+model PamPemasangan {
+  id          String   @id @default(uuid())
+  pelangganId String
+  date        DateTime
+  amount      Int
+  notes       String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Musyawarah {
+  id          String   @id @default(uuid())
+  date        DateTime
+  topic       String
+  notes       String
+  summary     String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
