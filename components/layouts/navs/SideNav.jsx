@@ -114,7 +114,6 @@ function SideNav({ isToggled }) {
       ]
     },
     { name: 'Musyawarah', icon: <IconMeeting />, alias: 'musyawarah', link: '/musyawarah', show: true, subMenu: [] },
-    { name: 'Analitik', icon: <IconAnalitik />, alias: 'analitik', link: '/analitik', show: true, subMenu: [] },
     { name: 'PAM', icon: <IconCalendar />, alias: 'pam', link: '/pam', show: true, 
       subMenu: [
         { name: 'Pemasangan', alias: 'laporan_pemasangan', link: '/pam/pemasangan', show: true },
