@@ -6,7 +6,6 @@ import IconButton from '@mui/material/IconButton'
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ModalConfirm from '@/components/modals/ModalConfirm';
-import { deleteUser } from '@/store/actions/user.action';
 import { useRouter } from 'next/router';
 import { deleteData } from '@/store/actions/master.action';
 
