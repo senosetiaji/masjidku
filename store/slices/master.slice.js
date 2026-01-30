@@ -1,10 +1,17 @@
 import { createSlice, current } from "@reduxjs/toolkit"
-import { createFinance, deleteData, getDetail, getFinance, updateDataFinance } from "../actions/finance.action"
-import { getAllPelanggan } from "../actions/master.action"
+import { createPelanggan, deleteData, getAllPelanggan, getDetail, updateDataPelanggan } from "../actions/master.action"
 
 export const initialState = {
 	data:[],
-  pelanggan:[],
+  pelanggan:{
+    data: [],
+    detail: null,
+    meta: {
+      total_row: 0,
+      total_page: 0
+    },
+    isLoading:false,
+  },
 	detail:null,
   meta: {
     total_row: 0,
@@ -28,53 +35,53 @@ const masterSlice = createSlice({
     })
     .addCase(getAllPelanggan.fulfilled, (state, actions) => {
       state.isLoading = false;
-      state.pelanggan = actions.payload.data;
-      state.meta = actions.payload.meta;
+      state.pelanggan.data = actions.payload.data;
+      state.pelanggan.meta = actions.payload.meta;
     })
     .addCase(getAllPelanggan.rejected, (state) => {
       state.isLoading = false
     })
     
-    // .addCase(getDetail.pending, (state) => {
-    //   state.isLoadingDetail = true
-    // })
-    // .addCase(getDetail.fulfilled, (state, actions) => {
-    //   state.isLoadingDetail = false;
-    //   state.detail = actions.payload.data;
-    // })
-    // .addCase(getDetail.rejected, (state) => {
-    //   state.isLoadingDetail = false
-    // })
+    .addCase(getDetail.pending, (state) => {
+      state.isLoadingDetail = true
+    })
+    .addCase(getDetail.fulfilled, (state, actions) => {
+      state.isLoadingDetail = false;
+      state.pelanggan.detail = actions.payload.data;
+    })
+    .addCase(getDetail.rejected, (state) => {
+      state.isLoadingDetail = false
+    })
     
-    // .addCase(deleteData.pending, (state) => {
-    //   state.isLoadingDelete = true
-    // })
-    // .addCase(deleteData.fulfilled, (state, actions) => {
-    //   state.isLoadingDelete = false;
-    // })
-    // .addCase(deleteData.rejected, (state) => {
-    //   state.isLoadingDelete = false
-    // })
+    .addCase(deleteData.pending, (state) => {
+      state.isLoadingDelete = true
+    })
+    .addCase(deleteData.fulfilled, (state, actions) => {
+      state.isLoadingDelete = false;
+    })
+    .addCase(deleteData.rejected, (state) => {
+      state.isLoadingDelete = false
+    })
     
-    // .addCase(createFinance.pending, (state) => {
-    //   state.isLoadingCreate = true
-    // })
-    // .addCase(createFinance.fulfilled, (state, actions) => {
-    //   state.isLoadingCreate = false;
-    // })
-    // .addCase(createFinance.rejected, (state) => {
-    //   state.isLoadingCreate = false
-    // })
+    .addCase(createPelanggan.pending, (state) => {
+      state.isLoadingCreate = true
+    })
+    .addCase(createPelanggan.fulfilled, (state, actions) => {
+      state.isLoadingCreate = false;
+    })
+    .addCase(createPelanggan.rejected, (state) => {
+      state.isLoadingCreate = false
+    })
     
-    // .addCase(updateDataFinance.pending, (state) => {
-    //   state.isLoadingCreate = true
-    // })
-    // .addCase(updateDataFinance.fulfilled, (state, actions) => {
-    //   state.isLoadingCreate = false;
-    // })
-    // .addCase(updateDataFinance.rejected, (state) => {
-    //   state.isLoadingCreate = false
-    // })
+    .addCase(updateDataPelanggan.pending, (state) => {
+      state.isLoadingCreate = true
+    })
+    .addCase(updateDataPelanggan.fulfilled, (state, actions) => {
+      state.isLoadingCreate = false;
+    })
+    .addCase(updateDataPelanggan.rejected, (state) => {
+      state.isLoadingCreate = false
+    })
   }
 })
 

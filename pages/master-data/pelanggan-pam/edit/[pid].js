@@ -4,9 +4,13 @@ import React from 'react'
 import IconButton from '@mui/material/IconButton'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useRouter } from 'next/router';
+import { useDispatch } from 'react-redux';
+import { getDetail } from '@/store/actions/master.action';
 
 function Index() {
+  const dispatch = useDispatch();
   const router = useRouter();
+  const { pid } = router.query;
   const breadcrumb = [
     {
       label: 'Master Data Pelanggan PAM',
@@ -15,12 +19,18 @@ function Index() {
       isDisabled: false
     },
     {
-      label: 'Create Pelanggan PAM',
-      alias: 'create-pelanggan-pam',
-      link: '/master-data/pelanggan-pam/create',
+      label: 'Edit Pelanggan PAM',
+      alias: 'edit-pelanggan-pam',
+      link: '/master-data/pelanggan-pam/edit/[pid]',
       isDisabled: true
     }
   ]
+  React.useEffect(() => {
+    if (!pid) return;
+    // You can dispatch an action to fetch the detail data here using the pid
+    // dispatch(fetchPelangganDetail(pid));
+    dispatch(getDetail({id: pid}))
+  }, [pid]);
   return (
     <RootLayout breadcrumbs={breadcrumb}>
       <div className="flex items-center mb-6 gap-4">
@@ -32,7 +42,7 @@ function Index() {
           <div className="text-[#666] tinos-regular">Lengkapi data pelanggan PAM dengan benar.</div>
         </div>
       </div>
-      <Form />
+      <Form isEdit={true} />
     </RootLayout>
   )
 }

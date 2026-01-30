@@ -15,18 +15,19 @@ export default async function handler(req, res) {
 
   try {
     const { id: idParam } = req.query;
-    const id = Array.isArray(idParam) ? parseInt(idParam[0], 10) : parseInt(idParam, 10);
+    const id = Array.isArray(idParam) ? idParam[0] : idParam;
+    const userId = typeof id === "string" ? id.trim() : "";
 
-    if (!Number.isInteger(id) || id <= 0) {
+    if (!userId) {
       return res.status(400).json({ message: "invalid_id" });
     }
 
-    const existing = await prisma.user.findUnique({ where: { id } });
+    const existing = await prisma.user.findUnique({ where: { id: userId } });
     if (!existing) {
       return res.status(404).json({ message: "user_not_found" });
     }
 
-    await prisma.user.delete({ where: { id } });
+    await prisma.user.delete({ where: { id: userId } });
 
     const safeUser = {
       id: existing.id,

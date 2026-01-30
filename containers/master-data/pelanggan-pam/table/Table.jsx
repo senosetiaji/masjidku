@@ -8,9 +8,11 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import ModalConfirm from '@/components/modals/ModalConfirm';
 import { deleteUser } from '@/store/actions/user.action';
 import { useRouter } from 'next/router';
+import { deleteData } from '@/store/actions/master.action';
 
 function Table({ source, params, setParams, fetchData }) {
-  const { pelanggan: data, isLoading, meta } = useSelector(state => state.master);
+  const { pelanggan, isLoading, meta } = useSelector(state => state.master);
+  const { data } = pelanggan;
   const deleteModalRef = React.useRef();
   const dispatch = useDispatch();
   const router = useRouter();
@@ -57,7 +59,7 @@ function Table({ source, params, setParams, fetchData }) {
       render: (val) => {
         return (
           <div className='flex gap-2 w-full justify-center'>
-            <IconButton aria-label="edit" className='bg-yellow-400! text-white! hover:bg-yellow-500!' onClick={() => { router.push(`/takmeer/edit/${val?.id}`) }}>
+            <IconButton aria-label="edit" className='bg-yellow-400! text-white! hover:bg-yellow-500!' onClick={() => { router.push(`/master-data/pelanggan-pam/edit/${val?.id}`) }}>
               <EditIcon fontSize="small" />
             </IconButton>
             <IconButton aria-label="delete" className='bg-red-400! text-white! hover:bg-red-500!' onClick={() => { deleteModalRef.current.open(val?.id); }}>
@@ -72,7 +74,7 @@ function Table({ source, params, setParams, fetchData }) {
   async function handleDelete(id) {
     // dispatch(deleteUserAction(id, params));
     console.log("DELETE USER ID:", id);
-    const res = await dispatch(deleteUser({ id: id, params: {} }))
+    const res = await dispatch(deleteData({ id: id, params: {} }))
     fetchData();
   }
 

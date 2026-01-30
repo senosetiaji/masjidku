@@ -99,7 +99,7 @@ function SideNav({ isToggled }) {
     { name: 'Dashboard', icon: <IconDashboard />, alias: 'dashboard', link: '/dashboard', show: true, subMenu: [] },
     { name: 'Master Data', icon: <MasterDataIcon />, alias: 'master_data', link: '/master-data', show: true, 
       subMenu: [
-        { name: 'Pelnggan PAM', alias: 'pelanggan_pam', link: '/master-data/pelanggan-pam', show: true },
+        { name: 'Pelanggan PAM', alias: 'pelanggan_pam', link: '/master-data/pelanggan-pam', show: true },
       ]
     },
     { name: 'Takmeer', icon: <IconTakmeer />, alias: 'takmeer', link: '/takmeer', show: true, subMenu: [] },
