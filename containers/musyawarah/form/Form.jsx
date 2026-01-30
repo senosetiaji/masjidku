@@ -99,6 +99,8 @@ function Form({ isEdit = false}) {
   });
   React.useEffect(() => {
     form.resetForm();
+    setText('');
+    setSummary('');
   },[]);
   React.useEffect(() => {
     if (isEdit && detail) {
