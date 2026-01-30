@@ -26,27 +26,32 @@ function Table({ params, setParams, fetchData }) {
     },
     {
       label:"Tanggal",
-      align:"left",
+      align:"center",
       sx: {
-        minWidth: 350,
+        width: 150,
       },
       render: (val) => val?.date ? moment(val.date).format('DD MMM YYYY') : '-'
     },
     {
-      label:"Jumlah",
-      align:"left",
+      label:"Jumlah (Rp.)",
+      align:"right",
       sx: {
-        minWidth: 350,
+        width: 150,
       },
       render: (val) => formatRupiah(val.amount, { zeroAsDash: true })
     },
     {
       label:"Tipe",
-      align:"left",
+      align:"center",
       sx: {
         minWidth: 350,
       },
-      render: (val) => __renderValue(val.type)
+      render: (val) => {
+        if(val.type === 'income') return <div className="text-emerald-600 font-bold uppercase">Pemasukan</div>
+        return (
+          <div className="text-yellow-500 font-bold uppercase">Pengeluaran</div>
+        )
+      }
     },
     {
       label:"Keterangan",
@@ -69,7 +74,7 @@ function Table({ params, setParams, fetchData }) {
       label:"Aksi",
       align:"center",
       sx: {
-        width: 350,
+        width: '150px',
       },
       render: (val) => {
         return (

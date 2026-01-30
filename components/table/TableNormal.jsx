@@ -208,7 +208,11 @@ function TableNormal(
                         colSpan={cell.colSpan}
                         rowSpan={cell.rowSpan}
                         align={getAlignValue(cell.node.align)}
-                        sx={{ minWidth: cell.node.sx?.minWidth, textAlign: cell.node.sx?.textAlign, ...cell.node.sx, ...(cell.node.ellipsis ? ellipsisSx : {}) }}
+                        sx={[
+                          { minWidth: cell.node.sx?.minWidth, textAlign: cell.node.sx?.textAlign },
+                          cell.node.sx,
+                          cell.node.ellipsis ? ellipsisSx : null,
+                        ]}
                       >
                         <div className="font-semibold">
                           {typeof cell.node.label === 'function' ? cell.node.label() : cell.node.label}
@@ -240,7 +244,11 @@ function TableNormal(
                           className='p-2! text-[13px]!'
                           key={`c-${rowIndex}-${colIndex}`}
                           align={getAlignValue(col.align)}
-                          sx={{ verticalAlign: 'top', textAlign: col.sx?.textAlign, ...col.sx, ...(col.ellipsis ? ellipsisSx : {}) }}
+                          sx={[
+                            { verticalAlign: 'top', textAlign: col.sx?.textAlign },
+                            col.sx,
+                            col.ellipsis ? ellipsisSx : null,
+                          ]}
                         >
                           {typeof col.render === 'function' ? col.render(row, rowIndex) : null}
                         </TableCell>

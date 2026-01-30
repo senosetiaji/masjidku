@@ -1,5 +1,5 @@
 import TableNormal from '@/components/table/TableNormal';
-import { __renderValue, __renderValueDefaultZero } from '@/lib/helpers/helper';
+import { __renderValue, __renderValueDefaultZero, formatRupiah } from '@/lib/helpers/helper';
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import IconButton from '@mui/material/IconButton'
@@ -77,27 +77,33 @@ function Table({ params, setParams, fetchData }) {
     },
     {
       label:"Total Biaya (Rp)",
-      align:"left",
+      align:"right",
       sx: {
         minWidth: 350,
       },
-      render: (val) => __renderValueDefaultZero(val.billAmount)
+      render: (val) => formatRupiah(val.billAmount)
     },
     {
       label:"Total Bayar (Rp)",
-      align:"left",
+      align:"right",
       sx: {
         minWidth: 350,
       },
-      render: (val) => __renderValueDefaultZero(val.paidAmount)
+      render: (val) => formatRupiah(val.paidAmount)
     },
     {
       label:"Status",
-      align:"left",
+      align:"center",
       sx: {
         minWidth: 150,
       },
-      render: (val) => __renderValue(val.status)
+      render: (val) => {
+        if(val.status === 'paid') return <div className="text-emerald-600 font-bold uppercase">LUNAS</div>
+        if(val.status === 'half_paid') return <div className="text-yellow-600 font-bold uppercase">BELUM LUNAS</div>
+        return (
+          <div className="text-red-600 font-bold uppercase">BELUM BAYAR</div>
+        )
+      }
     },
     {
       label:"Catatan",

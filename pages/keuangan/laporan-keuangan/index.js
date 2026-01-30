@@ -15,9 +15,10 @@ function Index() {
     page: 1,
     limit: 10,
     search: '',
+    tahun: null,
   });
   const [selectedFilter, setSelectedFilter] = React.useState({
-    tahun: {label: moment().format('YYYY'), value: moment().format('YYYY')},
+    tahun: '',
     bulan: '',
     tipe_transaksi: '',
   });

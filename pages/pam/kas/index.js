@@ -6,6 +6,7 @@ import React from 'react'
 import { useDispatch } from 'react-redux';
 import Button from '@mui/material/Button'
 import { useRouter } from 'next/router';
+import moment from 'moment';
 
 function Index() {
   const dispatch = useDispatch();
@@ -16,7 +17,7 @@ function Index() {
     search: '',
   });
   const [selectedFilter, setSelectedFilter] = React.useState({
-    tahun: {label: new Date().getFullYear().toString(), value: new Date().getFullYear().toString()},
+    tahun: {label: moment().year().toString(), value: moment().year().toString()},
     bulan: '',
     tipe_transaksi: '',
   });
@@ -54,7 +55,7 @@ function Index() {
   return (
     <RootLayout breadcrumbs={breadcrumbs}>
       <div className="flex justify-between items-center mb-8">
-        <div className="title text-[20px] font-bold text-[#333]">Laporan Keuangan</div>
+        <div className="title text-[20px] font-bold text-[#333]">Laporan Keuangan PAM</div>
         <Button variant="contained" color="primary" onClick={() => router.push('/pam/kas/create')}>
           Input Data Keuangan
         </Button>
@@ -64,7 +65,7 @@ function Index() {
         filterState={selectedFilter}
         onSubmit={setSelectedFilter}
         requiredField={['tahun']}
-        keyName={'kas'}
+        keyName={'pam_kas'}
       />
       <Kas params={params} setParams={setParams} fetchData={fetchData} />
     </RootLayout>

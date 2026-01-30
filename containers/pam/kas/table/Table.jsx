@@ -29,36 +29,47 @@ function Table({ params, setParams, fetchData }) {
     },
     {
       label:"Tanggal",
-      align:"left",
+      align:"center",
       sx: {
         minWidth: 350,
       },
       render: (val) => val?.date ? moment(val.date).format('DD MMM YYYY') : '-'
     },
     {
-      label:"Jumlah",
-      align:"left",
+      label:"Jumlah (Rp.)",
+      align:"right",
       sx: {
         minWidth: 350,
       },
-      render: (val) => __renderValue(val.amount)
+      render: (val) => formatRupiah(val.amount)
     },
     {
       label:"Tipe",
-      align:"left",
+      align:"center",
       sx: {
         minWidth: 350,
       },
-      render: (val) => __renderValue(val.type)
+      render: (val) => {
+        if(val.type === 'income') return <div className="text-emerald-600 font-bold uppercase">Pemasukan</div>
+        return (
+          <div className="text-yellow-500 font-bold uppercase">Pengeluaran</div>
+        )
+      }
     },
     {
       label:"Saldo",
-      align:"left",
+      align:"center",
       hide: params?.bulan,
       sx: {
         minWidth: 350,
       },
-      render: (val) => formatRupiah(val.saldo) 
+      render: (val) => {
+        return (
+          <div className="text-right">
+            {formatRupiah(val.saldo)}
+          </div>
+        )
+      } 
     },
     {
       label:"Keterangan",
@@ -72,7 +83,7 @@ function Table({ params, setParams, fetchData }) {
       label:"Aksi",
       align:"center",
       sx: {
-        width: 350,
+        width: 250,
       },
       render: (val) => {
         return (
@@ -101,6 +112,7 @@ function Table({ params, setParams, fetchData }) {
         columns={columns}
         data={data}
         totalData={meta?.total_row}
+        totalPage={meta?.total_page}
         page={params.page}
         params={params}
         setParams={setParams}

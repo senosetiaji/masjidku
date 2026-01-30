@@ -9,6 +9,7 @@ import masterReducer from './master.slice'
 import filterReducer from './filter.slice'
 import pamReducer from './pam.slice'
 import musyawarahReducer from './musyawarah.slice'
+import dashboardReducer from './dashboard.slice'
 
 const rootReducer = combineReducers({
   // Add your slice reducers here
@@ -23,6 +24,7 @@ const rootReducer = combineReducers({
   filter: filterReducer,
   pam: pamReducer,
   musyawarah: musyawarahReducer,
+  dashboard: dashboardReducer,
 })
 
 export default rootReducer

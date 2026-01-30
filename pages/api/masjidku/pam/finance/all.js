@@ -84,6 +84,8 @@ export default async function handler(req, res) {
 		const allowedTypes = ["income", "expense"];
 		const typeFilter = allowedTypes.includes(typeCandidate) ? typeCandidate : null;
 
+		const periodStart = dateFilter?.gte ?? null;
+
 		const baseWhere = {
 			userId,
 			...(search
@@ -102,23 +104,60 @@ export default async function handler(req, res) {
 			...(typeFilter ? { type: typeFilter } : {}),
 		};
 
+		let openingSaldo = 0;
+		if (periodStart) {
+			const [priorIncome, priorExpense] = await Promise.all([
+				prisma.pamKas.aggregate({
+					where: { userId, date: { lt: periodStart }, type: "income" },
+					_sum: { amount: true },
+				}),
+				prisma.pamKas.aggregate({
+					where: { userId, date: { lt: periodStart }, type: "expense" },
+					_sum: { amount: true },
+				}),
+			]);
+
+			openingSaldo = (priorIncome._sum.amount || 0) - (priorExpense._sum.amount || 0);
+		}
+
 		const total = await prisma.pamKas.count({ where });
 
 		const rows = await prisma.pamKas.findMany({
 			where,
-			orderBy: [{ date: "desc" }, { createdAt: "desc" }],
+			orderBy: [{ date: "asc" }, { createdAt: "asc" }, { id: "asc" }],
 			skip: (page - 1) * limit,
 			take: limit,
 			select: {
 	        id: true,
 				date: true,
+				createdAt: true,
 				amount: true,
 				type: true,
 				description: true,
 			},
 		});
 
-		let runningSaldo = 0;
+		let initialSaldo = openingSaldo;
+		if (page > 1 && rows.length > 0) {
+			const first = rows[0];
+			const boundaryWhere = {
+				...where,
+				OR: [
+					{ date: { lt: first.date } },
+					{ date: first.date, createdAt: { lt: first.createdAt } },
+					{ date: first.date, createdAt: first.createdAt, id: { lt: first.id } },
+				],
+			};
+
+			const [priorIncome, priorExpense] = await Promise.all([
+				prisma.pamKas.aggregate({ where: { ...boundaryWhere, type: "income" }, _sum: { amount: true } }),
+				prisma.pamKas.aggregate({ where: { ...boundaryWhere, type: "expense" }, _sum: { amount: true } }),
+			]);
+
+			initialSaldo = (priorIncome._sum.amount || 0) - (priorExpense._sum.amount || 0);
+		}
+
+		let runningSaldo = initialSaldo;
 		const data = rows.map((item) => {
 			runningSaldo += item.type === "income" ? item.amount : -item.amount;
 			return {
@@ -144,7 +183,7 @@ export default async function handler(req, res) {
 
 		const incomeSum = sumIncome._sum.amount || 0;
 		const expenseSum = sumExpense._sum.amount || 0;
-		const totalSaldo = incomeSum - expenseSum;
+		const totalSaldo = openingSaldo + incomeSum - expenseSum;
 
 		const totalPage = total === 0 ? 0 : Math.ceil(total / limit);
 

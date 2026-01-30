@@ -9,6 +9,10 @@ const initialState = {
     values: null,
     appliedAt: null,
   },
+  pam_kas: {
+    values: null,
+    appliedAt: null,
+  },
 };
 
 const filterSlice = createSlice({
