@@ -106,7 +106,7 @@ export default async function handler(req, res) {
 
 		const rows = await prisma.keuangan.findMany({
 			where,
-			orderBy: [{ date: "desc" }, { createdAt: "desc" }],
+			orderBy: [{ date: "asc" }, { createdAt: "asc" }, { id: "asc" }],
 			skip: (page - 1) * limit,
 			take: limit,
 			select: {
@@ -114,11 +114,32 @@ export default async function handler(req, res) {
 				date: true,
 				amount: true,
 				type: true,
+				createdAt: true,
 				description: true,
 			},
 		});
 
-		let runningSaldo = 0;
+		let initialSaldo = 0;
+		if (page > 1 && rows.length > 0) {
+			const first = rows[0];
+			const boundaryWhere = {
+				...where,
+				OR: [
+					{ date: { lt: first.date } },
+					{ date: first.date, createdAt: { lt: first.createdAt } },
+					{ date: first.date, createdAt: first.createdAt, id: { lt: first.id } },
+				],
+			};
+
+			const [priorIncome, priorExpense] = await Promise.all([
+				prisma.keuangan.aggregate({ where: { ...boundaryWhere, type: "income" }, _sum: { amount: true } }),
+				prisma.keuangan.aggregate({ where: { ...boundaryWhere, type: "expense" }, _sum: { amount: true } }),
+			]);
+
+			initialSaldo = (priorIncome._sum.amount || 0) - (priorExpense._sum.amount || 0);
+		}
+
+		let runningSaldo = initialSaldo;
 		const data = rows.map((item) => {
 			runningSaldo += item.type === "income" ? item.amount : -item.amount;
 			return {

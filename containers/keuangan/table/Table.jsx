@@ -15,7 +15,6 @@ function Table({ params, setParams, fetchData }) {
   const deleteModalRef = React.useRef();
   const dispatch = useDispatch();
   const router = useRouter();
-
   const columns = [
     {
       label:"No",
@@ -99,6 +98,7 @@ function Table({ params, setParams, fetchData }) {
         columns={columns}
         data={data}
         totalData={meta?.total_row}
+        totalPage={meta?.total_page}
         page={params.page}
         params={params}
         setParams={setParams}

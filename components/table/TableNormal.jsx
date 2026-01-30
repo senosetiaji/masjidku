@@ -9,8 +9,8 @@ function TableNormal(
     data = [], 
     params = {},
     setParams = () => {},
+    totalPage = 0,
     totalData = 0,
-    pageCount = 0,
     limit = 10,
     isLoading = false,
   }
@@ -104,10 +104,11 @@ function TableNormal(
   const renderPagination = () => {
     // Pagination rendering logic can be added here if needed
     const perPage = Number(limit)
+    const pageTotal = Number(totalPage ?? 0)
     // Treat incoming params.page as 1-based; convert to 0-based index
     const currentPage = Math.min(
       Math.max(Number((params?.page ?? 1)) - 1, 0),
-      Math.max(pageCount - 1, 0)
+      Math.max(pageTotal - 1, 0)
     )
     const start = totalData > 0 ? currentPage * perPage + 1 : 0
     const end = totalData > 0 ? Math.min(totalData, (currentPage + 1) * perPage) : 0
@@ -120,7 +121,7 @@ function TableNormal(
           {totalData > 0 ? `Menampilkan ${start}-${end} dari ${totalData}` : 'Tidak ada data'}
         </span>
         <Pagination
-          count={Math.max(Number(pageCount ?? 0), 1)}
+          count={Math.max(pageTotal, 1)}
           page={currentPage + 1}
           onChange={(_, value) => setParams({ ...params, page: value })}
           siblingCount={siblingCount}
