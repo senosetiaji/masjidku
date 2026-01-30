@@ -105,6 +105,7 @@ model Musyawarah {
   date        DateTime
   topic       String
   notes       String
+  summary     String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }

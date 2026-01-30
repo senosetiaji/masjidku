@@ -8,11 +8,10 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import ModalConfirm from '@/components/modals/ModalConfirm';
 import { useRouter } from 'next/router';
 import moment from 'moment';
-import { deleteDataPamKas, deleteDataPamPemasangan } from '@/store/actions/pam.action';
+import { deleteData } from '@/store/actions/musyawarah.action';
 
 function Table({ params, setParams, fetchData }) {
-  const { installation, isLoading } = useSelector(state => state.pam);
-  const { data = [], meta } = installation ;
+  const { data, meta, isLoading } = useSelector((state) => state.musyawarah);
   const deleteModalRef = React.useRef();
   const dispatch = useDispatch();
   const router = useRouter();
@@ -27,91 +26,28 @@ function Table({ params, setParams, fetchData }) {
       render: (val, index) => index + 1 + ((params.page - 1) * params.limit),
     },
     {
-      label:"Nama Pelanggan",
+      label:"Tanggal Musyawarah",
       align:"left",
       sx: {
         minWidth: 350,
       },
-      render: (val) => val?.pelangganName ?? '-'
+      render: (val) => val?.date ? moment(val.date).format('dddd, DD MMMM YYYY') : '-'
     },
     {
-      label:"Pembayaran Kredit",
-      align:"center",
+      label:"Topik Musyawarah",
+      align:"left",
       sx: {
         minWidth: 350,
       },
-      children: [
-        {
-          label: "Angsuran Ke-1",
-          align: "left",
-          sx: {
-            minWidth: 200,
-          },
-          render: (val) => __renderValueDefaultZero(val?.payments?.[0]?.amount),
-        },
-        {
-          label: "Angsuran Ke-2",
-          align: "left",
-          sx: {
-            minWidth: 200,
-          },
-          render: (val) => __renderValueDefaultZero(val?.payments?.[1]?.amount),
-        },
-        {
-          label: "Angsuran Ke-3",
-          align: "left",
-          sx: {
-            minWidth: 200,
-          },
-          render: (val) => __renderValueDefaultZero(val?.payments?.[2]?.amount),
-        },
-        {
-          label: "Angsuran Ke-4",
-          align: "left",
-          sx: {
-            minWidth: 200,
-          },
-          render: (val) => __renderValueDefaultZero(val?.payments?.[3]?.amount),
-        },
-        {
-          label: "Angsuran Ke-5",
-          align: "left",
-          sx: {
-            minWidth: 200,
-          },
-          render: (val) => __renderValueDefaultZero(val?.payments?.[4]?.amount),
-        },
-      ]
+      render: (val) => val?.topic ?? '-'
     },
     {
-      label:"Total Pembayaran (A)",
-      align:"center",
-      sx: {
-        minWidth: 250,
-      },
-      render: (val) => {
-        const totalPayment = val?.payments?.reduce((sum, payment) => sum + payment.amount, 0) || 0;
-        return __renderValueDefaultZero(totalPayment);
-      }
-    },
-    {
-      label:"Total Tagihan (B)",
-      align:"center",
-      sx: {
-        minWidth: 250,
-      },
-      render: (val) => {
-        const installationBill = val?.installationBill || 0;
-        return __renderValueDefaultZero(installationBill);
-      }
-    },
-    {
-      label:"Tagihan Yang Harus Dibayar (B-A)",
+      label:"Rangkuman",
       align:"left",
       sx: {
         minWidth: 250,
       },
-      render: (val) => __renderValue(val.billsToPay)
+      render: (val) => __renderValue(val.summary)
     },
     {
       label:"Aksi",
@@ -122,7 +58,7 @@ function Table({ params, setParams, fetchData }) {
       render: (val) => {
         return (
           <div className='flex gap-2 w-full justify-center'>
-            <IconButton aria-label="edit" className='bg-yellow-400! text-white! hover:bg-yellow-500!' onClick={() => { router.push(`/pam/pemasangan/edit/${val?.id}`) }}>
+            <IconButton aria-label="edit" className='bg-yellow-400! text-white! hover:bg-yellow-500!' onClick={() => { router.push(`/musyawarah/edit/${val?.id}`) }}>
               <EditIcon fontSize="small" />
             </IconButton>
             <IconButton aria-label="delete" className='bg-red-400! text-white! hover:bg-red-500!' onClick={() => { deleteModalRef.current.open(val?.id); }}>
@@ -136,7 +72,7 @@ function Table({ params, setParams, fetchData }) {
 
   async function handleDelete(id) {
     // dispatch(deleteUserAction(id, params));
-    const res = await dispatch(deleteDataPamPemasangan({ id: id, params: {} }))
+    const res = await dispatch(deleteData({ id: id, params: {} }))
     fetchData();
   }
 

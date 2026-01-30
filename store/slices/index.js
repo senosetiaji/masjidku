@@ -8,6 +8,7 @@ import inventarisReducer from './inventaris.slice'
 import masterReducer from './master.slice'
 import filterReducer from './filter.slice'
 import pamReducer from './pam.slice'
+import musyawarahReducer from './musyawarah.slice'
 
 const rootReducer = combineReducers({
   // Add your slice reducers here
@@ -21,6 +22,7 @@ const rootReducer = combineReducers({
   master: masterReducer,
   filter: filterReducer,
   pam: pamReducer,
+  musyawarah: musyawarahReducer,
 })
 
 export default rootReducer

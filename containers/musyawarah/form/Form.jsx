@@ -9,6 +9,7 @@ import DatePickerField from '@/components/fields/DatePickerField';
 import { Editor } from 'primereact/editor';
 import TextAreaField from '@/components/fields/TextAreaField';
 import { API } from '@/lib/config/api';
+import { createMusyawarah, rangkumMusyawarah, updateDataMusyawarah } from '@/store/actions/musyawarah.action';
 
 const stripHtml = (html) => {
   if (!html) return '';
@@ -29,6 +30,7 @@ function Form({ isEdit = false}) {
   const [summaryError, setSummaryError] = React.useState(null);
   const dispatch = useDispatch();
   const hasNotes = React.useMemo(() => stripHtml(text).length > 0, [text]);
+  const { isLoadingCreate, summary: summaryFromStore, detail } = useSelector((state) => state.musyawarah);
 
   const requestSummary = React.useCallback(async () => {
     if (!hasNotes) {
@@ -39,10 +41,11 @@ function Form({ isEdit = false}) {
     try {
       setIsSummarizing(true);
       setSummaryError(null);
-      const response = await API.post('/masjidku/musyawarah/summary', { notes: text });
-      const generated = response?.data?.data?.summary?.trim() || '';
-      setSummary(generated);
-      return generated;
+      const response = await dispatch(rangkumMusyawarah({
+        payload: {
+          notes: stripHtml(text),
+        }
+      })).unwrap();
     } catch (error) {
       console.error('GENERATE MUSYAWARAH SUMMARY ERROR:', error);
       const message = error?.response?.data?.message;
@@ -57,6 +60,12 @@ function Form({ isEdit = false}) {
     }
   }, [hasNotes, text]);
 
+  React.useEffect(() => {
+    if (summaryFromStore) {
+      setSummary(summaryFromStore);
+    }
+  }, [summaryFromStore]);
+
   const handleGenerateSummary = React.useCallback(async () => {
     await requestSummary();
   }, [requestSummary]);
@@ -65,9 +74,17 @@ function Form({ isEdit = false}) {
     const autoSummary = summary || (await requestSummary());
     const payload = {
       ...values,
+      topic: values.topic.toLowerCase(),
       notes: text,
       summary: autoSummary || '',
     };
+    if (isEdit) {
+      // dispatch update action
+      dispatch(updateDataMusyawarah({id: detail.id, payload: payload}));
+      return;
+    }
+    dispatch(createMusyawarah({payload: payload}));
+
   }
   const form = useFormik({
     initialValues: {
@@ -83,6 +100,16 @@ function Form({ isEdit = false}) {
   React.useEffect(() => {
     form.resetForm();
   },[]);
+  React.useEffect(() => {
+    if (isEdit && detail) {
+      form.setValues({
+        topic: detail.topic || '',
+        date: detail.date || '',
+      });
+      setText(detail.notes || '');
+      setSummary(detail.summary || '');
+    }
+  }, [isEdit, detail]);
   return (
     <div>
       <div className="flex items-center mb-6 gap-4">
@@ -91,7 +118,7 @@ function Form({ isEdit = false}) {
         </IconButton>
         <div>
           <div className="text-[20px] font-bold text-[#333]">{isEdit ? 'Edit Musyawarah' : 'Buat Musyawarah'}</div>
-          <div className="text-[#666] text-[13px]">Lengkapi data biaya rutinan dengan benar.</div>
+          <div className="text-[#666] text-[13px]">Lengkapi data musyawarah dengan benar.</div>
         </div>
       </div>
 

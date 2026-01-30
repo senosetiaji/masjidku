@@ -52,7 +52,7 @@ export default async function handler(req, res) {
 			return res.status(401).json({ message: "invalid_session_user" });
 		}
 
-		const { date: rawDate, topic: rawTopic, notes: rawNotes } = req.body || {};
+		const { date: rawDate, topic: rawTopic, notes: rawNotes, summary: rawSummary } = req.body || {};
 		const topic = typeof rawTopic === "string" ? rawTopic.trim() : "";
 		if (!topic) {
 			return res.status(400).json({ message: "invalid_topic" });
@@ -64,9 +64,10 @@ export default async function handler(req, res) {
 		}
 
 		const notes = typeof rawNotes === "string" ? rawNotes : "";
+		const summary = typeof rawSummary === "string" ? rawSummary.trim() : "";
 
 		const duplicateTopic = await prisma.musyawarah.findFirst({
-			where: { topic: { equals: topic, mode: "insensitive" } },
+			where: { topic: { equals: topic } },
 			select: { id: true },
 		});
 		if (duplicateTopic) {
@@ -78,6 +79,7 @@ export default async function handler(req, res) {
 				date,
 				topic,
 				notes,
+				summary,
 			},
 		});
 
@@ -89,6 +91,7 @@ export default async function handler(req, res) {
 				date: created.date.toISOString(),
 				topic: created.topic,
 				notes: created.notes,
+				summary: created.summary,
 				createdAt: created.createdAt.toISOString(),
 				updatedAt: created.updatedAt.toISOString(),
 			},

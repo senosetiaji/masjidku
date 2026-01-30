@@ -91,6 +91,7 @@ export default async function handler(req, res) {
 					OR: [
 						{ topic: { contains: search } },
 						{ notes: { contains: search } },
+						{ summary: { contains: search } },
 					],
 				}
 				: {}),
@@ -113,6 +114,7 @@ export default async function handler(req, res) {
 			date: row.date.toISOString(),
 			topic: row.topic,
 			notes: row.notes,
+			summary: row.summary,
 			createdAt: row.createdAt.toISOString(),
 			updatedAt: row.updatedAt.toISOString(),
 		}));
