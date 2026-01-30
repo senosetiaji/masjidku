@@ -84,6 +84,8 @@ export default async function handler(req, res) {
 		const allowedTypes = ["income", "expense"];
 		const typeFilter = allowedTypes.includes(typeCandidate) ? typeCandidate : null;
 
+		const periodStart = dateFilter?.gte ?? null;
+
 		const baseWhere = {
 			userId,
 			...(search
@@ -102,6 +104,22 @@ export default async function handler(req, res) {
 			...(typeFilter ? { type: typeFilter } : {}),
 		};
 
+		let openingSaldo = 0;
+		if (periodStart) {
+			const [priorIncome, priorExpense] = await Promise.all([
+				prisma.keuangan.aggregate({
+					where: { userId, date: { lt: periodStart }, type: "income" },
+					_sum: { amount: true },
+				}),
+				prisma.keuangan.aggregate({
+					where: { userId, date: { lt: periodStart }, type: "expense" },
+					_sum: { amount: true },
+				}),
+			]);
+
+			openingSaldo = (priorIncome._sum.amount || 0) - (priorExpense._sum.amount || 0);
+		}
+
 		const total = await prisma.keuangan.count({ where });
 
 		const rows = await prisma.keuangan.findMany({
@@ -119,7 +137,7 @@ export default async function handler(req, res) {
 			},
 		});
 
-		let initialSaldo = 0;
+		let initialSaldo = openingSaldo;
 		if (page > 1 && rows.length > 0) {
 			const first = rows[0];
 			const boundaryWhere = {
@@ -165,7 +183,7 @@ export default async function handler(req, res) {
 
 		const incomeSum = sumIncome._sum.amount || 0;
 		const expenseSum = sumExpense._sum.amount || 0;
-		const totalSaldo = incomeSum - expenseSum;
+		const totalSaldo = openingSaldo + incomeSum - expenseSum;
 
 		const totalPage = total === 0 ? 0 : Math.ceil(total / limit);
 

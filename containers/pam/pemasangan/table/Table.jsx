@@ -1,5 +1,5 @@
 import TableNormal from '@/components/table/TableNormal';
-import { __renderValue, __renderValueDefaultZero } from '@/lib/helpers/helper';
+import { __renderValue, __renderValueDefaultZero, formatRupiah } from '@/lib/helpers/helper';
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import IconButton from '@mui/material/IconButton'
@@ -43,43 +43,51 @@ function Table({ params, setParams, fetchData }) {
       children: [
         {
           label: "Angsuran Ke-1",
-          align: "left",
+          align: "center",
           sx: {
             minWidth: 200,
           },
-          render: (val) => __renderValueDefaultZero(val?.payments?.[0]?.amount),
+          render: (val) => formatRupiah(val?.payments?.[0]?.amount),
         },
         {
           label: "Angsuran Ke-2",
-          align: "left",
+          align: "center",
           sx: {
             minWidth: 200,
           },
-          render: (val) => __renderValueDefaultZero(val?.payments?.[1]?.amount),
+          render: (val) => formatRupiah(val?.payments?.[1]?.amount),
         },
         {
           label: "Angsuran Ke-3",
-          align: "left",
+          align: "center",
           sx: {
             minWidth: 200,
           },
-          render: (val) => __renderValueDefaultZero(val?.payments?.[2]?.amount),
+          render: (val) => formatRupiah(val?.payments?.[2]?.amount),
         },
         {
           label: "Angsuran Ke-4",
-          align: "left",
+          align: "center",
           sx: {
             minWidth: 200,
           },
-          render: (val) => __renderValueDefaultZero(val?.payments?.[3]?.amount),
+          render: (val) => formatRupiah(val?.payments?.[3]?.amount),
         },
         {
           label: "Angsuran Ke-5",
-          align: "left",
+          align: "center",
           sx: {
             minWidth: 200,
           },
-          render: (val) => __renderValueDefaultZero(val?.payments?.[4]?.amount),
+          render: (val) => formatRupiah(val?.payments?.[4]?.amount),
+        },
+        {
+          label: "Angsuran Ke-6",
+          align: "center",
+          sx: {
+            minWidth: 200,
+          },
+          render: (val) => formatRupiah(val?.payments?.[5]?.amount),
         },
       ]
     },
@@ -91,7 +99,7 @@ function Table({ params, setParams, fetchData }) {
       },
       render: (val) => {
         const totalPayment = val?.payments?.reduce((sum, payment) => sum + payment.amount, 0) || 0;
-        return __renderValueDefaultZero(totalPayment);
+        return formatRupiah(totalPayment);
       }
     },
     {
@@ -102,16 +110,21 @@ function Table({ params, setParams, fetchData }) {
       },
       render: (val) => {
         const installationBill = val?.installationBill || 0;
-        return __renderValueDefaultZero(installationBill);
+        return formatRupiah(installationBill);
       }
     },
     {
       label:"Tagihan Yang Harus Dibayar (B-A)",
-      align:"left",
+      align:"center",
       sx: {
         minWidth: 250,
       },
-      render: (val) => __renderValue(val.billsToPay)
+      render: (val) => {
+        if(!val?.billsToPay || val?.billsToPay <= 0) return <div className='text-emerald-600 uppercase font-bold'>Lunas</div>;
+        return (
+          <div className="text-red-600 font-bold">{formatRupiah(val.billsToPay)}</div>
+        )
+      }
     },
     {
       label:"Aksi",

@@ -40,7 +40,8 @@ function Form({ isEdit = false}) {
   const router = useRouter();
   const { isLoadingCreate, installation } = useSelector((state) => state.pam);
   const { detail: detailPemasangan } = installation;
-  const { pelanggan: dataPelanggan } = useSelector(state => state.master);
+  const { pelanggan } = useSelector(state => state.master);
+  const {data: dataPelanggan} = pelanggan;
   const [totalInstallationBill, setTotalInstallationBill] = React.useState(0);
   
   const dispatch = useDispatch();
@@ -115,7 +116,7 @@ function Form({ isEdit = false}) {
   React.useEffect(() => {
     if(!form.values.pelangganId || dataPelanggan.length === 0) return;
     const selectedPelanggan = dataPelanggan.find(item => item.id === extractSelect(form.values.pelangganId, 'value'));
-    setTotalInstallationBill(selectedPelanggan ? selectedPelanggan.installationBill : 0);
+    setTotalInstallationBill(selectedPelanggan ? selectedPelanggan?.installationBill : 0);
   }, [form.values.pelangganId, dataPelanggan]);
   React.useEffect(() => {
     if (isEdit && detailPemasangan) {
@@ -166,7 +167,7 @@ function Form({ isEdit = false}) {
             />
           </FormControl>
           <div className="col-span-3">
-            <div className='text-[13px] text-gray-400'>Total Biaya Pemasangan: Rp. {isEdit ? detailPemasangan.installationBill : totalInstallationBill}</div>
+            <div className='text-[13px] text-gray-400'>Total Biaya Pemasangan: Rp. {isEdit ? detailPemasangan?.installationBill : totalInstallationBill}</div>
           </div>
           {/* Credit Payments Section */}
           {form.values.credit_payments.map((payment, index) => (

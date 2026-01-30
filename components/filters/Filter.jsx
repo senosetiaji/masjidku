@@ -263,7 +263,7 @@ function Filter({ filters, multipleFilters, onSubmit, filterState, requiredField
   });
 
   return (
-    <div className="relative z-50 animate__animated animate__fadeIn p-4 mb-6 bg-white border border-dashed border-gray-200 rounded-lg shadow-sm">
+    <div className="relative w-full animate__animated animate__fadeIn p-4 mb-6 bg-white border border-dashed border-gray-200 rounded-lg shadow-sm">
       <Box component={'div'} className='relative' borderRadius="8px">
         <div className="flex justify-between gap-4">
           <div className={`w-6/6 grid ${className} gap-4 mb-6`}>
@@ -274,7 +274,7 @@ function Filter({ filters, multipleFilters, onSubmit, filterState, requiredField
             <Button
               label="Terapkan"
               icon={'/assets/icons/icon-util-filter.svg'}
-              className="border border-gray-300 w-full! bg-white text-gray-700 hover:bg-gray-100 hover:shadow-md"
+              className="border border-gray-300 w-full! min-w-fit! bg-white text-gray-700 hover:bg-gray-100 hover:shadow-md"
               onClick={() => {
                 // Simpan ke Redux berdasarkan keyName (wajib isi keyName di halaman pemakai)
                 if (keyName) {

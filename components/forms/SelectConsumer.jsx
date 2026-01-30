@@ -5,19 +5,31 @@ import { getAllPelanggan } from '@/store/actions/master.action';
 
 function SelectConsumer({ ...props }) {
   const dispatch = useDispatch();
-  const { pelanggan: data } = useSelector(state => state.master);
-
+  const { pelanggan } = useSelector(state => state.master);
+  const { data } = pelanggan;
+  const [options, setOptions] = React.useState([]);
   React.useEffect(() => {
     dispatch(getAllPelanggan({ params: { all: true } }));
-  }, [dispatch]);
+  }, []);
 
-  const options = React.useMemo(() => {
-    if (!data || data.length === 0) return [];
-    return data.map(item => ({
-      label: item.name,
-      value: item.id,
-    }));
+  React.useEffect(() => {
+    if (data && data.length > 0) {
+      const opts = data.map(item => ({
+        label: item.name,
+        value: item.id,
+      }));
+      setOptions(opts);
+    }
   }, [data]);
+
+
+  // const options = React.useMemo(() => {
+  //   if (!data || data.length === 0) return [];
+  //   return data.map(item => ({
+  //     label: item.name,
+  //     value: item.id,
+  //   }));
+  // }, [data]);
 
   return (
     <div>

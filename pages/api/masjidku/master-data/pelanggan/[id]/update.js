@@ -70,17 +70,6 @@ export default async function handler(req, res) {
 			return res.status(400).json({ message: "invalid_installation_bill" });
 		}
 
-		const duplicatePhone = await prisma.masterDataPelanggan.findFirst({
-			where: {
-				phone: { equals: phone },
-				NOT: { id: pelangganId },
-			},
-			select: { id: true },
-		});
-		if (duplicatePhone) {
-			return res.status(400).json({ message: "phone_already_exist" });
-		}
-
 		const updated = await prisma.masterDataPelanggan.update({
 			where: { id: pelangganId },
 			data: {
