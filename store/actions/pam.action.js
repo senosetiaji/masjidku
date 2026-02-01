@@ -61,7 +61,7 @@ export const createPamRutinan = createAsyncThunk('pamRutinan/createPamRutinan', 
   try {
     const response = await API.post('/masjidku/pam/rutinan/create', payload)
     const data = await response.data.data
-    dispatch(successHelper('Pam Rutinan created successfully', '/pam/rutinan'))
+    dispatch(successHelper('Pam Rutinan created successfully', '/pam/biaya-rutinan'))
     return data
   } catch(err){
     dispatch(errorHelper(err))

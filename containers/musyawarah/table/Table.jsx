@@ -9,12 +9,23 @@ import ModalConfirm from '@/components/modals/ModalConfirm';
 import { useRouter } from 'next/router';
 import moment from 'moment';
 import { deleteData } from '@/store/actions/musyawarah.action';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 
 function Table({ params, setParams, fetchData }) {
   const { data, meta, isLoading } = useSelector((state) => state.musyawarah);
   const deleteModalRef = React.useRef();
   const dispatch = useDispatch();
   const router = useRouter();
+  const refModalDetail = React.useRef();
+
+  const copyToClipboard = () => {
+    let allSummaries = data.map(item => item.summary).filter(summary => summary).join('\n\n');
+    navigator.clipboard.writeText(allSummaries).then(() => {
+      alert('Semua rangkuman musyawarah berhasil disalin ke clipboard.');
+    }, (err) => {
+      alert('Gagal menyalin rangkuman musyawarah: ', err);
+    });
+  }
 
   const columns = [
     {
@@ -39,7 +50,13 @@ function Table({ params, setParams, fetchData }) {
       sx: {
         minWidth: 350,
       },
-      render: (val) => val?.topic ?? '-'
+      render: (val) => {
+        return (
+          <div className="">
+            {val?.topic ?? '-'}
+          </div>
+        )
+      }
     },
     {
       label:"Rangkuman",
@@ -47,7 +64,20 @@ function Table({ params, setParams, fetchData }) {
       sx: {
         minWidth: 250,
       },
-      render: (val) => __renderValue(val.summary)
+      render: (val) => {
+        return(
+          <div className="">
+            <div className="text-ellipsis max-w-75 overflow-hidden whitespace-nowrap">
+              {val?.summary ?? '-'}
+            </div>
+            <div className="inline-block ml-2">
+              <IconButton aria-label="copy" color="secondary" onClick={() => copyToClipboard()} disabled={!val?.summary}>
+                <ContentCopyIcon />
+              </IconButton>
+            </div>  
+          </div>
+        )
+      }
     },
     {
       label:"Aksi",

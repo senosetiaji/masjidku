@@ -10,6 +10,7 @@ import { Editor } from 'primereact/editor';
 import TextAreaField from '@/components/fields/TextAreaField';
 import { API } from '@/lib/config/api';
 import { createMusyawarah, rangkumMusyawarah, updateDataMusyawarah } from '@/store/actions/musyawarah.action';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 
 const stripHtml = (html) => {
   if (!html) return '';
@@ -31,7 +32,7 @@ function Form({ isEdit = false}) {
   const dispatch = useDispatch();
   const hasNotes = React.useMemo(() => stripHtml(text).length > 0, [text]);
   const { isLoadingCreate, summary: summaryFromStore, detail } = useSelector((state) => state.musyawarah);
-
+  
   const requestSummary = React.useCallback(async () => {
     if (!hasNotes) {
       setSummaryError('Catatan musyawarah belum diisi.');
@@ -112,6 +113,13 @@ function Form({ isEdit = false}) {
       setSummary(detail.summary || '');
     }
   }, [isEdit, detail]);
+  function copyToClipboard() {
+    navigator.clipboard.writeText(summary).then(() => {
+      alert('Ringkasan musyawarah berhasil disalin ke clipboard.');
+    }, (err) => {
+      alert('Gagal menyalin ringkasan musyawarah: ', err);
+    });
+  }
   return (
     <div>
       <div className="flex items-center mb-6 gap-4">
@@ -181,6 +189,11 @@ function Form({ isEdit = false}) {
             />
             {summaryError && <p className="text-sm text-red-500 mt-2">{summaryError}</p>}
           </FormControl>
+          <div className="">
+            <Button variant="text" color="secondary" onClick={() => copyToClipboard()} startIcon={<ContentCopyIcon />} disabled={!summary}>
+              Copy Rangkuman
+            </Button>
+          </div>
           <div className="flex justify-end mt-6">
             <Button type="submit" variant="contained" color="primary" disabled={isSummarizing}>
               {isEdit ? 'Update Musyawarah' : 'Buat Musyawarah'}
