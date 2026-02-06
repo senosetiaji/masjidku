@@ -26,6 +26,7 @@ function Form({ isEdit = false}) {
       status: extractSelect(values.status, 'value'),
       tahun: tahun ? parseInt(tahun, 10) : null,
       bulan: bulan ? parseInt(bulan, 10) : null,
+      water_bill: Number(values.current_used || 0) - Number(values.previous_used || 0),
     };
     if (isEdit) {
       await dispatch(updateDataPamRutin({ id: detailRutinan.id, payload: payoad }));

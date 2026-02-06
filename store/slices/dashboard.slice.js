@@ -1,5 +1,5 @@
 import { createSlice, current } from "@reduxjs/toolkit"
-import { getDashboardSummary, getFinanceChart, getFinanceTable, getPamFinanceChart } from "../actions/dashboard.action"
+import { getDashboardSummary, getFinanceChart, getFinanceTable, getPamChart, getPamFinanceChart } from "../actions/dashboard.action"
 
 export const initialState = {
 	data:[],
@@ -15,6 +15,7 @@ export const initialState = {
   pam: {
     data: [],
     chart: null,
+    finance: null,
     isLoading: false,
     meta: {
       total_row: 0,
@@ -79,9 +80,20 @@ const dashboardSlice = createSlice({
     })
     .addCase(getPamFinanceChart.fulfilled, (state, actions) => {
       state.pam.isLoading = false;
-      state.pam.chart = actions.payload.data;
+      state.pam.finance = actions.payload.data;
     })
     .addCase(getPamFinanceChart.rejected, (state) => {
+      state.pam.isLoading = false
+    })
+    
+    .addCase(getPamChart.pending, (state) => {
+      state.pam.isLoading = true
+    })
+    .addCase(getPamChart.fulfilled, (state, actions) => {
+      state.pam.isLoading = false;
+      state.pam.chart = actions.payload.data;
+    })
+    .addCase(getPamChart.rejected, (state) => {
       state.pam.isLoading = false
     })
   }

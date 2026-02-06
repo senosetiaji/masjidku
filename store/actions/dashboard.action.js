@@ -45,3 +45,14 @@ export const getPamFinanceChart = createAsyncThunk('dashboard/getPamFinanceChart
     return rejectWithValue(err?.response?.data)
   }
 })
+
+export const getPamChart = createAsyncThunk('dashboard/getPamChart', async ({params}, { dispatch, rejectWithValue }) => {
+  try {
+    const response = await API.get('/masjidku/dashboard/pam/chart', { params: params })
+    const data = await response.data
+    return data
+  } catch(err){
+    dispatch(errorHelper(err))
+    return rejectWithValue(err?.response?.data)
+  }
+})
