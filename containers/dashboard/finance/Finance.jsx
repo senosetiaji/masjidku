@@ -22,7 +22,7 @@ function Finance() {
   React.useEffect(() => {
     // fetch data when params change
     const newParams = {
-      year: extractSelect(params?.year, 'value'),
+      tahun: extractSelect(params?.year, 'value'),
       month: extractSelect(params?.month, 'value'),
     }
 
@@ -30,7 +30,11 @@ function Finance() {
   }, [params])
 
   React.useEffect(() => {
-    dispatch(getFinanceTable({ params: {} }))
+    const newParams = {
+      tahun: extractSelect(params?.year, 'value'),
+      month: extractSelect(params?.month, 'value'),
+    }
+    dispatch(getFinanceTable({ params: newParams }))
   }, [])
   return (
     <div className='grid grid-cols-1 lg:grid-cols-3 gap-4'>

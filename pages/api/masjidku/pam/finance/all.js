@@ -122,54 +122,6 @@ export default async function handler(req, res) {
 
 		const total = await prisma.pamKas.count({ where });
 
-		const rows = await prisma.pamKas.findMany({
-			where,
-			orderBy: [{ date: "asc" }, { createdAt: "asc" }, { id: "asc" }],
-			skip: (page - 1) * limit,
-			take: limit,
-			select: {
-	        id: true,
-				date: true,
-				createdAt: true,
-				amount: true,
-				type: true,
-				description: true,
-			},
-		});
-
-		let initialSaldo = openingSaldo;
-		if (page > 1 && rows.length > 0) {
-			const first = rows[0];
-			const boundaryWhere = {
-				...where,
-				OR: [
-					{ date: { lt: first.date } },
-					{ date: first.date, createdAt: { lt: first.createdAt } },
-					{ date: first.date, createdAt: first.createdAt, id: { lt: first.id } },
-				],
-			};
-
-			const [priorIncome, priorExpense] = await Promise.all([
-				prisma.pamKas.aggregate({ where: { ...boundaryWhere, type: "income" }, _sum: { amount: true } }),
-				prisma.pamKas.aggregate({ where: { ...boundaryWhere, type: "expense" }, _sum: { amount: true } }),
-			]);
-
-			initialSaldo = (priorIncome._sum.amount || 0) - (priorExpense._sum.amount || 0);
-		}
-
-		let runningSaldo = initialSaldo;
-		const data = rows.map((item) => {
-			runningSaldo += item.type === "income" ? item.amount : -item.amount;
-			return {
-	      id: item.id,
-				date: item.date.toISOString(),
-				amount: item.amount,
-				type: item.type,
-				description: item.description,
-				saldo: runningSaldo,
-			};
-		});
-
 		const [sumIncome, sumExpense] = await Promise.all([
 			prisma.pamKas.aggregate({
 				where: { ...baseWhere, type: "income" },
@@ -184,6 +136,55 @@ export default async function handler(req, res) {
 		const incomeSum = sumIncome._sum.amount || 0;
 		const expenseSum = sumExpense._sum.amount || 0;
 		const totalSaldo = openingSaldo + incomeSum - expenseSum;
+
+		const rows = await prisma.pamKas.findMany({
+			where,
+			orderBy: [{ date: "desc" }, { createdAt: "desc" }, { id: "desc" }],
+			skip: (page - 1) * limit,
+			take: limit,
+			select: {
+	        id: true,
+				date: true,
+				createdAt: true,
+				amount: true,
+				type: true,
+				description: true,
+			},
+		});
+
+		let runningSaldo = totalSaldo;
+		if (page > 1 && rows.length > 0) {
+			const first = rows[0];
+			const newerWhere = {
+				...where,
+				OR: [
+					{ date: { gt: first.date } },
+					{ date: first.date, createdAt: { gt: first.createdAt } },
+					{ date: first.date, createdAt: first.createdAt, id: { gt: first.id } },
+				],
+			};
+
+			const [newerIncome, newerExpense] = await Promise.all([
+				prisma.pamKas.aggregate({ where: { ...newerWhere, type: "income" }, _sum: { amount: true } }),
+				prisma.pamKas.aggregate({ where: { ...newerWhere, type: "expense" }, _sum: { amount: true } }),
+			]);
+
+			const netNewer = (newerIncome._sum.amount || 0) - (newerExpense._sum.amount || 0);
+			runningSaldo = totalSaldo - netNewer;
+		}
+
+		const data = rows.map((item) => {
+			const saldoAfter = runningSaldo;
+			runningSaldo += item.type === "income" ? -item.amount : item.amount;
+			return {
+	      id: item.id,
+				date: item.date.toISOString(),
+				amount: item.amount,
+				type: item.type,
+				description: item.description,
+				saldo: saldoAfter,
+			};
+		});
 
 		const totalPage = total === 0 ? 0 : Math.ceil(total / limit);
 

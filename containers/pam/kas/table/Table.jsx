@@ -88,7 +88,7 @@ function Table({ params, setParams, fetchData }) {
       render: (val) => {
         return (
           <div className='flex gap-2 w-full justify-center'>
-            <IconButton aria-label="edit" className='bg-yellow-400! text-white! hover:bg-yellow-500!' onClick={() => { router.push(`/keuangan/edit/${val?.id}`) }}>
+            <IconButton aria-label="edit" className='bg-yellow-400! text-white! hover:bg-yellow-500!' onClick={() => { router.push(`/pam/kas/edit/${val?.id}`) }}>
               <EditIcon fontSize="small" />
             </IconButton>
             <IconButton aria-label="delete" className='bg-red-400! text-white! hover:bg-red-500!' onClick={() => { deleteModalRef.current.open(val?.id); }}>

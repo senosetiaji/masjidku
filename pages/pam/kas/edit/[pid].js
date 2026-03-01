@@ -31,7 +31,7 @@ function Index() {
   }, [pid, router]);
   return (
     <RootLayout breadcrumbs={breadcrumbs}>
-      <Form isEdit />
+      <Form isEdit={true} />
     </RootLayout>
   )
 }

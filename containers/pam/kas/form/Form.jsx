@@ -33,7 +33,8 @@ function Form({ isEdit = false }) {
   const router = useRouter();
   const { pid } = router.query;
   const dispatch = useDispatch();
-  const { detail } = useSelector(state => state.finance);
+  const { finance } = useSelector(state => state.pam);
+  const { detail } = finance;
   
   function onSubmit(values) {
     const payload = {
@@ -66,6 +67,7 @@ function Form({ isEdit = false }) {
 
   React.useEffect(() => {
     if (isEdit && detail) {
+      console.log(detail)
       form.setValues({
         data: [{
           date: moment(detail.date).format('YYYY-MM-DD'),
