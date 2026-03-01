@@ -109,3 +109,28 @@ model Musyawarah {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
+
+model Zakats {
+  id            String   @id @default(uuid())
+  date          DateTime
+  type          String // fitrah | mal
+  zakatType     String // uang | beras
+  amount        Int
+  name          String
+  description   String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Qurban {
+  id          String   @id @default(uuid())
+  date        DateTime
+  type        String // hewan | uang
+  animalType  String? // kambing | sapi | domba (jika type = hewan)
+  amount      Int
+  price       Int
+  name        String
+  description String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
