@@ -122,6 +122,29 @@ model Zakats {
   updatedAt     DateTime @updatedAt
 }
 
+model PanitiaZakat {
+  id              String   @id @default(uuid())
+  name            String
+  phone           String
+  serviceYears    Int
+  role            String // ketua | bendahara | amil
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model PenerimaZakat {
+  id          String   @id @default(uuid())
+  name        String
+  address     String
+  phone       String
+  role        String // warga | pemuka agama | lembaga sosial
+  zakatType   String // fitrah | mal
+  amount      Int
+  receivingYear Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
 model Qurban {
   id          String   @id @default(uuid())
   date        DateTime

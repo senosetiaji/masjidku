@@ -1,0 +1,82 @@
+import { PrismaClient } from "@prisma/client";
+import crypto from "crypto";
+
+// Prisma singleton (avoid new clients per hot-reload)
+const globalForPrisma = globalThis;
+let prisma = globalForPrisma.prisma;
+if (!prisma) {
+	prisma = new PrismaClient();
+	if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
+}
+
+const SECRET = process.env.APP_SECRET || "dev-secret";
+const VALID_ROLES = new Set(["ketua", "bendahara", "amil"]);
+
+const verifyToken = (token) => {
+	if (!token) return null;
+	const [encoded, signature] = token.split(".");
+	if (!encoded || !signature) return null;
+	const expected = crypto.createHmac("sha256", SECRET).update(encoded).digest("hex");
+	if (expected !== signature) return null;
+	const json = Buffer.from(encoded, "base64url").toString("utf8");
+	try {
+		return JSON.parse(json);
+	} catch (e) {
+		return null;
+	}
+};
+
+export default async function handler(req, res) {
+	if (req.method !== "POST") {
+		return res.status(405).json({ message: "Method not allowed" });
+	}
+
+	try {
+		const cookieHeader = req.headers.cookie || "";
+		const sessionCookie = cookieHeader.split(";").find((c) => c.trim().startsWith("session="));
+		const token = sessionCookie ? sessionCookie.trim().replace("session=", "") : null;
+		const session = verifyToken(token);
+		if (!session?.id) {
+			return res.status(401).json({ message: "unauthorized" });
+		}
+
+		const userId = String(session.id);
+		const userExists = await prisma.user.findUnique({ where: { id: userId }, select: { id: true } });
+		if (!userExists) {
+			return res.status(401).json({ message: "invalid_session_user" });
+		}
+
+		const { name, phone, serviceYears, role } = req.body || {};
+
+		if (!name || !phone || serviceYears === undefined || serviceYears === null || !role) {
+			return res.status(400).json({ message: "missing_fields" });
+		}
+
+		const normalizedRole = String(role).toLowerCase();
+		if (!VALID_ROLES.has(normalizedRole)) {
+			return res.status(400).json({ message: "invalid_role" });
+		}
+
+		const parsedYears = Number(serviceYears);
+		if (!Number.isInteger(parsedYears) || parsedYears < 0) {
+			return res.status(400).json({ message: "invalid_years_of_service" });
+		}
+
+		await prisma.panitiaZakat.create({
+			data: {
+				name: String(name),
+				phone: String(phone),
+				serviceYears: parsedYears,
+				role: normalizedRole,
+			},
+		});
+
+		return res.status(201).json({ status: 201, message: "panitia_zakat_created" });
+	} catch (error) {
+		console.error("CREATE PANITIA ZAKAT ERROR:", error);
+		if (error?.code === "P2003") {
+			return res.status(400).json({ message: "foreign_key_constraint_failed" });
+		}
+		return res.status(500).json({ message: "server_error" });
+	}
+}
