@@ -88,7 +88,7 @@ function Chart() {
   }), [categories, series])
 
   return (
-    <div className="p-4 shadow-md rounded-lg border border-slate-100 bg-white">
+    <div className="p-4 shadow-md rounded-lg border border-slate-100 bg-white pb-8">
       <div className="flex items-center justify-between mb-3">
         <div>
           <h3 className="text-lg font-semibold text-slate-800">Grafik Pemakaian PAM</h3>
@@ -102,7 +102,7 @@ function Chart() {
       )}
 
       {hasData && (
-        <div className="h-90">
+        <div className="h-90 mb-8">
           <HighchartsReact highcharts={Highcharts} options={options} immutable={false} updateArgs={[true, true]} />
         </div>
       )}

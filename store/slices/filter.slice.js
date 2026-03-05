@@ -13,6 +13,10 @@ const initialState = {
     values: null,
     appliedAt: null,
   },
+  zakat: {
+    values: null,
+    appliedAt: null,
+  },
 };
 
 const filterSlice = createSlice({
@@ -20,8 +24,6 @@ const filterSlice = createSlice({
   initialState,
   reducers: {
     setFilter(state, action) {
-      console.log(action);
-      
       const { key, values } = action.payload;
       state[key] = { values, appliedAt: Date.now() };
     },

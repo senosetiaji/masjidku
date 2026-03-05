@@ -84,7 +84,6 @@ export default async function handler(req, res) {
 
 		return res.status(201).json({ status: 201, message: "zakat_created" });
 	} catch (error) {
-		console.error("CREATE ZAKAT ERROR:", error);
 		if (error?.code === "P2003") {
 			return res.status(400).json({ message: "foreign_key_constraint_failed" });
 		}

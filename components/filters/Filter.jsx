@@ -13,6 +13,7 @@ import SelectBulan from '../forms/SelectBulan';
 import SelectYear from '../forms/SelectYear';
 import SelectPaymentStatus from '../forms/SelectPaymentStatus';
 import SelectConsumer from '../forms/SelectConsumer';
+import SelectZakatType from '../forms/SelectZakatType';
 
 function Filter({ filters, multipleFilters, onSubmit, filterState, requiredField = [], keyName = '', loading = false }) {
   const [className, setClassName] = React.useState('');
@@ -35,7 +36,6 @@ function Filter({ filters, multipleFilters, onSubmit, filterState, requiredField
       return;
     } 
     onSubmit(savedRedux);
-    console.log('save redux: ', savedRedux);
     
   }, [savedRedux]);
 
@@ -251,6 +251,20 @@ function Filter({ filters, multipleFilters, onSubmit, filterState, requiredField
             />
           </FormControl>
         );
+        case 'zakat_type':
+        return (
+          <FormControl key={keyIdx}>
+            <SelectZakatType
+              label={overrideLabel || 'Tipe Zakat'}
+              placeholder="Pilih Tipe Zakat"
+              name={name} 
+              id={name}
+              size="small"
+              value={localFilterState?.[name]}
+              onChange={handleChange}
+            />
+          </FormControl>
+        );
       default:
         return null;
     }
@@ -278,7 +292,7 @@ function Filter({ filters, multipleFilters, onSubmit, filterState, requiredField
   });
 
   return (
-    <div className="relative w-full animate__animated animate__fadeIn p-4 mb-6 bg-white border border-dashed border-gray-200 rounded-lg shadow-sm">
+    <div className="relative w-full animate__animated animate__fadeIn p-4 mb-6 bg-white border border-dashed border-gray-200 rounded-lg">
       <Box component={'div'} className='relative' borderRadius="8px">
         <div className="flex justify-between gap-4">
           <div className={`w-6/6 grid ${className} gap-4 mb-6`}>
@@ -289,7 +303,7 @@ function Filter({ filters, multipleFilters, onSubmit, filterState, requiredField
             <Button
               label="Terapkan"
               icon={'/assets/icons/icon-util-filter.svg'}
-              className="border border-gray-300 w-full! min-w-fit! bg-white text-gray-700 hover:bg-gray-100 hover:shadow-md"
+              className="border border-gray-300 w-full! bg-white text-gray-700 hover:bg-gray-100 hover:shadow-md"
               onClick={() => {
                 // Simpan ke Redux berdasarkan keyName (wajib isi keyName di halaman pemakai)
                 if (keyName) {

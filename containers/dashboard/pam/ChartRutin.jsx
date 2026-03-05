@@ -41,14 +41,13 @@ function ChartRutin() {
   }, [filterState])
 
   return (
-    <div className="shadow-md rounded-lg border border-slate-100 bg-white p-4">
+    <div className="rounded-lg bg-white p-4 pb-6">
       <div className="flex items-center justify-between mb-4">
         <div>
           <h2 className="text-lg font-semibold text-slate-800">PAM Rutin</h2>
           <p className="text-xs text-slate-500">Filter untuk menyesuaikan data grafik pemakaian air.</p>
         </div>
       </div>
-
       <div className="mb-4">
         <Filter
           filters={['tahun', 'pelanggan']}
@@ -56,7 +55,6 @@ function ChartRutin() {
           onSubmit={handleFilterChange}
         />
       </div>
-
       <Chart />
     </div>
   )
