@@ -13,6 +13,7 @@ import dashboardReducer from './dashboard.slice'
 import zakatReducer from './zakat.slice'
 import mustahikReducer from './mustahik.slice'
 import panitiaZakatReducer from './panitiaZakat.slice'
+import uiReducer from './ui.slice'
 
 const rootReducer = combineReducers({
   // Add your slice reducers here
@@ -31,6 +32,7 @@ const rootReducer = combineReducers({
   zakat: zakatReducer,
   mustahik: mustahikReducer,
   panitiaZakat: panitiaZakatReducer,
+  ui: uiReducer,
 })
 
 export default rootReducer
