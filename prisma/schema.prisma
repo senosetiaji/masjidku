@@ -126,7 +126,7 @@ model PanitiaZakat {
   id              String   @id @default(uuid())
   name            String
   phone           String
-  serviceYears    Int
+  serviceYear     Int
   role            String // ketua | bendahara | amil
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt

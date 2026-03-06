@@ -46,9 +46,10 @@ export default async function handler(req, res) {
 			return res.status(401).json({ message: "invalid_session_user" });
 		}
 
-		const { name, phone, serviceYears, role } = req.body || {};
+		const { name, phone, serviceYear, serviceYears, role } = req.body || {};
+		const serviceYearInput = serviceYear ?? serviceYears;
 
-		if (!name || !phone || serviceYears === undefined || serviceYears === null || !role) {
+		if (!name || !phone || serviceYearInput === undefined || serviceYearInput === null || !role) {
 			return res.status(400).json({ message: "missing_fields" });
 		}
 
@@ -57,7 +58,7 @@ export default async function handler(req, res) {
 			return res.status(400).json({ message: "invalid_role" });
 		}
 
-		const parsedYears = Number(serviceYears);
+		const parsedYears = Number(serviceYearInput);
 		if (!Number.isInteger(parsedYears) || parsedYears < 0) {
 			return res.status(400).json({ message: "invalid_years_of_service" });
 		}
@@ -66,7 +67,7 @@ export default async function handler(req, res) {
 			data: {
 				name: String(name),
 				phone: String(phone),
-				serviceYears: parsedYears,
+				serviceYear: parsedYears,
 				role: normalizedRole,
 			},
 		});

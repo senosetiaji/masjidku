@@ -89,7 +89,7 @@ export default async function handler(req, res) {
 				id: true,
 				name: true,
 				phone: true,
-				serviceYears: true,
+				serviceYear: true,
 				role: true,
 				createdAt: true,
 			},
@@ -99,7 +99,7 @@ export default async function handler(req, res) {
 			id: item.id,
 			name: item.name,
 			phone: item.phone,
-			serviceYears: item.serviceYears,
+			serviceYear: item.serviceYear,
 			role: item.role,
 			createdAt: item.createdAt.toISOString(),
 		}));
