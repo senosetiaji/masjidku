@@ -58,3 +58,31 @@ export const updateDataFinance = createAsyncThunk('finance/updateDataFinance', a
     return rejectWithValue(err?.response?.data)
   }
 })
+
+export const exportFinance = createAsyncThunk('finance/exportFinance', async ({ params }, { dispatch, rejectWithValue }) => {
+  try {
+    const response = await API.get('/masjidku/finance/export', {
+      params,
+      responseType: 'blob',
+    });
+
+    const disposition = response.headers['content-disposition'] || '';
+    const match = disposition.match(/filename="?([^";]+)"?/i);
+    const filename = match ? match[1] : 'keuangan-masjid.pdf';
+
+    const blob = new Blob([response.data], { type: 'application/pdf' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', filename);
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.URL.revokeObjectURL(url);
+
+    return { filename };
+  } catch (err) {
+    dispatch(errorHelper(err));
+    return rejectWithValue(err?.response?.data);
+  }
+})

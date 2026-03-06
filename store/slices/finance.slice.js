@@ -1,5 +1,5 @@
 import { createSlice, current } from "@reduxjs/toolkit"
-import { createFinance, deleteData, getDetail, getFinance, updateDataFinance } from "../actions/finance.action"
+import { createFinance, deleteData, exportFinance, getDetail, getFinance, updateDataFinance } from "../actions/finance.action"
 
 export const initialState = {
 	data:[],
@@ -12,6 +12,7 @@ export const initialState = {
   isLoading:false,
   isLoadingCreate:false,
   isLoadingDelete:false,
+  isLoadingExport:false,
   isLoadingDetail:false,
 }
 
@@ -74,6 +75,16 @@ const financeSlice = createSlice({
     })
     .addCase(updateDataFinance.rejected, (state) => {
       state.isLoadingCreate = false
+    })
+
+    .addCase(exportFinance.pending, (state) => {
+      state.isLoadingExport = true
+    })
+    .addCase(exportFinance.fulfilled, (state) => {
+      state.isLoadingExport = false
+    })
+    .addCase(exportFinance.rejected, (state) => {
+      state.isLoadingExport = false
     })
   }
 })
