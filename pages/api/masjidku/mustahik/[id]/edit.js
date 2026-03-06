@@ -1,7 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import crypto from "crypto";
 
-// Prisma singleton (avoid new clients per hot-reload)
 const globalForPrisma = globalThis;
 let prisma = globalForPrisma.prisma;
 if (!prisma) {
@@ -10,20 +9,8 @@ if (!prisma) {
 }
 
 const SECRET = process.env.APP_SECRET || "dev-secret";
-const VALID_TYPES = new Set(["fitrah", "mal"]);
-const VALID_ZAKAT_TYPES = new Set(["uang", "beras", "lainnya", "lain-lain"]);
-const normalizeZakatType = (value) => {
-	const val = String(value || "").toLowerCase().trim();
-	if (val === "lain-lain") return "lainnya";
-	return val;
-};
-
-const parseAmount = (value) => {
-	if (value === undefined || value === null) return NaN;
-	if (typeof value === "number") return value;
-	const normalized = String(value).replace(/\s+/g, "").replace(",", ".");
-	return Number(normalized);
-};
+const VALID_ROLES = new Set(["warga", "pemuka agama", "lembaga sosial"]);
+const VALID_ZAKAT_TYPES = new Set(["fitrah", "mal"]);
 
 const verifyToken = (token) => {
 	if (!token) return null;
@@ -37,6 +24,21 @@ const verifyToken = (token) => {
 	} catch (e) {
 		return null;
 	}
+};
+
+const parseIntStrict = (value) => {
+	if (value === undefined || value === null) return NaN;
+	const num = Number(value);
+	if (!Number.isFinite(num)) return NaN;
+	return Math.trunc(num);
+};
+
+const parseAmount = (value) => {
+	if (value === undefined || value === null) return NaN;
+	if (typeof value === "number") return value;
+	const normalized = String(value).replace(/\s+/g, "").replace(",", ".");
+	const parsed = Number(normalized);
+	return Number.isFinite(parsed) ? parsed : NaN;
 };
 
 export default async function handler(req, res) {
@@ -65,62 +67,64 @@ export default async function handler(req, res) {
 			return res.status(400).json({ message: "id_required" });
 		}
 
-		const { name, date, type, zakatType, amount, description = "" } = req.body || {};
-
-		if (!name || !date || !type || !zakatType || amount === undefined || amount === null) {
+		const { name, address, phone, role, zakatType, amount, receivingYear } = req.body || {};
+		if (!name || !address || !phone || !role || !zakatType || amount === undefined || receivingYear === undefined) {
 			return res.status(400).json({ message: "missing_fields" });
 		}
 
-		if (!VALID_TYPES.has(String(type).toLowerCase())) {
-			return res.status(400).json({ message: "invalid_type" });
+		const normalizedRole = String(role).toLowerCase().trim();
+		if (!VALID_ROLES.has(normalizedRole)) {
+			return res.status(400).json({ message: "invalid_role" });
 		}
 
-		const normalizedZakatType = normalizeZakatType(zakatType);
+		const normalizedZakatType = String(zakatType).toLowerCase().trim();
 		if (!VALID_ZAKAT_TYPES.has(normalizedZakatType)) {
 			return res.status(400).json({ message: "invalid_zakat_type" });
 		}
 
 		const parsedAmount = parseAmount(amount);
-		if (!Number.isFinite(parsedAmount)) {
+		if (!Number.isFinite(parsedAmount) || parsedAmount < 0) {
 			return res.status(400).json({ message: "invalid_amount" });
 		}
 
-		const parsedDate = new Date(date);
-		if (Number.isNaN(parsedDate.getTime())) {
-			return res.status(400).json({ message: "invalid_date" });
+		const parsedReceivingYear = parseIntStrict(receivingYear);
+		if (!Number.isFinite(parsedReceivingYear) || parsedReceivingYear < 1900 || parsedReceivingYear > 3000) {
+			return res.status(400).json({ message: "invalid_receiving_year" });
 		}
 
-		const updated = await prisma.zakats.update({
+		const updated = await prisma.penerimaZakat.update({
 			where: { id },
 			data: {
 				name: String(name),
-				date: parsedDate,
-				type: String(type).toLowerCase(),
+				address: String(address),
+				phone: String(phone),
+				role: normalizedRole,
 				zakatType: normalizedZakatType,
 				amount: parsedAmount,
-				description: String(description || ""),
+				receivingYear: parsedReceivingYear,
 			},
 		});
 
 		return res.status(200).json({
 			status: 200,
-			message: "zakat_updated",
+			message: "mustahik_updated",
 			data: {
 				id: updated.id,
 				name: updated.name,
-				date: updated.date.toISOString(),
-				type: updated.type,
+				address: updated.address,
+				phone: updated.phone,
+				role: updated.role,
 				zakatType: updated.zakatType,
 				amount: updated.amount,
-				description: updated.description,
+				receivingYear: updated.receivingYear,
 				createdAt: updated.createdAt.toISOString(),
 				updatedAt: updated.updatedAt.toISOString(),
 			},
 		});
 	} catch (error) {
-		console.error("EDIT ZAKAT ERROR:", error);
+		console.error("EDIT MUSTAHIK ERROR:", error);
 		if (error?.code === "P2025") {
-			return res.status(404).json({ message: "zakat_not_found" });
+			return res.status(404).json({ message: "mustahik_not_found" });
 		}
 		return res.status(500).json({ message: "server_error" });
 	}

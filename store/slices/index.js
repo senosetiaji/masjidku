@@ -10,6 +10,8 @@ import filterReducer from './filter.slice'
 import pamReducer from './pam.slice'
 import musyawarahReducer from './musyawarah.slice'
 import dashboardReducer from './dashboard.slice'
+import zakatReducer from './zakat.slice'
+import mustahikReducer from './mustahik.slice'
 
 const rootReducer = combineReducers({
   // Add your slice reducers here
@@ -25,6 +27,8 @@ const rootReducer = combineReducers({
   pam: pamReducer,
   musyawarah: musyawarahReducer,
   dashboard: dashboardReducer,
+  zakat: zakatReducer,
+  mustahik: mustahikReducer,
 })
 
 export default rootReducer

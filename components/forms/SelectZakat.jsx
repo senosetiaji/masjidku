@@ -5,7 +5,7 @@ function SelectZakat({...props}) {
   const options = [
     { label: 'Uang', value: 'uang' },
     { label: 'Beras', value: 'beras' },
-    { label: 'Lain-lain', value: 'lain-lain' },
+    { label: 'Lain-lain', value: 'lainnya' },
   ]
 
   return (

@@ -1,6 +1,6 @@
 import RootLayout from '@/components/layouts/RootLayout';
-import Form from '@/containers/zakat/form/Form';
-import { getDetailZakat } from '@/store/actions/zakat.action';
+import Form from '@/containers/mustahik/form/Form';
+import { getDetailMustahik } from '@/store/actions/mustahik.action';
 import { useRouter } from 'next/router';
 import React from 'react'
 import { useDispatch } from 'react-redux';
@@ -11,17 +11,17 @@ function Index() {
 	const dispatch = useDispatch();
 
 	const breadcrumbs = [
-		{ label: 'Zakat', href: '/zakat' },
-		{ label: 'Edit Data Zakat', href: `/zakat/edit/${pid}` },
-	];
+		{ label: 'Mustahik', href: '/mustahik' },
+		{ label: 'Edit Data Mustahik', href: `/mustahik/edit/${pid}` },
+	]
 
 	async function fetchData() {
-		await dispatch(getDetailZakat({ id: pid }));
+		await dispatch(getDetailMustahik({ id: pid }));
 	}
 
 	React.useEffect(() => {
 		if (!pid) {
-			router.replace('/zakat');
+			router.replace('/mustahik');
 		} else {
 			fetchData();
 		}

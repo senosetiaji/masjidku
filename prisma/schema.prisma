@@ -115,7 +115,7 @@ model Zakats {
   date          DateTime
   type          String // fitrah | mal
   zakatType     String // uang | beras
-  amount        Int
+  amount        Float
   name          String
   description   String
   createdAt     DateTime @default(now())
@@ -139,7 +139,7 @@ model PenerimaZakat {
   phone       String
   role        String // warga | pemuka agama | lembaga sosial
   zakatType   String // fitrah | mal
-  amount      Int
+  amount      Float
   receivingYear Int
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
