@@ -12,6 +12,7 @@ import musyawarahReducer from './musyawarah.slice'
 import dashboardReducer from './dashboard.slice'
 import zakatReducer from './zakat.slice'
 import mustahikReducer from './mustahik.slice'
+import panitiaZakatReducer from './panitiaZakat.slice'
 
 const rootReducer = combineReducers({
   // Add your slice reducers here
@@ -29,6 +30,7 @@ const rootReducer = combineReducers({
   dashboard: dashboardReducer,
   zakat: zakatReducer,
   mustahik: mustahikReducer,
+  panitiaZakat: panitiaZakatReducer,
 })
 
 export default rootReducer
