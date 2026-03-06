@@ -35,6 +35,15 @@ const normalizeQueryValue = (val) => {
 	return val;
 };
 
+const formatDate = (value) => {
+	const d = new Date(value);
+	return new Intl.DateTimeFormat('id-ID', {
+		day: '2-digit',
+		month: 'short',
+		year: 'numeric',
+	}).format(d);
+};
+
 export default async function handler(req, res) {
 	if (req.method !== "GET") {
 		return res.status(405).json({ message: "Method not allowed" });
@@ -124,6 +133,9 @@ export default async function handler(req, res) {
 
 		const incomeSum = sumIncome._sum.amount || 0;
 		const expenseSum = sumExpense._sum.amount || 0;
+		const firstRowSaldo = rows.length
+			? openingSaldo + (rows[0].type === "income" ? rows[0].amount : -rows[0].amount)
+			: openingSaldo;
 		const closingSaldo = openingSaldo + incomeSum - expenseSum;
 
 		const filenameParts = ["pam-finance"];
@@ -149,9 +161,12 @@ export default async function handler(req, res) {
 		doc.fontSize(10).text(metaLines.join(" | "), { align: "center" });
 
 		doc.moveDown(0.8);
-		doc.fontSize(10).text(`Saldo Awal: Rp ${new Intl.NumberFormat("id-ID").format(openingSaldo)}`);
+		doc.fontSize(10).text(`Saldo Awal: Rp ${new Intl.NumberFormat("id-ID").format(firstRowSaldo)}`);
+		doc.moveDown(0.2);
 		doc.text(`Total Pemasukan: Rp ${new Intl.NumberFormat("id-ID").format(incomeSum)}`);
+		doc.moveDown(0.2);
 		doc.text(`Total Pengeluaran: Rp ${new Intl.NumberFormat("id-ID").format(expenseSum)}`);
+		doc.moveDown(0.2);
 		doc.text(`Saldo Akhir: Rp ${new Intl.NumberFormat("id-ID").format(closingSaldo)}`);
 
 		doc.moveDown(0.8);
@@ -162,14 +177,27 @@ export default async function handler(req, res) {
 
 		const drawRow = (vals, isHeader = false) => {
 			let x = startX;
-			vals.forEach((text, idx) => {
-				doc.fontSize(9).font(isHeader ? "Helvetica-Bold" : "Helvetica").text(String(text), x, y, {
+			const paddingY = 4; // ~2px top/bottom
+			const heights = vals.map((text, idx) =>
+				doc.heightOfString(String(text), {
 					width: colWidths[idx],
-					continued: false,
-				});
+					font: isHeader ? "Helvetica-Bold" : "Helvetica",
+					fontSize: 9,
+				})
+			);
+			const rowHeight = Math.max(...heights, 12) + paddingY;
+			const yText = y + paddingY / 2;
+			vals.forEach((text, idx) => {
+				doc
+					.font(isHeader ? "Helvetica-Bold" : "Helvetica")
+					.fontSize(9)
+					.text(String(text), x, yText, {
+						width: colWidths[idx],
+						continued: false,
+					});
 				x += colWidths[idx];
 			});
-			y += 16;
+			y += rowHeight;
 			if (y > doc.page.height - 60) {
 				doc.addPage();
 				y = doc.y;
@@ -184,7 +212,7 @@ export default async function handler(req, res) {
 			const formattedAmount = new Intl.NumberFormat("id-ID").format(row.amount);
 			const formattedSaldo = new Intl.NumberFormat("id-ID").format(running);
 			drawRow([
-				row.date.toISOString().slice(0, 10),
+				formatDate(row.date),
 				row.type === "income" ? "Pemasukan" : "Pengeluaran",
 				row.description || "-",
 				formattedAmount,
