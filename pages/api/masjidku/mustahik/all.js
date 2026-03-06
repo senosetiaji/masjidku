@@ -64,18 +64,33 @@ export default async function handler(req, res) {
 		const page = parsePositiveInt(normalizeQueryValue(req.query.page), 1);
 		const limit = Math.min(parsePositiveInt(normalizeQueryValue(req.query.limit), DEFAULT_LIMIT), MAX_LIMIT);
 		const search = (normalizeQueryValue(req.query.search) || "").toString().trim();
+		const rawReceivingYear = normalizeQueryValue(req.query.receivingYear);
+		const receivingYear = rawReceivingYear ? parsePositiveInt(rawReceivingYear, null) : null;
+		const role = (normalizeQueryValue(req.query.role) || "").toString().trim();
 
-		const where = search
-			? {
-					OR: [
-						{ name: { contains: search } },
-						{ address: { contains: search } },
-						{ phone: { contains: search } },
-						{ role: { contains: search } },
-						{ zakatType: { contains: search } },
-					],
-			  }
-			: undefined;
+		const andConditions = [];
+
+		if (search) {
+			andConditions.push({
+				OR: [
+					{ name: { contains: search } },
+					{ address: { contains: search } },
+					{ phone: { contains: search } },
+					{ role: { contains: search } },
+					{ zakatType: { contains: search } },
+				],
+			});
+		}
+
+		if (role) {
+			andConditions.push({ role: { equals: role } });
+		}
+
+		if (Number.isFinite(receivingYear)) {
+			andConditions.push({ receivingYear });
+		}
+
+		const where = andConditions.length ? { AND: andConditions } : undefined;
 
 		const total = await prisma.penerimaZakat.count({ where });
 

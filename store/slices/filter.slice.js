@@ -17,6 +17,10 @@ const initialState = {
     values: null,
     appliedAt: null,
   },
+  mustahik: {
+    values: null,
+    appliedAt: null,
+  },
 };
 
 const filterSlice = createSlice({

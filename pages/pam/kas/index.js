@@ -1,9 +1,9 @@
 import Filter from '@/components/filters/Filter';
 import RootLayout from '@/components/layouts/RootLayout'
 import Kas from '@/containers/pam/kas/Kas';
-import { getPamKas } from '@/store/actions/pam.action';
+import { exportPamKas, getPamKas } from '@/store/actions/pam.action';
 import React from 'react'
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import Button from '@mui/material/Button'
 import { useRouter } from 'next/router';
 import moment from 'moment';
@@ -11,6 +11,7 @@ import moment from 'moment';
 function Index() {
   const dispatch = useDispatch();
   const router = useRouter();
+  const { isLoadingExport } = useSelector((state) => state.pam);
   const [params, setParams] = React.useState({
     page: 1,
     limit: 10,
@@ -52,13 +53,22 @@ function Index() {
     newParams.page = 1;
     setParams(newParams);
   }, [selectedFilter]);
+
+  const handleExport = async () => {
+    await dispatch(exportPamKas({ params }));
+  };
   return (
     <RootLayout breadcrumbs={breadcrumbs}>
       <div className="flex justify-between items-center mb-8">
         <div className="title text-[20px] font-bold text-[#333]">Laporan Keuangan PAM</div>
-        <Button variant="contained" color="primary" onClick={() => router.push('/pam/kas/create')}>
-          Input Data Keuangan
-        </Button>
+        <div className="flex gap-3">
+          <Button variant="contained" color="inherit" onClick={handleExport} disabled={isLoadingExport}>
+            {isLoadingExport ? 'Exporting...' : 'Export PDF'}
+          </Button>
+          <Button variant="contained" color="primary" onClick={() => router.push('/pam/kas/create')}>
+            Input Data Keuangan
+          </Button>
+        </div>
       </div>
       <Filter
         filters={['tahun', 'bulan', 'tipe_transaksi']}

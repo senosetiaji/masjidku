@@ -1,5 +1,5 @@
 import { createSlice, current } from "@reduxjs/toolkit"
-import { createPamKas, createPamPemasangan, createPamRutinan, deleteDataPamKas, deleteDataPamPemasangan, getDetailPamKas, getDetailPamPemasangan, getDetailPamRutin, getPamKas, getPamPemasangan, getPamRutinan, getPamSummary, getPreviousUsed, updateDataPamKas, updateDataPamPemasangan, updateDataPamRutin } from "../actions/pam.action"
+import { createPamKas, createPamPemasangan, createPamRutinan, deleteDataPamKas, deleteDataPamPemasangan, exportPamKas, getDetailPamKas, getDetailPamPemasangan, getDetailPamRutin, getPamKas, getPamPemasangan, getPamRutinan, getPamSummary, getPreviousUsed, updateDataPamKas, updateDataPamPemasangan, updateDataPamRutin } from "../actions/pam.action"
 
 export const initialState = {
 	data:[],
@@ -25,6 +25,7 @@ export const initialState = {
   isLoading:false,
   isLoadingCreate:false,
   isLoadingDelete:false,
+  isLoadingExport:false,
   isLoadingDetail:false,
 }
 
@@ -165,6 +166,16 @@ const pamSlice = createSlice({
     })
     .addCase(updateDataPamKas.rejected, (state) => {
       state.isLoadingCreate = false
+    })
+
+    .addCase(exportPamKas.pending, (state) => {
+      state.isLoadingExport = true
+    })
+    .addCase(exportPamKas.fulfilled, (state) => {
+      state.isLoadingExport = false
+    })
+    .addCase(exportPamKas.rejected, (state) => {
+      state.isLoadingExport = false
     })
 
     // pam pemasangan

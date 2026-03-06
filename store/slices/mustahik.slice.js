@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit"
-import { createMustahik, deleteMustahik, getAllMustahik, getDetailMustahik, updateMustahik } from "../actions/mustahik.action"
+import { createMustahik, deleteMustahik, duplicateMustahik, exportMustahik, getAllMustahik, getDetailMustahik, updateMustahik } from "../actions/mustahik.action"
 
 export const initialState = {
 	data: [],
@@ -11,6 +11,8 @@ export const initialState = {
 	isLoading: false,
 	isLoadingCreate: false,
 	isLoadingDelete: false,
+	isLoadingDuplicate: false,
+	isLoadingExport: false,
 	isLoadingDetail: false,
 }
 
@@ -67,6 +69,24 @@ const mustahikSlice = createSlice({
 			})
 			.addCase(deleteMustahik.rejected, (state) => {
 				state.isLoadingDelete = false
+			})
+			.addCase(duplicateMustahik.pending, (state) => {
+				state.isLoadingDuplicate = true
+			})
+			.addCase(duplicateMustahik.fulfilled, (state) => {
+				state.isLoadingDuplicate = false
+			})
+			.addCase(duplicateMustahik.rejected, (state) => {
+				state.isLoadingDuplicate = false
+			})
+			.addCase(exportMustahik.pending, (state) => {
+				state.isLoadingExport = true
+			})
+			.addCase(exportMustahik.fulfilled, (state) => {
+				state.isLoadingExport = false
+			})
+			.addCase(exportMustahik.rejected, (state) => {
+				state.isLoadingExport = false
 			})
 	}
 })

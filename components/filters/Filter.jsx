@@ -14,6 +14,7 @@ import SelectYear from '../forms/SelectYear';
 import SelectPaymentStatus from '../forms/SelectPaymentStatus';
 import SelectConsumer from '../forms/SelectConsumer';
 import SelectZakatType from '../forms/SelectZakatType';
+import SelectKategori from '../forms/SelectKategori';
 
 function Filter({ filters, multipleFilters, onSubmit, filterState, requiredField = [], keyName = '', loading = false }) {
   const [className, setClassName] = React.useState('');
@@ -257,6 +258,20 @@ function Filter({ filters, multipleFilters, onSubmit, filterState, requiredField
             <SelectZakatType
               label={overrideLabel || 'Tipe Zakat'}
               placeholder="Pilih Tipe Zakat"
+              name={name} 
+              id={name}
+              size="small"
+              value={localFilterState?.[name]}
+              onChange={handleChange}
+            />
+          </FormControl>
+        );
+        case 'kategori':
+        return (
+          <FormControl key={keyIdx}>
+            <SelectKategori
+              label={overrideLabel || 'Kategori'}
+              placeholder="Pilih Kategori"
               name={name} 
               id={name}
               size="small"
