@@ -58,7 +58,6 @@ export default async function handler(req, res) {
 		const item = await prisma.inventaris.findFirst({
 			where: {
 				id: id.toString(),
-				userId,
 			},
 			select: {
 				id: true,
