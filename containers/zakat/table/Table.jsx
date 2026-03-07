@@ -57,41 +57,26 @@ function Table({ source, params, setParams, fetchData }) {
     {
       label:"Muzzaki/Pemberi Zakat",
       align:"left",
-      sx: {
-        minWidth: 350,
-      },
       render: (val) => __renderValue(val.name)
     },
     {
       label:"Tanggal",
       align:"left",
-      sx: {
-        minWidth: 350,
-      },
       render: (val) => val?.date ? moment(val.date).format('DD MMM YYYY') : '-'
     },
     {
       label:"Zakat(Fitrah/Mal)",
       align:"left",
-      sx: {
-        minWidth: 350,
-      },
       render: (val) => renderTypeLabel(val?.type)
     },
     {
       label:"Bentuk Zakat",
       align:"left",
-      sx: {
-        minWidth: 350,
-      },
       render: (val) => renderZakatTypeLabel(val?.zakatType)
     },
     {
       label:"Jumlah Zakat",
       align:"center",
-      sx: {
-        minWidth: 350,
-      },
       render: (val) => {
         const zakatType = String(val?.zakatType || "").toLowerCase();
         return (
@@ -104,16 +89,13 @@ function Table({ source, params, setParams, fetchData }) {
     {
       label:"Keterangan",
       align:"left",
-      sx: {
-        minWidth: 350,
-      },
       render: (val) => __renderValue(val.description)
     },
     {
       label:"Aksi",
       align:"center",
       sx: {
-        width: 350,
+        width: 150,
       },
       render: (val) => {
         return (

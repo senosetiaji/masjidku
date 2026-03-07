@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit"
-import { createZakat, deleteZakat, getAllZakat, getDetailZakat, updateZakat } from "../actions/zakat.action"
+import { createZakat, deleteZakat, getAllZakat, getDetailZakat, getZakatSummary, updateZakat } from "../actions/zakat.action"
 
 export const initialState = {
 	data: [],
@@ -8,7 +8,13 @@ export const initialState = {
 		total_row: 0,
 		total_page: 0,
 	},
+	summary: {
+		totalPezakat: 0,
+		totalZakatUang: 0,
+		totalZakatBeras: 0,
+	},
 	isLoading: false,
+	isLoadingSummary: false,
 	isLoadingCreate: false,
 	isLoadingDelete: false,
 	isLoadingDetail: false,
@@ -30,6 +36,16 @@ const zakatSlice = createSlice({
 			})
 			.addCase(getAllZakat.rejected, (state) => {
 				state.isLoading = false
+			})
+			.addCase(getZakatSummary.pending, (state) => {
+				state.isLoadingSummary = true
+			})
+			.addCase(getZakatSummary.fulfilled, (state, actions) => {
+				state.isLoadingSummary = false
+				state.summary = actions.payload.data
+			})
+			.addCase(getZakatSummary.rejected, (state) => {
+				state.isLoadingSummary = false
 			})
 			.addCase(getDetailZakat.pending, (state) => {
 				state.isLoadingDetail = true

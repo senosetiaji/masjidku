@@ -13,6 +13,17 @@ export const getAllZakat = createAsyncThunk('zakat/getAllZakat', async ({ params
 	}
 })
 
+export const getZakatSummary = createAsyncThunk('zakat/getZakatSummary', async ({ params }, { dispatch, rejectWithValue }) => {
+	try {
+		const response = await API.get('/masjidku/zakat/summary', { params: params })
+		const data = await response.data
+		return data
+	} catch (err) {
+		dispatch(errorHelper(err))
+		return rejectWithValue(err?.response?.data)
+	}
+})
+
 export const createZakat = createAsyncThunk('zakat/createZakat', async ({ payload }, { dispatch, rejectWithValue }) => {
 	try {
 		const response = await API.post('/masjidku/zakat/create', payload)
