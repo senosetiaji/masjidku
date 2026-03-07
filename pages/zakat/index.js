@@ -39,9 +39,9 @@ function Index() {
       delete newParams.tahun;
     }
     if (selectedFilter.zakat_type) {
-      newParams.zakat_type = selectedFilter.zakat_type.value;
+      newParams.type = selectedFilter.zakat_type.value;
     } else {
-      delete newParams.zakat_type;
+      delete newParams.type;
     }
     newParams.page = 1;
     setParams(newParams);

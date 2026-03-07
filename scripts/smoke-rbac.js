@@ -241,6 +241,63 @@ async function runPamChecks(sessionCookie, ownerId, suffix, failures) {
   }
 }
 
+async function runZakatChecks(sessionCookie, suffix, failures) {
+  let createdId = null;
+
+  try {
+    const now = new Date();
+    const created = await prisma.zakats.create({
+      data: {
+        date: now,
+        type: "fitrah",
+        zakatType: "uang",
+        amount: 300001,
+        name: `SMOKE-ZAKAT-${suffix}`,
+        description: `SMOKE-ZAKAT-DESC-${suffix}`,
+      },
+      select: { id: true },
+    });
+
+    createdId = created.id;
+
+    const listRes = await fetch(
+      `${BASE_URL}/api/masjidku/zakat/all?search=SMOKE-ZAKAT-${suffix}&type=fitrah&tahun=${now.getFullYear()}&page=1&limit=10`,
+      {
+        headers: { Cookie: sessionCookie },
+      }
+    );
+    const listJson = await readJson(listRes);
+
+    const summaryRes = await fetch(`${BASE_URL}/api/masjidku/zakat/summary?type=fitrah&tahun=${now.getFullYear()}`, {
+      headers: { Cookie: sessionCookie },
+    });
+    const summaryJson = await readJson(summaryRes);
+
+    assertCheck("zakat:list_status", listRes.status === 200, { status: listRes.status, body: listJson }, failures);
+    assertCheck(
+      "zakat:list_contains_record",
+      Array.isArray(listJson?.data) && listJson.data.some((x) => x.id === createdId),
+      { createdId, body: listJson },
+      failures
+    );
+    assertCheck("zakat:summary_status", summaryRes.status === 200, { status: summaryRes.status, body: summaryJson }, failures);
+    assertCheck(
+      "zakat:summary_shape",
+      typeof summaryJson?.data?.totalPezakat === "number" &&
+        typeof summaryJson?.data?.totalZakatUang === "number" &&
+        typeof summaryJson?.data?.totalZakatBeras === "number",
+      { body: summaryJson },
+      failures
+    );
+
+    createdId = null;
+  } finally {
+    if (createdId) {
+      await prisma.zakats.delete({ where: { id: createdId } }).catch(() => {});
+    }
+  }
+}
+
 async function main() {
   const failures = [];
 
@@ -280,6 +337,7 @@ async function main() {
     await runInventarisChecks(sessionCookie, owner.id, suffix, failures);
     await runKeuanganChecks(sessionCookie, owner.id, suffix, failures);
     await runPamChecks(sessionCookie, owner.id, suffix, failures);
+    await runZakatChecks(sessionCookie, suffix, failures);
 
     if (failures.length > 0) {
       console.error("RBAC smoke test FAILED");
@@ -302,6 +360,7 @@ async function main() {
         "inventaris:list/detail/update/delete",
         "keuangan:list/detail/update/export/delete",
         "pam-finance:list/detail/update/export/delete",
+        "zakat:list+summary(filter by type+tahun)",
       ],
     }, null, 2));
   } catch (error) {

@@ -26,14 +26,20 @@ function SummaryCards({ params }) {
 
   React.useEffect(() => {
     if (!params?.tahun) return
+
+    const selectedType = params?.type || params?.zakat_type
+
+    const summaryParams = {
+      tahun: params.tahun,
+      ...(selectedType ? { type: selectedType } : {}),
+    }
+
     dispatch(
       getZakatSummary({
-        params: {
-          tahun: params.tahun,
-        },
+        params: summaryParams,
       })
     )
-  }, [dispatch, params?.tahun])
+  }, [dispatch, params?.tahun, params?.type, params?.zakat_type])
 
   const cards = [
     {

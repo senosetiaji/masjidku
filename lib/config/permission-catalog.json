@@ -44,6 +44,15 @@
       ]
     },
     {
+      "key": "musyawarah",
+      "label": "Musyawarah",
+      "permissions": [
+        { "name": "/musyawarah", "description": "Akses menu laporan musyawarah" },
+        { "name": "/musyawarah/create", "description": "Akses halaman input musyawarah" },
+        { "name": "/musyawarah/edit", "description": "Akses halaman edit musyawarah" }
+      ]
+    },
+    {
       "key": "zakat",
       "label": "Zakat",
       "permissions": [

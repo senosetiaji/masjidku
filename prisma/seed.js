@@ -54,6 +54,11 @@ async function main() {
       { name: "/inventaris/create", description: "Akses halaman input inventaris" },
       { name: "/inventaris/edit", description: "Akses halaman edit inventaris" },
     ],
+    musyawarah: [
+      { name: "/musyawarah", description: "Akses menu laporan musyawarah" },
+      { name: "/musyawarah/create", description: "Akses halaman input musyawarah" },
+      { name: "/musyawarah/edit", description: "Akses halaman edit musyawarah" },
+    ],
     zakat: [
       { name: "/zakat", description: "Akses menu laporan zakat" },
       { name: "/zakat/create", description: "Akses halaman input zakat" },
@@ -88,6 +93,7 @@ async function main() {
     ...sidebarPermissions.takmeer,
     ...sidebarPermissions.keuangan,
     ...sidebarPermissions.inventaris,
+    ...sidebarPermissions.musyawarah,
     ...sidebarPermissions.zakat,
     ...sidebarPermissions.pam,
     ...sidebarPermissions.settings,
@@ -99,6 +105,7 @@ async function main() {
       ...sidebarPermissions.dashboard,
       ...sidebarPermissions.keuangan.filter((p) => p.name === "/keuangan/laporan-keuangan"),
       ...sidebarPermissions.inventaris.filter((p) => p.name === "/inventaris/laporan-inventaris"),
+      ...sidebarPermissions.musyawarah.filter((p) => p.name === "/musyawarah"),
       ...sidebarPermissions.zakat.filter((p) => ["/zakat", "/zakat/panitia", "/mustahik"].includes(p.name)),
       ...sidebarPermissions.pam.filter((p) => ["/pam/pemasangan", "/pam/biaya-rutinan", "/pam/kas"].includes(p.name)),
     ],
@@ -107,6 +114,7 @@ async function main() {
       ...sidebarPermissions.masterData,
       ...sidebarPermissions.takmeer,
       ...sidebarPermissions.inventaris,
+      ...sidebarPermissions.musyawarah,
       ...sidebarPermissions.zakat.filter((p) => ["/zakat/panitia", "/mustahik", "/mustahik/create", "/mustahik/edit"].includes(p.name)),
     ],
     bendahara: [

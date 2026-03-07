@@ -134,6 +134,9 @@ function SideNav({ isToggled }) {
         { name: 'Laporan Inventaris', alias: 'laporan_inventaris', link: '/inventaris/laporan-inventaris', show: true },
       ]
     },
+    { name: 'Musyawarah', icon: <IconMeeting />, alias: 'musyawarah', link: '/musyawarah', show: true,
+      subMenu: []
+    },
     { name: 'Zakat', icon: <IconMeeting />, alias: 'zakat', link: '/zakat', show: true, 
       subMenu: [
         { name: 'Panitia Zakat', alias: 'panitia_zakat', link: '/zakat/panitia', show: true },
