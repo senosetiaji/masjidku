@@ -38,3 +38,51 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/pages/building-your-application/deploying) for more details.
+
+## Multi-tenant (subdomain)
+
+Project ini mendukung fondasi multi-tenant berbasis subdomain.
+
+- Tenant di-resolve dari host request (contoh `alkhusna.masjidku.com` -> tenant `alkhusna`).
+- Session login menyimpan tenant di token, dan API akan menolak akses jika tenant token tidak cocok dengan host.
+- Prisma bisa diarahkan ke database tenant masing-masing melalui `TENANT_DATABASE_TEMPLATE` (lihat `env.example`).
+
+Contoh local sqlite:
+
+```env
+TENANT_DATABASE_TEMPLATE="file:./prisma/tenants/{tenant}.db"
+DEFAULT_TENANT_KEY="default"
+```
+
+## Smoke test multi-tenant
+
+Siapkan user admin tenant otomatis (opsional tapi disarankan):
+
+```bash
+npm run seed:tenant-users
+```
+
+Untuk verifikasi cepat bahwa session tenant A tidak bisa dipakai di tenant B, jalankan:
+
+```bash
+npm run smoke:tenant
+```
+
+Environment variable yang diperlukan:
+
+```env
+SMOKE_BASE_URL="http://localhost:3010"
+SMOKE_TENANT_A_HOST="alkhusna.masjidku.com"
+SMOKE_TENANT_A_USERNAME="admin_a"
+SMOKE_TENANT_A_PASSWORD="password_a"
+SMOKE_TENANT_B_HOST="alhuda.masjidku.com"
+SMOKE_TENANT_B_USERNAME="admin_b"
+SMOKE_TENANT_B_PASSWORD="password_b"
+```
+
+Opsional untuk seed tenant manual via CSV:
+
+```env
+MULTITENANT_SEED_KEYS="alkhusna,alhuda"
+MULTITENANT_SEED_PASSWORD="admin123"
+```

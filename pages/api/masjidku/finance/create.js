@@ -1,13 +1,7 @@
-import { PrismaClient } from "@prisma/client";
 import crypto from "crypto";
+import { getTenantPrisma } from "../../../../lib/helpers/tenantPrisma";
 
 // Prisma singleton (avoid new clients per hot-reload)
-const globalForPrisma = globalThis;
-let prisma = globalForPrisma.prisma;
-if (!prisma) {
-	prisma = new PrismaClient();
-	if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
-}
 
 const SECRET = process.env.APP_SECRET || "dev-secret";
 const VALID_TYPES = new Set(["income", "expense", "transfer"]);
@@ -32,6 +26,7 @@ export default async function handler(req, res) {
 	}
 
 	try {
+		const { prisma, tenant } = getTenantPrisma(req);
 		// derive user from cookie (set on login)
 		const cookieHeader = req.headers.cookie || "";
 		const sessionCookie = cookieHeader.split(";").find((c) => c.trim().startsWith("session="));
@@ -39,6 +34,10 @@ export default async function handler(req, res) {
 		const session = verifyToken(token);
 		if (!session?.id) {
 			return res.status(401).json({ message: "unauthorized" });
+		}
+
+		if (session?.tenant && session.tenant !== tenant.tenantKey) {
+			return res.status(403).json({ message: "tenant_mismatch" });
 		}
 
 		// normalize user id to string (schema uses String/UUID)

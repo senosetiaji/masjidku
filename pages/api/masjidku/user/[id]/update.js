@@ -1,13 +1,7 @@
-import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
+import { getTenantPrisma } from "../../../../../lib/helpers/tenantPrisma";
 
 // Reuse Prisma client in dev to avoid exhausting connections on hot reload
-const globalForPrisma = globalThis;
-let prisma = globalForPrisma.prisma;
-if (!prisma) {
-  prisma = new PrismaClient();
-  if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
-}
 
 const VALID_ROLES = new Set(["superadmin", "admin", "ketua", "sekretaris", "bendahara"]);
 const SALT_ROUNDS = 10;
@@ -18,6 +12,7 @@ export default async function handler(req, res) {
   }
 
   try {
+  	const { prisma, tenant } = getTenantPrisma(req);
     const { id: idParam } = req.query;
     const id = Array.isArray(idParam) ? idParam[0] : idParam;
 

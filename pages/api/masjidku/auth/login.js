@@ -1,16 +1,6 @@
-import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
-
-// Use a global singleton for Prisma Client so we don't create new instances
-// on every hot-reload / request (prevents connection exhaustion in dev/serverless).
-const globalForPrisma = globalThis;
-let prisma = globalForPrisma.prisma;
-if (!prisma) {
-  prisma = new PrismaClient();
-  // Only attach to global in non-production to avoid long-lived connections in prod
-  if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
-}
+import { getTenantPrisma } from "../../../../lib/helpers/tenantPrisma";
 
 const SECRET = process.env.APP_SECRET || "dev-secret";
 const ONE_WEEK = 60 * 60 * 24 * 7; // seconds
@@ -27,6 +17,7 @@ export default async function handler(req, res) {
   }
 
   try {
+  	const { prisma, tenant } = getTenantPrisma(req);
     const { username, password } = req.body;
 
     if (!username || !password) {
@@ -53,6 +44,7 @@ export default async function handler(req, res) {
         name: user.name,
         role: user.role,
         username: user.username,
+        tenant: tenant.tenantKey,
       };
 
       const token = signToken(safeUser);
@@ -66,6 +58,7 @@ export default async function handler(req, res) {
         data: {
           user: safeUser,
           token,
+          tenant: tenant.tenantKey,
         },
       });
   } catch (error) {

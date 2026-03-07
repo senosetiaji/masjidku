@@ -1,11 +1,4 @@
-import { PrismaClient } from "@prisma/client";
-
-const globalForPrisma = globalThis;
-let prisma = globalForPrisma.prisma;
-if (!prisma) {
-	prisma = new PrismaClient();
-	if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
-}
+import { getTenantPrisma } from "../../../../lib/helpers/tenantPrisma";
 
 const DEFAULT_ROLES = ["admin", "ketua", "sekretaris", "bendahara"];
 
@@ -15,6 +8,7 @@ export default async function handler(req, res) {
 	}
 
 	try {
+		const { prisma, tenant } = getTenantPrisma(req);
 		const roles = await prisma.roles.findMany({
 			orderBy: { name: "asc" },
 			select: {

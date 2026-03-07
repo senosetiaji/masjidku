@@ -1,13 +1,7 @@
-import { PrismaClient } from "@prisma/client";
 import crypto from "crypto";
+import { getTenantPrisma } from "../../../../../../lib/helpers/tenantPrisma";
 
 // Reuse a single Prisma instance during dev hot-reload
-const globalForPrisma = globalThis;
-let prisma = globalForPrisma.prisma;
-if (!prisma) {
-	prisma = new PrismaClient();
-	if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
-}
 
 const SECRET = process.env.APP_SECRET || "dev-secret";
 const MONTH_LABELS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -44,6 +38,7 @@ export default async function handler(req, res) {
 	}
 
 	try {
+		const { prisma, tenant } = getTenantPrisma(req);
 		// Auth via HMAC session cookie
 		const cookieHeader = req.headers.cookie || "";
 		const sessionCookie = cookieHeader.split(";").find((c) => c.trim().startsWith("session="));
@@ -51,6 +46,10 @@ export default async function handler(req, res) {
 		const session = verifyToken(token);
 		if (!session?.id) {
 			return res.status(401).json({ message: "unauthorized" });
+		}
+
+		if (session?.tenant && session.tenant !== tenant.tenantKey) {
+			return res.status(403).json({ message: "tenant_mismatch" });
 		}
 
 		const userExists = await prisma.user.findUnique({ where: { id: String(session.id) }, select: { id: true } });

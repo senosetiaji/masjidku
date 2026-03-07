@@ -1,13 +1,6 @@
-import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import { authenticateSessionUser } from "@/lib/helpers/apiSessionAuth";
-
-const globalForPrisma = globalThis;
-let prisma = globalForPrisma.prisma;
-if (!prisma) {
-  prisma = new PrismaClient();
-  if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
-}
+import { getTenantPrisma } from "../../../../lib/helpers/tenantPrisma";
 
 const SALT_ROUNDS = 10;
 
@@ -17,6 +10,7 @@ export default async function handler(req, res) {
   }
 
   try {
+  	const { prisma, tenant } = getTenantPrisma(req);
     const authUser = await authenticateSessionUser({ req, res, prisma });
     if (!authUser) return;
 

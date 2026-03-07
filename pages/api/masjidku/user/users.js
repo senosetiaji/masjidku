@@ -1,12 +1,6 @@
-import { PrismaClient } from "@prisma/client";
+import { getTenantPrisma } from "../../../../lib/helpers/tenantPrisma";
 
 // Reuse Prisma client in dev to avoid exhausting connections on hot reload
-const globalForPrisma = globalThis;
-let prisma = globalForPrisma.prisma;
-if (!prisma) {
-	prisma = new PrismaClient();
-	if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
-}
 
 export default async function handler(req, res) {
 	if (req.method !== "GET") {
@@ -14,6 +8,7 @@ export default async function handler(req, res) {
 	}
 
 	try {
+		const { prisma, tenant } = getTenantPrisma(req);
 		const DEFAULT_LIMIT = 10;
 		const MAX_LIMIT = 100;
 

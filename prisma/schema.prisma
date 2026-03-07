@@ -10,8 +10,7 @@ generator client {
 
 datasource db {
   provider = "sqlite"
-  // Path is relative to the `prisma/` folder, so keep it inside that folder
-  url      = "file:./dev.db"
+  url      = env("DATABASE_URL")
 }
 
 model User {
