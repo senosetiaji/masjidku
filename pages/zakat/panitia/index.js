@@ -1,7 +1,9 @@
+import Filter from '@/components/filters/Filter'
 import RootLayout from '@/components/layouts/RootLayout'
 import Panitia from '@/containers/zakat/panitia/Panitia'
 import { getAllPanitiaZakat } from '@/store/actions/panitiaZakat.action'
 import { Button } from '@mui/material'
+import moment from 'moment'
 import { useRouter } from 'next/router'
 import React from 'react'
 import { useDispatch } from 'react-redux'
@@ -14,6 +16,9 @@ function Index() {
     page: 1,
     limit: 10,
     search: '',
+  });
+  const [selectedFilter, setSelectedFilter] = React.useState({
+    tahun: { label: moment().year().toString(), value: moment().year().toString() },
   });
 
   const breadcrumbs = [
@@ -29,6 +34,19 @@ function Index() {
     fetchData();
   }, [params]);
 
+  React.useEffect(() => {
+    setParams((prev) => {
+      const next = { ...prev };
+      if (selectedFilter.tahun) {
+        next.tahun = selectedFilter.tahun.value;
+      } else {
+        delete next.tahun;
+      }
+      next.page = 1;
+      return next;
+    });
+  }, [selectedFilter]);
+
   return (
     <RootLayout breadcrumbs={breadcrumbs}>
       <div className="flex flex-col gap-4 mb-8 sm:flex-row sm:items-center sm:justify-between">
@@ -37,6 +55,13 @@ function Index() {
           Input Data Panitia
         </Button>
       </div>
+      <Filter
+        filters={['tahun']}
+        filterState={selectedFilter}
+        onSubmit={setSelectedFilter}
+        requiredField={['tahun']}
+        keyName={'panitia_zakat'}
+      />
       <Panitia params={params} setParams={setParams} fetchData={fetchData} />
     </RootLayout>
   )

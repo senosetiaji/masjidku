@@ -21,6 +21,10 @@ const initialState = {
     values: null,
     appliedAt: null,
   },
+  panitia_zakat: {
+    values: null,
+    appliedAt: null,
+  },
 };
 
 const filterSlice = createSlice({

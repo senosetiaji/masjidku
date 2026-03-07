@@ -13,17 +13,40 @@ const SECRET = process.env.APP_SECRET || "dev-secret";
 const VALID_ROLES = ["ketua", "bendahara", "amil"];
 
 const verifyToken = (token) => {
-	if (!token) return null;
-	const [encoded, signature] = token.split(".");
-	if (!encoded || !signature) return null;
-	const expected = crypto.createHmac("sha256", SECRET).update(encoded).digest("hex");
-	if (expected !== signature) return null;
-	const json = Buffer.from(encoded, "base64url").toString("utf8");
 	try {
+		if (!token) return null;
+		const decodedToken = decodeURIComponent(token);
+		const [encoded, signature] = decodedToken.split(".");
+		if (!encoded || !signature) return null;
+
+		const expected = crypto.createHmac("sha256", SECRET).update(encoded).digest("hex");
+		if (expected.length !== signature.length) return null;
+
+		const expectedBuf = Buffer.from(expected, "utf8");
+		const signatureBuf = Buffer.from(signature, "utf8");
+		if (!crypto.timingSafeEqual(expectedBuf, signatureBuf)) return null;
+
+		const json = Buffer.from(encoded, "base64url").toString("utf8");
 		return JSON.parse(json);
-	} catch (e) {
+	} catch (error) {
 		return null;
 	}
+};
+
+const getSessionTokenFromCookie = (cookieHeader) => {
+	if (!cookieHeader) return null;
+	const tokenPair = cookieHeader
+		.split(";")
+		.map((item) => item.trim())
+		.find((item) => item.startsWith("session="));
+	if (!tokenPair) return null;
+	return tokenPair.slice("session=".length) || null;
+};
+
+const toIsoOrNull = (value) => {
+	if (!value) return null;
+	const date = value instanceof Date ? value : new Date(value);
+	return Number.isNaN(date.getTime()) ? null : date.toISOString();
 };
 
 export default async function handler(req, res) {
@@ -33,8 +56,7 @@ export default async function handler(req, res) {
 
 	try {
 		const cookieHeader = req.headers.cookie || "";
-		const sessionCookie = cookieHeader.split(";").find((c) => c.trim().startsWith("session="));
-		const token = sessionCookie ? sessionCookie.trim().replace("session=", "") : null;
+		const token = getSessionTokenFromCookie(cookieHeader);
 		const session = verifyToken(token);
 		if (!session?.id) {
 			return res.status(401).json({ message: "unauthorized" });
@@ -64,6 +86,7 @@ export default async function handler(req, res) {
 		const search = (normalizeQueryValue(req.query.search) || "").toString().trim();
 		const roleCandidate = (normalizeQueryValue(req.query.role) || "").toString().trim().toLowerCase();
 		const roleFilter = VALID_ROLES.includes(roleCandidate) ? roleCandidate : null;
+		const yearCandidate = parsePositiveInt(normalizeQueryValue(req.query.tahun ?? req.query.serviceYear ?? req.query.year), null);
 
 		const where = {
 			...(search
@@ -76,6 +99,7 @@ export default async function handler(req, res) {
 				}
 				: {}),
 			...(roleFilter ? { role: roleFilter } : {}),
+			...(Number.isFinite(yearCandidate) ? { serviceYear: yearCandidate } : {}),
 		};
 
 		const total = await prisma.panitiaZakat.count({ where });
@@ -101,7 +125,7 @@ export default async function handler(req, res) {
 			phone: item.phone,
 			serviceYear: item.serviceYear,
 			role: item.role,
-			createdAt: item.createdAt.toISOString(),
+			createdAt: toIsoOrNull(item.createdAt),
 		}));
 
 		const totalPage = total === 0 ? 0 : Math.ceil(total / limit);
@@ -117,6 +141,7 @@ export default async function handler(req, res) {
 				limit,
 				search,
 				role: roleFilter,
+				tahun: Number.isFinite(yearCandidate) ? yearCandidate : null,
 			},
 		});
 	} catch (error) {

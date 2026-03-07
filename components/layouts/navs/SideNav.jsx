@@ -94,6 +94,17 @@ function SideNav({ isToggled }) {
     if (!router?.pathname) return false;
     return router.pathname === link || router.pathname.startsWith(`${link}/`);
   };
+  const getMostSpecificActiveLink = (links = []) => {
+    const matchedLinks = links.filter((link) => isActive(link));
+    if (matchedLinks.length === 0) return null;
+    return matchedLinks.sort((a, b) => b.length - a.length)[0];
+  };
+  const isSubmenuItemActive = (parentItem, link) => {
+    const links = (parentItem?.subMenu || [])
+      .filter((sub) => sub.show)
+      .map((sub) => sub.link);
+    return getMostSpecificActiveLink(links) === link;
+  };
   const toggleSubMenu = (alias) => {
     setOpenAlias((prev) => (prev === alias ? null : alias));
   };
@@ -139,7 +150,7 @@ function SideNav({ isToggled }) {
   ];
 
   const renderDesktopMini = () => (
-    <div className="fixed left-0 top-16 bottom-0 z-[999] hidden w-14 bg-white border-r border-gray-200 shadow-sm md:flex flex-col items-center py-4 gap-3">
+    <div className="fixed left-0 top-16 bottom-0 z-999 hidden w-14 bg-white border-r border-gray-200 shadow-sm md:flex flex-col items-center py-4 gap-3">
       {menu.filter(item => item.show).map((item, index) => {
         const hasSub = item.subMenu && item.subMenu.length > 0;
         const active = isActive(item.link);
@@ -163,7 +174,7 @@ function SideNav({ isToggled }) {
             {hasSub && isOpen && (
               <div className="absolute left-full top-0 ml-0 w-48 bg-white border border-gray-200 rounded-md shadow-lg py-2">
                 {item.subMenu.filter(sub => sub.show).map((subItem, subIndex) => {
-                  const subActive = isActive(subItem.link);
+                  const subActive = isSubmenuItemActive(item, subItem.link);
                   return (
                     <div
                       key={subIndex}
@@ -208,7 +219,7 @@ function SideNav({ isToggled }) {
                 {isOpen && (
                   <div className="mt-4 border-t border-gray-200">
                     {item.subMenu.filter(sub => sub.show).map((subItem, subIndex) => {
-                      const subActive = isActive(subItem.link);
+                      const subActive = isSubmenuItemActive(item, subItem.link);
                       return (
                         <div
                           key={subIndex}
@@ -244,7 +255,7 @@ function SideNav({ isToggled }) {
   const renderMobileFloating = () => {
     if (!isToggled) return null;
     return (
-      <div className="fixed bottom-4 left-1/2 z-[1000] flex -translate-x-1/2 flex-col items-center gap-2 md:hidden">
+      <div className="fixed bottom-4 left-1/2 z-1000 flex -translate-x-1/2 flex-col items-center gap-2 md:hidden">
         <div className="flex items-center gap-2 rounded-full border border-gray-200 bg-white/95 px-3 py-2 shadow-lg overflow-x-auto">
           {menu.filter(item => item.show).map((item, index) => {
             const hasSub = item.subMenu && item.subMenu.length > 0;
@@ -273,11 +284,12 @@ function SideNav({ isToggled }) {
           <div className="w-[90vw] max-w-sm rounded-xl border border-gray-200 bg-white shadow-xl">
             <div className="px-4 py-3 text-sm font-semibold text-gray-700">Menu</div>
             <div className="border-t border-gray-100">
-              {menu
-                .find((item) => item.alias === mobileOpenAlias)?.subMenu
-                ?.filter(sub => sub.show)
-                ?.map((subItem, subIndex) => {
-                  const subActive = isActive(subItem.link);
+              {(() => {
+                const activeMenu = menu.find((item) => item.alias === mobileOpenAlias);
+                const subMenuItems = activeMenu?.subMenu?.filter((sub) => sub.show) || [];
+                const activeSubLink = getMostSpecificActiveLink(subMenuItems.map((sub) => sub.link));
+                return subMenuItems.map((subItem, subIndex) => {
+                  const subActive = activeSubLink === subItem.link;
                   return (
                     <button
                       key={subIndex}
@@ -292,7 +304,8 @@ function SideNav({ isToggled }) {
                       <span className="text-[11px] text-gray-400">Buka</span>
                     </button>
                   );
-                })}
+                });
+              })()}
             </div>
           </div>
         )}
