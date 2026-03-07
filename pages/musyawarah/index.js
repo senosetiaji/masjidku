@@ -31,9 +31,10 @@ function Index() {
 
   return (
     <RootLayout breadcrumbs={breadcrumbs}>
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex flex-col gap-4 mb-6 sm:flex-row sm:items-center sm:justify-between">
         <div className="title text-[20px] font-bold text-[#333]">Musyawarah</div>
         <Button variant="contained" color="primary"
+          className="w-full sm:w-auto"
           onClick={() => router.push({
             pathname: '/musyawarah/create',
           })}>

@@ -165,10 +165,10 @@ function TableNormal(
 
   return (
     <>
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex flex-col gap-3 mb-4 sm:flex-row sm:items-center sm:justify-between">
         {/* select data per-page & search */}
-        <div className="flex items-center gap-3">
-          <FormControl size="small" className="w-28">
+        <div className="flex items-center gap-3 flex-wrap">
+          <FormControl size="small" className="w-full sm:w-auto">
             <InputLabel id="per-page-label">Per Page</InputLabel>
             <Select
               labelId="per-page-label"
@@ -188,14 +188,14 @@ function TableNormal(
 
         <TextField
           size="small"
-          className="w-64"
+          className="w-full sm:w-64"
           placeholder="Cari..."
           value={searchValue}
           onChange={(e) => handleSearch(e.target.value)}
         />
       </div>
       {isLoading ? <SkeletonTable rows={10} /> : (
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto max-w-sm md:max-w-full">
           <TableContainer component={Paper} sx={{ width: '100%', overflowX: 'auto' }}>
             <Table stickyHeader size="small" sx={{ tableLayout: 'fixed', width: '100%', minWidth: 900 }}>
               <TableHead className='bg-gray-100!'>
@@ -267,7 +267,7 @@ function TableNormal(
             </Table>
           </TableContainer>
           {/* pagination here */}
-          <div className="mt-4 flex items-center justify-between">
+          <div className="mt-4 flex flex-col gap-3 items-start justify-between md:flex-row md:items-center">
             {renderPagination()}
           </div>
         </div>

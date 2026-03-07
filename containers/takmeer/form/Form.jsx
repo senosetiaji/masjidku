@@ -69,7 +69,7 @@ function Form({ isEdit = false }) {
           <div className="text-[#666] tinos-regular">Lengkapi data takmeer dengan benar.</div>
         </div>
       </div>
-      <form onSubmit={form.handleSubmit} className="grid grid-cols-2 gap-4">
+      <form onSubmit={form.handleSubmit} className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <FormControl fullWidth className=''>
           <TextInputField
             label="Nama Lengkap"
@@ -90,7 +90,7 @@ function Form({ isEdit = false }) {
             size={'small'}
           />            
         </FormControl>
-        <FormControl fullWidth className='col-span-2'>
+        <FormControl fullWidth className='md:col-span-2'>
           <TextInputField
             label="Jabatan"
             name="jabatan"
@@ -100,7 +100,7 @@ function Form({ isEdit = false }) {
             size={'small'}
           />            
         </FormControl>
-        <FormControl fullWidth className='col-span-2'>
+        <FormControl fullWidth className='md:col-span-2'>
           <SelectRoles
             label="Role"
             name="role"
@@ -110,7 +110,7 @@ function Form({ isEdit = false }) {
             size={'small'}
           />            
         </FormControl>
-        <div className="p-6 rounded-xl border border-dashed border-gray-300 col-span-2 grid grid-cols-1 gap-4">
+        <div className="p-6 rounded-xl border border-dashed border-gray-300 md:col-span-2 grid grid-cols-1 gap-4">
           <FormControl fullWidth className='mb-4'>
             <TextInputField
               label="Username"
@@ -122,7 +122,7 @@ function Form({ isEdit = false }) {
             />            
           </FormControl>
           <div className="">
-            <Button variant="contained" color="secondary" onClick={handleGeneratePassword}>
+            <Button variant="contained" color="secondary" onClick={handleGeneratePassword} className="w-full sm:w-auto">
               Generate Password
             </Button>
             <div className="">
@@ -131,8 +131,8 @@ function Form({ isEdit = false }) {
             </div>
           </div>
         </div>
-        <div className="col-span-2 flex justify-end mt-4">
-          <Button type="submit" variant="contained" color="primary" disabled={!generatedPassword || !form.isValid || isLoadingCreate} loading={isLoadingCreate}>
+        <div className="md:col-span-2 flex justify-end mt-4">
+          <Button type="submit" variant="contained" color="primary" disabled={!generatedPassword || !form.isValid || isLoadingCreate} loading={isLoadingCreate} className="w-full sm:w-auto">
             Simpan Takmeer
           </Button>
         </div>

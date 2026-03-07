@@ -29,9 +29,9 @@ function RootLayout({ breadcrumbs, children }) {
       <TopNav toggleHandler={toggleHandler} isToggled={sidebarToggled} />
       <div className="mt-16 flex">
         <SideNav isToggled={sidebarToggled} />
-        <div className={`${sidebarToggled ? 'ml-0' : 'ml-56'} p-12 pl-6 pr-6 flex-1 bg-[#f0f4f8] min-h-[calc(100vh-4rem)]`}>
-          <nav aria-label="Breadcrumb" className="mb-4 ml-4 text-sm text-gray-600">
-            <ol className="flex items-center gap-2">
+        <div className={`${sidebarToggled ? 'md:ml-14' : 'md:ml-56'} ml-0 p-4 sm:p-6 md:p-8 lg:p-10 flex-1 bg-[#f0f4f8] min-h-[calc(100vh-4rem)]`}>
+          <nav aria-label="Breadcrumb" className="mb-4 text-sm text-gray-600 overflow-x-auto">
+            <ol className="flex items-center gap-2 whitespace-nowrap">
               <li>
                 <Link href="/dashboard" className="font-medium text-gray-700 hover:text-gray-900">
                   Home <span>/</span>
@@ -58,7 +58,7 @@ function RootLayout({ breadcrumbs, children }) {
               })}
             </ol>
           </nav>
-          <div className="mt-2 bg-white p-6 rounded-lg shadow-sm">
+          <div className="mt-2 bg-white p-4 md:p-6 rounded-lg shadow-sm">
             {children}
           </div>
         </div>

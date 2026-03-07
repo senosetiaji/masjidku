@@ -105,9 +105,9 @@ function Form({ isEdit = false}) {
           <div className="text-[#666] text-[13px]">Lengkapi data biaya rutinan dengan benar.</div>
         </div>
       </div>
-      <form onSubmit={form.handleSubmit} className="ml-auto">
-        <div className="grid grid-cols-3 gap-4">
-          <FormControl fullWidth className='col-span-3'>
+      <form onSubmit={form.handleSubmit} className="w-full">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          <FormControl fullWidth className='lg:col-span-3'>
             <SelectConsumer
               label="Pelanggan"
               name="pelangganId"
@@ -118,8 +118,8 @@ function Form({ isEdit = false}) {
               disabled={isEdit}
             />
           </FormControl>
-          <div className="col-span-3 p-4 bg-[#f9f9f9] rounded-lg border border-dashed border-gray-200">
-            <div className="grid grid-cols-3 gap-4">
+          <div className="lg:col-span-3 p-4 bg-[#f9f9f9] rounded-lg border border-dashed border-gray-200">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               <FormControl fullWidth>
                 <NumericInputField
                   label="Bulan Ini"
@@ -150,7 +150,7 @@ function Form({ isEdit = false}) {
                   disabled={true}
                 />
               </FormControl>
-              <div className="col-span-3 flex justify-end mt-2">
+              <div className="md:col-span-2 lg:col-span-3 flex justify-end mt-2">
                 <Button
                   variant="contained"
                   size="medium"
@@ -162,7 +162,7 @@ function Form({ isEdit = false}) {
               </div>
             </div>
           </div>
-          <FormControl fullWidth className='col-span-3'>
+          <FormControl fullWidth className='lg:col-span-3'>
             <SelectPaymentStatus
               label="Status Pembayaran"
               name="status"
@@ -174,7 +174,7 @@ function Form({ isEdit = false}) {
           </FormControl>
           {
             (form.values.status?.value === 'paid' || form.values.status?.value === 'half_paid') && (
-            <FormControl fullWidth className='col-span-3'>
+            <FormControl fullWidth className='lg:col-span-3'>
               <DatePickerField
                 label="Tanggal"
                 name="paymentDate"
@@ -187,7 +187,7 @@ function Form({ isEdit = false}) {
           }
           {
             (form.values.status?.value === 'half_paid' || form.values.status?.value === 'paid') && (
-            <FormControl fullWidth className='col-span-3'>
+            <FormControl fullWidth className='lg:col-span-3'>
               <NumericInputField
                 label="Jumlah Bayar (Rp)"
                 name="paidAmount"
@@ -199,7 +199,7 @@ function Form({ isEdit = false}) {
             </FormControl>
             )
           }
-          <FormControl fullWidth className='col-span-3'>
+          <FormControl fullWidth className='lg:col-span-3'>
             <TextAreaField
               label="Keterangan"
               name="notes"
@@ -218,6 +218,7 @@ function Form({ isEdit = false}) {
             color='primary'
             loading={isLoadingCreate}
             disabled={isLoadingCreate}
+            className='w-full sm:w-auto'
           >
             {isEdit ? 'Update Biaya Rutinan' : 'Simpan Biaya Rutinan'}
           </Button>

@@ -87,6 +87,8 @@ function MasterDataIcon() {
 
 function SideNav({ isToggled }) {
   const [openAlias, setOpenAlias] = React.useState(null);
+  const [hoveredAlias, setHoveredAlias] = React.useState(null);
+  const [mobileOpenAlias, setMobileOpenAlias] = React.useState(null);
   const router = useRouter();
   const isActive = (link) => {
     if (!router?.pathname) return false;
@@ -135,8 +137,53 @@ function SideNav({ isToggled }) {
       ] 
     },
   ];
-  return (
-    <div className={`${isToggled ? '-left-full' : 'left-0'} w-56 fixed top-16 bottom-0 z-999 transition-all overflow-auto bg-white pt-4 transition-width duration-300`}>
+
+  const renderDesktopMini = () => (
+    <div className="fixed left-0 top-16 bottom-0 z-[999] hidden w-14 bg-white border-r border-gray-200 shadow-sm md:flex flex-col items-center py-4 gap-3">
+      {menu.filter(item => item.show).map((item, index) => {
+        const hasSub = item.subMenu && item.subMenu.length > 0;
+        const active = isActive(item.link);
+        const isOpen = hoveredAlias === item.alias;
+
+        return (
+          <div
+            key={index}
+            className="relative"
+            onMouseEnter={() => setHoveredAlias(item.alias)}
+            onMouseLeave={() => setHoveredAlias(null)}
+          >
+            <button
+              type="button"
+              title={item.name}
+              onClick={() => { if (!hasSub) router.push(item.link); }}
+              className={`w-10 h-10 flex items-center justify-center rounded-md ${active ? 'bg-[#003844] text-white' : 'hover:bg-[#003844]/15 text-[#333333]'}`}
+            >
+              {item.icon}
+            </button>
+            {hasSub && isOpen && (
+              <div className="absolute left-full top-0 ml-0 w-48 bg-white border border-gray-200 rounded-md shadow-lg py-2">
+                {item.subMenu.filter(sub => sub.show).map((subItem, subIndex) => {
+                  const subActive = isActive(subItem.link);
+                  return (
+                    <div
+                      key={subIndex}
+                      className={`px-4 py-2 text-sm cursor-pointer hover:bg-[#003844]/10 ${subActive ? 'bg-[#003844]/15 font-semibold text-[#003844]' : 'text-[#333333]'}`}
+                      onClick={() => router.push(subItem.link)}
+                    >
+                      {subItem.name}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+
+  const renderDesktopFull = () => (
+    <div className={`${isToggled ? '-left-full' : 'left-0'} hidden w-56 fixed top-16 bottom-0 z-999 transition-all overflow-auto bg-white pt-4 transition-width duration-300 md:block`}>
       <div className="p-2 grid grid-cols-1 gap-4">
         {menu.filter(item => item.show).map((item, index) => {
           const hasSub = item.subMenu && item.subMenu.length > 0;
@@ -192,6 +239,72 @@ function SideNav({ isToggled }) {
         })}
       </div>
     </div>
+  );
+
+  const renderMobileFloating = () => {
+    if (!isToggled) return null;
+    return (
+      <div className="fixed bottom-4 left-1/2 z-[1000] flex -translate-x-1/2 flex-col items-center gap-2 md:hidden">
+        <div className="flex items-center gap-2 rounded-full border border-gray-200 bg-white/95 px-3 py-2 shadow-lg overflow-x-auto">
+          {menu.filter(item => item.show).map((item, index) => {
+            const hasSub = item.subMenu && item.subMenu.length > 0;
+            const active = isActive(item.link);
+            return (
+              <button
+                key={index}
+                type="button"
+                title={item.name}
+                onClick={() => {
+                  if (hasSub) {
+                    setMobileOpenAlias(prev => (prev === item.alias ? null : item.alias));
+                  } else {
+                    setMobileOpenAlias(null);
+                    router.push(item.link);
+                  }
+                }}
+                className={`h-10 w-10 flex items-center justify-center rounded-full border ${active ? 'border-[#003844] bg-[#003844] text-white' : 'border-transparent bg-white text-[#333333] shadow-sm'} hover:bg-[#003844]/10`}
+              >
+                {item.icon}
+              </button>
+            );
+          })}
+        </div>
+        {mobileOpenAlias && (
+          <div className="w-[90vw] max-w-sm rounded-xl border border-gray-200 bg-white shadow-xl">
+            <div className="px-4 py-3 text-sm font-semibold text-gray-700">Menu</div>
+            <div className="border-t border-gray-100">
+              {menu
+                .find((item) => item.alias === mobileOpenAlias)?.subMenu
+                ?.filter(sub => sub.show)
+                ?.map((subItem, subIndex) => {
+                  const subActive = isActive(subItem.link);
+                  return (
+                    <button
+                      key={subIndex}
+                      type="button"
+                      className={`flex w-full items-center justify-between px-4 py-3 text-sm ${subActive ? 'bg-[#003844]/10 font-semibold text-[#003844]' : 'text-[#333333] hover:bg-gray-50'}`}
+                      onClick={() => {
+                        setMobileOpenAlias(null);
+                        router.push(subItem.link);
+                      }}
+                    >
+                      <span>{subItem.name}</span>
+                      <span className="text-[11px] text-gray-400">Buka</span>
+                    </button>
+                  );
+                })}
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  return (
+    <>
+      {renderMobileFloating()}
+      {isToggled ? renderDesktopMini() : renderDesktopFull()}
+    </>
   )
 }
 

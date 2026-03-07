@@ -153,9 +153,9 @@ function Form({ isEdit = false}) {
           <div className="text-[#666] text-[13px]">Lengkapi data biaya rutinan dengan benar.</div>
         </div>
       </div>
-      <form onSubmit={form.handleSubmit} className="ml-auto">
-        <div className="grid grid-cols-3 gap-4">
-          <FormControl fullWidth className='col-span-3'>
+      <form onSubmit={form.handleSubmit} className="w-full">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          <FormControl fullWidth className='lg:col-span-3'>
             <SelectConsumer
               label="Pelanggan"
               name="pelangganId"
@@ -166,18 +166,18 @@ function Form({ isEdit = false}) {
               disabled={isEdit}
             />
           </FormControl>
-          <div className="col-span-3">
+          <div className="lg:col-span-3">
             <div className='text-[13px] text-gray-400'>Total Biaya Pemasangan: Rp. {isEdit ? detailPemasangan?.installationBill : totalInstallationBill}</div>
           </div>
           {/* Credit Payments Section */}
           {form.values.credit_payments.map((payment, index) => (
-            <div className="p-6 rounded-xl border border-dashed border-gray-400 col-span-3" key={index}>
-              <div className="flex justify-between items-center mb-4">
+            <div className="p-4 md:p-6 rounded-xl border border-dashed border-gray-400 lg:col-span-3" key={index}>
+              <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center mb-4">
                 <div className="">
                   <div className="text-gray-500">Angsuran ke-{index + 1}</div>
                   {payment.isCollapsed ? <div className="text-[12px] mt-2" >{form.values.credit_payments[index].paidAmount ? `Rp. ${form.values.credit_payments[index].paidAmount}` : 'Data Pembayaran Belum diisi.'}</div> : null}
                 </div>
-                <div className="flex gap-2">
+                <div className="flex gap-2 self-end sm:self-auto">
                   <IconButton aria-label="" className='text-red-500' disabled={form.values.credit_payments.length === 1} onClick={()=> removeCreditPayment(index)}>
                     {iconDelete()}
                   </IconButton>
@@ -224,7 +224,7 @@ function Form({ isEdit = false}) {
               }
             </div>
           ))}
-          <div className="w-full flex justify-center mt-4 col-span-3">
+          <div className="w-full flex justify-center mt-4 lg:col-span-3">
             <Button
               variant="outlined"
               size="medium"
@@ -232,6 +232,7 @@ function Form({ isEdit = false}) {
                 // add new installment logic here
                 addCreditPayment();
               }}
+              className="w-full sm:w-auto"
             >
               Tambah Angsuran
             </Button>
@@ -245,6 +246,7 @@ function Form({ isEdit = false}) {
             color='primary'
             loading={isLoadingCreate}
             disabled={isLoadingCreate}
+            className="w-full sm:w-auto"
           >
             {isEdit ? 'Update Biaya Rutinan' : 'Simpan Biaya Rutinan'}
           </Button>

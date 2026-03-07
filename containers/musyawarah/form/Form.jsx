@@ -156,13 +156,14 @@ function Form({ isEdit = false}) {
             <Editor value={text} name='notes' onTextChange={(e) => setText(e.htmlValue)} style={{ height: '320px' }} />
           </FormControl>
           <FormControl fullWidth margin="normal">
-            <div className="flex items-center justify-between mb-2">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-2">
               <span className="text-[#4F4F4F] font-medium text-[13px]">Ringkasan Musyawarah</span>
               <Button
                 variant="outlined"
                 size="small"
                 onClick={handleGenerateSummary}
                 disabled={!hasNotes || isSummarizing}
+                className="w-full sm:w-auto"
               >
                 {isSummarizing ? (
                   <span className="flex items-center gap-2">
@@ -195,7 +196,7 @@ function Form({ isEdit = false}) {
             </Button>
           </div>
           <div className="flex justify-end mt-6">
-            <Button type="submit" variant="contained" color="primary" disabled={isSummarizing}>
+            <Button type="submit" variant="contained" color="primary" disabled={isSummarizing} className="w-full sm:w-auto">
               {isEdit ? 'Update Musyawarah' : 'Buat Musyawarah'}
             </Button>
           </div>

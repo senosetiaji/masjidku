@@ -78,7 +78,7 @@ function Form({ isEdit = false }) {
   }, [isEdit, detail])
 
   return (
-    <div className='p-8 rounded-xl shadow-sm grid grid-cols-2 gap-6'>
+    <div className='p-4 md:p-8 rounded-xl shadow-sm grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6'>
       <FormControl fullWidth>
         <DatePickerField
           label="Tanggal Zakat"
@@ -105,12 +105,12 @@ function Form({ isEdit = false }) {
           placeholder={'Pilih Jenis Zakat'}
         />
       </FormControl>
-      <div className="p-8 rounded-xl border border-dashed border-gray-300 col-span-2 grid grid-cols-2 gap-6">
-        <div className="col-span-2">
+      <div className="p-4 md:p-8 rounded-xl border border-dashed border-gray-300 md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+        <div className="md:col-span-2">
           <div className="text-6">Data Zakat</div>
           <div className='text-[13px] text-gray-400'>Lengkapi data berikut untuk membuat Zakat baru.</div>
         </div>
-        <Divider className='col-span-2' />
+        <Divider className='md:col-span-2' />
         <FormControl fullWidth>
           <TextInputField
             label="Nama Muzzaki/Pemberi Zakat"
@@ -137,7 +137,7 @@ function Form({ isEdit = false }) {
             placeholder={'Pilih Jenis Zakat'}
           />
         </FormControl>
-        <FormControl fullWidth className='col-span-2'>
+        <FormControl fullWidth className='md:col-span-2'>
           <TextInputField
             label="Jumlah Zakat"
             name="amount"
@@ -152,7 +152,7 @@ function Form({ isEdit = false }) {
             placeholder={'Tuliskan Jumlah Zakat'}
           />
         </FormControl>
-        <FormControl fullWidth className='col-span-2'>
+        <FormControl fullWidth className='md:col-span-2'>
           <TextAreaField
             label="Keterangan"
             name="description"
@@ -166,7 +166,7 @@ function Form({ isEdit = false }) {
           />
         </FormControl>
       </div>
-      <Button type="submit" variant="contained" color="primary" onClick={formik.handleSubmit} className='col-span-2 self-end' disabled={isLoadingCreate}>
+      <Button type="submit" variant="contained" color="primary" onClick={formik.handleSubmit} className='w-full md:w-auto md:col-span-2 md:justify-self-end' disabled={isLoadingCreate}>
         Simpan Zakat
       </Button>
     </div>

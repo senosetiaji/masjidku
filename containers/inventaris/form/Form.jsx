@@ -98,7 +98,7 @@ function Form({ isEdit = false}) {
         {form.values.data.map((item, idx) => (
           <div
             key={idx}
-            className="flex justify-start gap-4 rounded-xl border border-dashed border-gray-200 bg-[#fbfbfb] p-6 shadow-sm"
+            className="flex flex-col md:flex-row justify-start gap-4 rounded-xl border border-dashed border-gray-200 bg-[#fbfbfb] p-6 shadow-sm"
           >
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
               <FormControl fullWidth className='col-span-1 md:col-span-2'>
@@ -157,7 +157,7 @@ function Form({ isEdit = false}) {
               </FormControl>
             </div>
 
-            <div className="">
+            <div className="self-end md:self-start">
               <IconButton
                 aria-label="hapus baris"
                 onClick={() => handleRemove(idx)}
@@ -177,7 +177,7 @@ function Form({ isEdit = false}) {
               variant="outlined"
               startIcon={<AddIcon />}
               onClick={handleAdd}
-              className="min-w-55! rounded-lg! border-gray-200! bg-white! hover:bg-gray-50! text-[#3b3b3b]! shadow-sm"
+              className="min-w-55! w-full! md:w-fit rounded-lg! border-gray-200! bg-white! hover:bg-gray-50! text-[#3b3b3b]! shadow-sm"
             >
               Tambah Inventaris
             </MuiButton>
@@ -190,6 +190,7 @@ function Form({ isEdit = false}) {
           variant="contained"
           onClick={form.submitForm}
           color='primary'
+          className='w-full md:w-auto'
         >
           {isEdit ? "Simpan Perubahan" : "Simpan Inventaris"}
         </MuiButton>

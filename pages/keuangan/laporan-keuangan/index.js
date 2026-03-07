@@ -60,9 +60,9 @@ function Index() {
   }
   return (
     <RootLayout breadcrumbs={breadcrumbs}>
-      <div className="flex justify-between items-center mb-8">
+      <div className="flex flex-col gap-4 mb-8 sm:flex-row sm:items-center sm:justify-between">
         <div className="title text-[20px] font-bold text-[#333]">Laporan Keuangan</div>
-        <div className="flex gap-3">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
           <Button variant="contained" color="inherit" onClick={handleExport} disabled={isLoadingExport}>
             {isLoadingExport ? 'Exporting...' : 'Export PDF'}
           </Button>

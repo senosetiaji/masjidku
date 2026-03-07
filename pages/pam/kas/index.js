@@ -59,13 +59,13 @@ function Index() {
   };
   return (
     <RootLayout breadcrumbs={breadcrumbs}>
-      <div className="flex justify-between items-center mb-8">
+      <div className="flex flex-col gap-4 mb-8 sm:flex-row sm:items-center sm:justify-between">
         <div className="title text-[20px] font-bold text-[#333]">Laporan Keuangan PAM</div>
-        <div className="flex gap-3">
-          <Button variant="contained" color="inherit" onClick={handleExport} disabled={isLoadingExport}>
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+          <Button variant="contained" color="inherit" onClick={handleExport} disabled={isLoadingExport} className="w-full sm:w-auto">
             {isLoadingExport ? 'Exporting...' : 'Export PDF'}
           </Button>
-          <Button variant="contained" color="primary" onClick={() => router.push('/pam/kas/create')}>
+          <Button variant="contained" color="primary" onClick={() => router.push('/pam/kas/create')} className="w-full sm:w-auto">
             Input Data Keuangan
           </Button>
         </div>

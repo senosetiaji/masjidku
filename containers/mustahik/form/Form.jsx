@@ -92,8 +92,8 @@ function Form({ isEdit = false }) {
 				</div>
 			</div>
 
-			<form onSubmit={formik.handleSubmit} className="grid grid-cols-2 gap-4">
-				<FormControl fullWidth className='col-span-2'>
+			<form onSubmit={formik.handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+				<FormControl fullWidth className='md:col-span-2'>
 					<TextInputField
 						label="Nama Penerima"
 						name="name"
@@ -104,7 +104,7 @@ function Form({ isEdit = false }) {
 					/>
 				</FormControl>
 
-				<FormControl fullWidth className='col-span-2'>
+				<FormControl fullWidth className='md:col-span-2'>
 					<TextAreaField
 						label="Alamat"
 						name="address"
@@ -160,7 +160,7 @@ function Form({ isEdit = false }) {
 					/>
 				</FormControl>
 
-				<FormControl fullWidth className='col-span-2'>
+				<FormControl fullWidth className='md:col-span-2'>
 					<TextInputField
 						label="Jumlah"
 						name="amount"
@@ -173,8 +173,8 @@ function Form({ isEdit = false }) {
 					/>
 				</FormControl>
 
-				<div className="col-span-2 flex justify-end mt-4">
-					<Button type="submit" variant="contained" color="primary" disabled={isLoadingCreate}>
+				<div className="md:col-span-2 flex justify-end mt-4">
+					<Button type="submit" variant="contained" color="primary" disabled={isLoadingCreate} className="w-full sm:w-auto">
 						{isEdit ? 'Simpan Perubahan' : 'Simpan Mustahik'}
 					</Button>
 				</div>

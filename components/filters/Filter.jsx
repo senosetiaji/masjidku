@@ -1,7 +1,7 @@
 import React from 'react';
 import FormControl from '@mui/material/FormControl';
 import { Box } from '@mui/material';
-import Button from '../buttons/Button';
+import Button from '@mui/material/Button';
 import PropTypes from 'prop-types';
 import SelectMonthYear from '../forms/SelectMonthYear';
 import moment from 'moment';
@@ -16,8 +16,15 @@ import SelectConsumer from '../forms/SelectConsumer';
 import SelectZakatType from '../forms/SelectZakatType';
 import SelectKategori from '../forms/SelectKategori';
 
+function FilterIcon () {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75" />
+    </svg>
+  );
+}
+
 function Filter({ filters, multipleFilters, onSubmit, filterState, requiredField = [], keyName = '', loading = false }) {
-  const [className, setClassName] = React.useState('');
   const [submitBtnDisabled, setSubmitBtnDisabled] = React.useState(false);
 
   // ===== Read saved filter from Redux by keyName =====
@@ -120,14 +127,6 @@ function Filter({ filters, multipleFilters, onSubmit, filterState, requiredField
 
     setSubmitBtnDisabled(disable);
   }, [localFilterState, requiredField, normalizedMulti]);
-
-  React.useEffect(() => {
-    let total = 0;
-    for (const t of filters) {
-      total += getCountForType(t);
-    }
-    setClassName(`grid-cols-${total}`);
-  }, [filters, normalizedMulti]);
 
   const baseNameFromName = (n) => n.replace(/_\d+$/, ''); // hapus suffix angka
   const ensureDefault = (name, value) => {
@@ -309,30 +308,41 @@ function Filter({ filters, multipleFilters, onSubmit, filterState, requiredField
   return (
     <div className="relative w-full animate__animated animate__fadeIn p-4 mb-6 bg-white border border-dashed border-gray-200 rounded-lg">
       <Box component={'div'} className='relative' borderRadius="8px">
-        <div className="flex justify-between gap-4">
-          <div className={`w-6/6 grid ${className} gap-4 mb-6`}>
+        <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+          <div className="grid w-full grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-[repeat(auto-fit,minmax(220px,_1fr))]">
             {renderedFilters}
           </div>
           {/* Submit button (opsional) */}
-          <div className="w-1/6 flex items-center">
+          <div className="flex items-start pt-7 md:pl-4 w-full md:w-auto">
             <Button
-              label="Terapkan"
-              icon={'/assets/icons/icon-util-filter.svg'}
-              className="border border-gray-300 w-full! bg-white text-gray-700 hover:bg-gray-100 hover:shadow-md"
+              variant="outlined"
+              color="inherit"
+              fullWidth
+              startIcon={<FilterIcon />}
+              sx={{
+                textTransform: 'none',
+                fontWeight: 600,
+                borderColor: '#d1d5db',
+                color: '#374151',
+                backgroundColor: '#ffffff',
+                '&:hover': {
+                  backgroundColor: '#f3f4f6',
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.08)'
+                }
+              }}
               onClick={() => {
                 // Simpan ke Redux berdasarkan keyName (wajib isi keyName di halaman pemakai)
                 if (keyName) {
-                  console.log(keyName);
-                  
                   dispatch(setFilter({ key: keyName, values: localFilterState }));
                 }
                 // Lanjutkan callback agar halaman melakukan fetch
                 onSubmit(localFilterState);
               }}
               disabled={submitBtnDisabled}
-              size={'small'}
-              loading={loading}
-            />
+              size="medium"
+            >
+              Terapkan
+            </Button>
           </div>
         </div>
       </Box>

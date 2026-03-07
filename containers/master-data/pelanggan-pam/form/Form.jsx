@@ -86,7 +86,7 @@ function Form({ isEdit = false }) {
             placeholder={'Tuliskan Jumlah Tagihan Instalasi'}
           />
         </FormControl>
-        <FormControl fullWidth className='col-span-3'>
+        <FormControl fullWidth className='md:col-span-3'>
           <TextAreaField
             size={'small'}
             row={3}
@@ -100,11 +100,11 @@ function Form({ isEdit = false }) {
           />
         </FormControl>
       </div>
-      <div className="flex justify-end gap-4 mt-4">
-        <Button variant="text" color="default">
+      <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 sm:gap-4 mt-4">
+        <Button variant="text" color="default" className='w-full sm:w-auto'>
           Batal
         </Button>
-        <Button variant="contained" color="primary" className='ml-2' onClick={form.handleSubmit}>
+        <Button variant="contained" color="primary" className='w-full sm:w-auto sm:ml-2' onClick={form.handleSubmit}>
           Simpan Data
         </Button>
       </div>

@@ -74,16 +74,16 @@ function Index() {
 
 	return (
 		<RootLayout breadcrumbs={breadcrumbs}>
-			<div className="flex justify-between items-center mb-8">
+			<div className="flex flex-col gap-4 mb-8 sm:flex-row sm:items-center sm:justify-between">
 				<div className="title text-[20px] font-bold text-[#333]">Data Mustahik</div>
-				<div className="flex gap-3">
-					<Button variant="contained" color="inherit" onClick={handleExport} disabled={isLoadingExport}>
+				<div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+					<Button variant="contained" color="inherit" onClick={handleExport} disabled={isLoadingExport} className="w-full sm:w-auto">
 						{isLoadingExport ? 'Exporting...' : 'Export PDF'}
 					</Button>
-					<Button variant="contained" color="secondary" onClick={() => duplicateModalRef.current?.open()}>
+					<Button variant="contained" color="secondary" onClick={() => duplicateModalRef.current?.open()} className="w-full sm:w-auto">
 						Duplicate Data Mustahik
 					</Button>
-					<Button variant="contained" color="primary" onClick={() => router.push('/mustahik/create')}>
+					<Button variant="contained" color="primary" onClick={() => router.push('/mustahik/create')} className="w-full sm:w-auto">
 						Input Data Mustahik
 					</Button>
 				</div>

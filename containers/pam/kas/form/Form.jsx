@@ -107,9 +107,9 @@ function Form({ isEdit = false }) {
         {form.values.data.map((item, idx) => (
           <div
             key={idx}
-            className="relative rounded-xl border border-dashed border-gray-200 bg-[#fbfbfb] p-6 shadow-sm flex gap-4 w-full"
+            className="relative rounded-xl border border-dashed border-gray-200 bg-[#fbfbfb] p-6 shadow-sm flex flex-col gap-4 w-full md:flex-row"
           >
-            <div className="grid grid-cols-3 gap-2 w-full">
+            <div className="grid w-full grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
               <FormControl fullWidth>
                 <DatePickerField
                   label="Tanggal"
@@ -151,7 +151,7 @@ function Form({ isEdit = false }) {
                   labelMb="6px"
                 />
               </FormControl>
-              <FormControl fullWidth className="col-span-3">
+              <FormControl fullWidth className="md:col-span-2 lg:col-span-3">
                 <TextInputField
                   label="Keterangan"
                   name={`data[${idx}].description`}
@@ -185,7 +185,7 @@ function Form({ isEdit = false }) {
               variant="outlined"
               startIcon={<AddIcon />}
               onClick={handleAddEntry}
-              className="min-w-55! rounded-lg! border-gray-200! bg-white! hover:bg-gray-50! text-[#3b3b3b]! shadow-sm"
+              className="min-w-55! w-full! md:w-fit rounded-lg! border-gray-200! bg-white! hover:bg-gray-50! text-[#3b3b3b]! shadow-sm"
             >
               Tambah Data Keuangan
             </MuiButton>
@@ -193,7 +193,7 @@ function Form({ isEdit = false }) {
         )}
       </form>
       <div className="mt-6 flex justify-end pt-4 border-t border-gray-50">
-        <Button variant="contained" color="primary" onClick={form.handleSubmit} className="mt-6">
+        <Button variant="contained" color="primary" onClick={form.handleSubmit} className="mt-6 w-full md:w-auto">
           {isEdit ? 'Perbarui Data Keuangan' : 'Simpan Data Keuangan'}
         </Button>
       </div>

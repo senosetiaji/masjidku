@@ -31,9 +31,9 @@ function Index() {
 
   return (
     <RootLayout breadcrumbs={breadcrumbs}>
-      <div className="flex justify-between items-center mb-8">
+      <div className="flex flex-col gap-4 mb-8 sm:flex-row sm:items-center sm:justify-between">
         <div className="title text-[20px] font-bold text-[#333]">Data Panitia Zakat</div>
-        <Button variant="contained" color="primary" onClick={() => router.push('/zakat/panitia/create')}>
+        <Button variant="contained" color="primary" onClick={() => router.push('/zakat/panitia/create')} className="w-full sm:w-auto">
           Input Data Panitia
         </Button>
       </div>

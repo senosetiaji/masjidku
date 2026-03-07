@@ -7,7 +7,7 @@ function Summary() {
   const router = useRouter();
   if(!summary) return null;
   return (
-    <div className='grid grid-cols-4 gap-4'>
+    <div className='grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4'>
       <div className="p-4 rounded-xl shadow-md hover:shadow-lg hover:bg-gray-50 transition-shadow duration-200 cursor-pointer" onClick={() => router.push('/keuangan/laporan-keuangan')}>
         <div className="text-sm text-gray-500">Saldo Kas</div>
         <div className="text-[12px] text-gray-400 mb-4">Total Saldo Kas Terupdate (Rp.)</div>

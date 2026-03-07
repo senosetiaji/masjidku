@@ -58,12 +58,14 @@ function Finance() {
               placeholder="Semua Bulan"
             />
           </FormControl>
-          <Chart />
+          <div className="md:col-span-2">
+            <Chart />
+          </div>
         </div>
       </div>
       <div className="lg:col-span-2 grid grid-cols-1 gap-4">
         <div className="p-4 shadow-md rounded-lg">
-          <div className="flex items-center justify-between gap-2">
+          <div className="flex items-start justify-between gap-2">
             <h2 className="text-lg font-semibold">Finance (Kas) Overview</h2>
             <IconButton aria-label="" onClick={() => router.push('/keuangan/laporan-keuangan')}>
               <ArrowOutwardIcon className='text-sky-700 hover:text-sky-800' />
