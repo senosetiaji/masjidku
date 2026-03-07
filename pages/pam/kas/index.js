@@ -1,6 +1,6 @@
 import Filter from '@/components/filters/Filter';
 import RootLayout from '@/components/layouts/RootLayout'
-import Kas from '@/containers/pam/kas/Kas';
+import Kas from '@/containers/pam/kas';
 import { exportPamKas, getPamKas } from '@/store/actions/pam.action';
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux';

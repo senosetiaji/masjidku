@@ -157,3 +157,22 @@ model Qurban {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
+
+model Roles {
+  id          String   @id @default(uuid())
+  name        String
+  description String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  permissions  Permissions[]
+}
+
+model Permissions {
+  id          String   @id @default(uuid())
+  role_id     String
+  role        Roles    @relation(fields: [role_id], references: [id])
+  name        String
+  description String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

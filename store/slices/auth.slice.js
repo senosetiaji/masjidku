@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit"
-import { loginUser, logout } from "../actions/auth.action"
+import { changePassword, loginUser, logout } from "../actions/auth.action"
 
 export const initialState = {
   userSSO: null,
@@ -11,6 +11,7 @@ export const initialState = {
     total_page: 0
   },
   isLoading:false,
+  isLoadingChangePassword:false,
   isLoadingCreate:false,
   isLoadingDelete:false,
   isLoadingDetail:false,
@@ -41,6 +42,16 @@ const authSlice = createSlice({
     })
     .addCase(logout.rejected, (state) => {
       state.isLoading = false
+    })
+
+    .addCase(changePassword.pending, (state) => {
+      state.isLoadingChangePassword = true
+    })
+    .addCase(changePassword.fulfilled, (state) => {
+      state.isLoadingChangePassword = false
+    })
+    .addCase(changePassword.rejected, (state) => {
+      state.isLoadingChangePassword = false
     })
   }
 })

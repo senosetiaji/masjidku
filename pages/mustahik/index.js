@@ -1,7 +1,7 @@
 import Filter from '@/components/filters/Filter'
 import RootLayout from '@/components/layouts/RootLayout'
 import ModalDuplicateMustahik from '@/components/modals/ModalDuplicateMustahik'
-import Mustahik from '@/containers/mustahik/Mustahik'
+import Mustahik from '@/containers/mustahik'
 import { duplicateMustahik, exportMustahik, getAllMustahik } from '@/store/actions/mustahik.action'
 import { Button } from '@mui/material'
 import moment from 'moment'

@@ -24,3 +24,15 @@ export const logout = createAsyncThunk('auth/logout', async ({payload}, { dispat
     return rejectWithValue(err?.response?.data)
   }
 })
+
+export const changePassword = createAsyncThunk('auth/changePassword', async ({ payload }, { dispatch, rejectWithValue }) => {
+  try {
+    const response = await API.post('/masjidku/auth/change-password', payload)
+    const data = await response.data
+    dispatch(successHelper('Password berhasil diperbarui.'))
+    return data
+  } catch (err) {
+    dispatch(errorHelper(err))
+    return rejectWithValue(err?.response?.data)
+  }
+})

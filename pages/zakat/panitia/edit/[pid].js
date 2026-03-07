@@ -1,5 +1,5 @@
 import RootLayout from '@/components/layouts/RootLayout'
-import Form from '@/containers/zakat/panitia/form/Form'
+import Form from '@/containers/zakat/panitia/form'
 import { getDetailPanitiaZakat } from '@/store/actions/panitiaZakat.action'
 import { useRouter } from 'next/router'
 import React from 'react'

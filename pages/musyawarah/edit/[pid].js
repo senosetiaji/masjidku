@@ -1,6 +1,6 @@
 import RootLayout from '@/components/layouts/RootLayout'
 import React from 'react'
-import Form from '@/containers/musyawarah/form/Form';
+import Form from '@/containers/musyawarah/form';
 import { useDispatch } from 'react-redux';
 import { useRouter } from 'next/router';
 import { getDetail } from '@/store/actions/musyawarah.action';

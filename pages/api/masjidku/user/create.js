@@ -9,7 +9,7 @@ if (!prisma) {
 	if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
 }
 
-const VALID_ROLES = new Set(["superadmin", "ketua", "anggota", "sekretaris", "bendahara"]);
+const VALID_ROLES = new Set(["superadmin", "admin", "ketua", "sekretaris", "bendahara"]);
 const SALT_ROUNDS = 10;
 
 export default async function handler(req, res) {

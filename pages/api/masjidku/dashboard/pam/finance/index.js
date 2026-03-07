@@ -76,7 +76,6 @@ export default async function handler(req, res) {
 		}
 
 		const where = {
-			userId,
 			...(dateFilter ? { date: dateFilter } : {}),
 		};
 

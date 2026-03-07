@@ -1,7 +1,7 @@
 import { Button } from '@mui/material';
 import { useRouter } from 'next/router';
 import React from 'react'
-import Table from './table/Table';
+import Table from './table';
 import { formatRupiah } from '@/lib/helpers/helper';
 import { useSelector } from 'react-redux';
 

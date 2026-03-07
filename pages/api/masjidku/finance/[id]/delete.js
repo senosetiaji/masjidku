@@ -58,7 +58,7 @@ export default async function handler(req, res) {
     }
 
     const existing = await prisma.keuangan.findFirst({
-      where: { id: financeId, userId },
+      where: { id: financeId },
       select: { id: true },
     });
 

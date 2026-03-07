@@ -1,6 +1,6 @@
 import Filter from '@/components/filters/Filter';
 import RootLayout from '@/components/layouts/RootLayout'
-import Zakat from '@/containers/zakat/Zakat';
+import Zakat from '@/containers/zakat';
 import { getAllZakat } from '@/store/actions/zakat.action';
 import { Button } from '@mui/material';
 import moment from 'moment';

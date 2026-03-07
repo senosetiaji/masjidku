@@ -1,5 +1,5 @@
 import RootLayout from '@/components/layouts/RootLayout';
-import Form from '@/containers/inventaris/form/Form';
+import Form from '@/containers/inventaris/form';
 import { getDetail } from '@/store/actions/inventaris.action';
 import { useRouter } from 'next/router';
 import React from 'react'

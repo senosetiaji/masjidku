@@ -1,6 +1,6 @@
 import Filter from '@/components/filters/Filter';
 import RootLayout from '@/components/layouts/RootLayout'
-import BiayaRutinan from '@/containers/pam/biaya-rutinan/BiayaRutinan';
+import BiayaRutinan from '@/containers/pam/biaya-rutinan';
 import { extractSelect } from '@/lib/helpers/helper';
 import { getPamRutinan } from '@/store/actions/pam.action';
 import { Button } from '@mui/material';

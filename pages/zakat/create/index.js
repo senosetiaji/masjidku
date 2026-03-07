@@ -1,5 +1,5 @@
 import RootLayout from '@/components/layouts/RootLayout';
-import Form from '@/containers/zakat/form/Form';
+import Form from '@/containers/zakat/form';
 import { IconButton } from '@mui/material';
 import React from 'react'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';

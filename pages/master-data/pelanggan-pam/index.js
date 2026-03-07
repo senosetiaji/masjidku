@@ -1,6 +1,5 @@
 import RootLayout from '@/components/layouts/RootLayout'
-import PelangganPam from '@/containers/master-data/pelanggan-pam/PelangganPam'
-import Takmeer from '@/containers/takmeer/Takmeer'
+import PelangganPam from '@/containers/master-data/pelanggan-pam'
 import React from 'react'
 
 function Index() {

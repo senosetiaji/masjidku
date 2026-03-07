@@ -1,5 +1,5 @@
 import RootLayout from '@/components/layouts/RootLayout'
-import Takmeer from '@/containers/takmeer/Takmeer'
+import Takmeer from '@/containers/takmeer'
 import React from 'react'
 
 function Index() {

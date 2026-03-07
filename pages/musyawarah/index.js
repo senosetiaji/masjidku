@@ -2,7 +2,7 @@ import RootLayout from '@/components/layouts/RootLayout'
 import React from 'react'
 import Button from '@mui/material/Button'
 import { useRouter } from 'next/router';
-import Musyawarah from '@/containers/musyawarah/Musyawarah';
+import Musyawarah from '@/containers/musyawarah';
 import { useDispatch } from 'react-redux';
 import { getAllMusyawarah } from '@/store/actions/musyawarah.action';
 

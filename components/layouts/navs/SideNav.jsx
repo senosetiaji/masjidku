@@ -1,5 +1,6 @@
 import { useRouter } from 'next/router'
 import React from 'react'
+import { useSelector } from 'react-redux'
 
 function IconSettings() {
   return(
@@ -90,9 +91,16 @@ function SideNav({ isToggled }) {
   const [hoveredAlias, setHoveredAlias] = React.useState(null);
   const [mobileOpenAlias, setMobileOpenAlias] = React.useState(null);
   const router = useRouter();
+  const { currentUser } = useSelector((state) => state.user);
+  const permissionSet = React.useMemo(() => new Set(currentUser?.permissions || []), [currentUser?.permissions]);
   const isActive = (link) => {
     if (!router?.pathname) return false;
     return router.pathname === link || router.pathname.startsWith(`${link}/`);
+  };
+  const hasPermission = (link) => {
+    if (!currentUser) return true;
+    if (permissionSet.has('*')) return true;
+    return permissionSet.has(link);
   };
   const getMostSpecificActiveLink = (links = []) => {
     const matchedLinks = links.filter((link) => isActive(link));
@@ -101,7 +109,7 @@ function SideNav({ isToggled }) {
   };
   const isSubmenuItemActive = (parentItem, link) => {
     const links = (parentItem?.subMenu || [])
-      .filter((sub) => sub.show)
+      .filter((sub) => sub.show && hasPermission(sub.link))
       .map((sub) => sub.link);
     return getMostSpecificActiveLink(links) === link;
   };
@@ -144,14 +152,27 @@ function SideNav({ isToggled }) {
       subMenu: [
         { name: 'Role Access', alias: 'role_access', link: '/settings/role-access', show: true },
         { name: 'Permissions', alias: 'permissions', link: '/settings/permissions', show: true },
-        { name: 'User Management', alias: 'user_management', link: '/settings/user-management', show: true },
       ] 
     },
   ];
 
+  const visibleMenu = menu
+    .map((item) => {
+      const allowedSubMenu = (item.subMenu || []).filter((sub) => sub.show && hasPermission(sub.link));
+      const hasSubMenu = allowedSubMenu.length > 0;
+      const canShowSingle = (!item.subMenu || item.subMenu.length === 0) && hasPermission(item.link);
+
+      return {
+        ...item,
+        subMenu: allowedSubMenu,
+        show: item.show && (hasSubMenu || canShowSingle),
+      };
+    })
+    .filter((item) => item.show);
+
   const renderDesktopMini = () => (
     <div className="fixed left-0 top-16 bottom-0 z-999 hidden w-14 bg-white border-r border-gray-200 shadow-sm md:flex flex-col items-center py-4 gap-3">
-      {menu.filter(item => item.show).map((item, index) => {
+      {visibleMenu.map((item, index) => {
         const hasSub = item.subMenu && item.subMenu.length > 0;
         const active = isActive(item.link);
         const isOpen = hoveredAlias === item.alias;
@@ -173,7 +194,7 @@ function SideNav({ isToggled }) {
             </button>
             {hasSub && isOpen && (
               <div className="absolute left-full top-0 ml-0 w-48 bg-white border border-gray-200 rounded-md shadow-lg py-2">
-                {item.subMenu.filter(sub => sub.show).map((subItem, subIndex) => {
+                {item.subMenu.map((subItem, subIndex) => {
                   const subActive = isSubmenuItemActive(item, subItem.link);
                   return (
                     <div
@@ -196,7 +217,7 @@ function SideNav({ isToggled }) {
   const renderDesktopFull = () => (
     <div className={`${isToggled ? '-left-full' : 'left-0'} hidden w-56 fixed top-16 bottom-0 z-999 transition-all overflow-auto bg-white pt-4 transition-width duration-300 md:block`}>
       <div className="p-2 grid grid-cols-1 gap-4">
-        {menu.filter(item => item.show).map((item, index) => {
+        {visibleMenu.map((item, index) => {
           const hasSub = item.subMenu && item.subMenu.length > 0;
           const isOpen = openAlias === item.alias || isActive(item.link);
 
@@ -218,7 +239,7 @@ function SideNav({ isToggled }) {
                 </button>
                 {isOpen && (
                   <div className="mt-4 border-t border-gray-200">
-                    {item.subMenu.filter(sub => sub.show).map((subItem, subIndex) => {
+                    {item.subMenu.map((subItem, subIndex) => {
                       const subActive = isSubmenuItemActive(item, subItem.link);
                       return (
                         <div
@@ -257,7 +278,7 @@ function SideNav({ isToggled }) {
     return (
       <div className="fixed bottom-4 left-1/2 z-1000 flex -translate-x-1/2 flex-col items-center gap-2 md:hidden">
         <div className="flex items-center gap-2 rounded-full border border-gray-200 bg-white/95 px-3 py-2 shadow-lg overflow-x-auto">
-          {menu.filter(item => item.show).map((item, index) => {
+          {visibleMenu.map((item, index) => {
             const hasSub = item.subMenu && item.subMenu.length > 0;
             const active = isActive(item.link);
             return (
@@ -285,8 +306,8 @@ function SideNav({ isToggled }) {
             <div className="px-4 py-3 text-sm font-semibold text-gray-700">Menu</div>
             <div className="border-t border-gray-100">
               {(() => {
-                const activeMenu = menu.find((item) => item.alias === mobileOpenAlias);
-                const subMenuItems = activeMenu?.subMenu?.filter((sub) => sub.show) || [];
+                const activeMenu = visibleMenu.find((item) => item.alias === mobileOpenAlias);
+                const subMenuItems = activeMenu?.subMenu || [];
                 const activeSubLink = getMostSpecificActiveLink(subMenuItems.map((sub) => sub.link));
                 return subMenuItems.map((subItem, subIndex) => {
                   const subActive = activeSubLink === subItem.link;

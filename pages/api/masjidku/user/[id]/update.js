@@ -9,7 +9,7 @@ if (!prisma) {
   if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
 }
 
-const VALID_ROLES = new Set(["superadmin", "ketua", "anggota", "sekretaris", "bendahara"]);
+const VALID_ROLES = new Set(["superadmin", "admin", "ketua", "sekretaris", "bendahara"]);
 const SALT_ROUNDS = 10;
 
 export default async function handler(req, res) {
@@ -19,9 +19,9 @@ export default async function handler(req, res) {
 
   try {
     const { id: idParam } = req.query;
-    const id = Array.isArray(idParam) ? parseInt(idParam[0], 10) : parseInt(idParam, 10);
+    const id = Array.isArray(idParam) ? idParam[0] : idParam;
 
-    if (!Number.isInteger(id) || id <= 0) {
+    if (!id || typeof id !== "string") {
       return res.status(400).json({ message: "invalid_id" });
     }
 

@@ -4,7 +4,7 @@ import React from 'react'
 import Button from '@mui/material/Button'
 import { useDispatch } from 'react-redux'
 import { getPamPemasangan } from '@/store/actions/pam.action'
-import Pemasangan from '@/containers/pam/pemasangan/Pemasangan'
+import Pemasangan from '@/containers/pam/pemasangan'
 
 function Index() {
   const [params, setParams] = React.useState({

@@ -1,5 +1,5 @@
 import RootLayout from '@/components/layouts/RootLayout'
-import Form from '@/containers/takmeer/form/Form'
+import Form from '@/containers/takmeer/form'
 import React from 'react'
 
 function Index() {

@@ -3,7 +3,7 @@ import React from 'react'
 import Button from '@mui/material/Button'
 import { useDispatch } from 'react-redux';
 import { getUsers } from '@/store/actions/user.action';
-import Table from './table/Table';
+import Table from './table';
 
 function Takmeer() {
   const router = useRouter();

@@ -1,6 +1,6 @@
 import Filter from '@/components/filters/Filter';
 import RootLayout from '@/components/layouts/RootLayout'
-import LaporanKeuangan from '@/containers/keuangan/LaporanKeuangan'
+import LaporanKeuangan from '@/containers/keuangan'
 import { exportFinance, getFinance } from '@/store/actions/finance.action';
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux';

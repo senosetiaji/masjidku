@@ -87,7 +87,6 @@ export default async function handler(req, res) {
 		const periodStart = dateFilter?.gte ?? null;
 
 		const baseWhere = {
-			userId,
 			...(search
 				? {
 					OR: [
@@ -108,11 +107,11 @@ export default async function handler(req, res) {
 		if (periodStart) {
 			const [priorIncome, priorExpense] = await Promise.all([
 				prisma.pamKas.aggregate({
-					where: { userId, date: { lt: periodStart }, type: "income" },
+					where: { date: { lt: periodStart }, type: "income" },
 					_sum: { amount: true },
 				}),
 				prisma.pamKas.aggregate({
-					where: { userId, date: { lt: periodStart }, type: "expense" },
+					where: { date: { lt: periodStart }, type: "expense" },
 					_sum: { amount: true },
 				}),
 			]);

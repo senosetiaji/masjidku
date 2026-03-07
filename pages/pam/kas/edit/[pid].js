@@ -1,5 +1,5 @@
 import RootLayout from '@/components/layouts/RootLayout';
-import Form from '@/containers/pam/kas/form/Form';
+import Form from '@/containers/pam/kas/form';
 import { getDetail } from '@/store/actions/finance.action';
 import { getDetailPamKas } from '@/store/actions/pam.action';
 import { useRouter } from 'next/router';

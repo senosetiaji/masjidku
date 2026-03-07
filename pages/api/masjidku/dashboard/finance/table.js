@@ -51,7 +51,6 @@ export default async function handler(req, res) {
 		}
 
 		const rows = await prisma.keuangan.findMany({
-			where: { userId },
 			orderBy: [{ date: "desc" }, { createdAt: "desc" }, { id: "desc" }],
 			take: 10,
 			select: {

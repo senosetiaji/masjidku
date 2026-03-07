@@ -1,5 +1,5 @@
 import RootLayout from '@/components/layouts/RootLayout';
-import Dashboard from '@/containers/dashboard/Dashboard';
+import Dashboard from '@/containers/dashboard';
 import { currentUser, getCurrentUser } from '@/store/actions/user.action';
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux';

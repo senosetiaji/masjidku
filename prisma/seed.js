@@ -1,5 +1,6 @@
 const { PrismaClient } = require("@prisma/client");
 const bcrypt = require("bcryptjs");
+const { randomUUID } = require("crypto");
 
 // Construct with an explicit options object to satisfy this build's runtime check
 const prisma = new PrismaClient({});
@@ -28,6 +29,152 @@ async function main() {
 
     console.log("✅ Superadmin created (username: admin, password: admin123)");
   }
+
+  const sidebarPermissions = {
+    dashboard: [
+      { name: "/dashboard", description: "Akses menu dan halaman Dashboard" },
+    ],
+    masterData: [
+      { name: "/master-data/pelanggan-pam", description: "Akses menu pelanggan PAM" },
+      { name: "/master-data/pelanggan-pam/create", description: "Akses halaman tambah pelanggan PAM" },
+      { name: "/master-data/pelanggan-pam/edit", description: "Akses halaman edit pelanggan PAM" },
+    ],
+    takmeer: [
+      { name: "/takmeer", description: "Akses menu takmeer" },
+      { name: "/takmeer/create", description: "Akses halaman tambah takmeer" },
+      { name: "/takmeer/edit", description: "Akses halaman edit takmeer" },
+    ],
+    keuangan: [
+      { name: "/keuangan/laporan-keuangan", description: "Akses menu laporan keuangan" },
+      { name: "/keuangan/create", description: "Akses halaman input data keuangan" },
+      { name: "/keuangan/edit", description: "Akses halaman edit data keuangan" },
+    ],
+    inventaris: [
+      { name: "/inventaris/laporan-inventaris", description: "Akses menu laporan inventaris" },
+      { name: "/inventaris/create", description: "Akses halaman input inventaris" },
+      { name: "/inventaris/edit", description: "Akses halaman edit inventaris" },
+    ],
+    zakat: [
+      { name: "/zakat", description: "Akses menu laporan zakat" },
+      { name: "/zakat/create", description: "Akses halaman input zakat" },
+      { name: "/zakat/edit", description: "Akses halaman edit zakat" },
+      { name: "/zakat/panitia", description: "Akses menu panitia zakat" },
+      { name: "/zakat/panitia/create", description: "Akses halaman tambah panitia zakat" },
+      { name: "/zakat/panitia/edit", description: "Akses halaman edit panitia zakat" },
+      { name: "/mustahik", description: "Akses menu mustahik" },
+      { name: "/mustahik/create", description: "Akses halaman input mustahik" },
+      { name: "/mustahik/edit", description: "Akses halaman edit mustahik" },
+    ],
+    pam: [
+      { name: "/pam/pemasangan", description: "Akses menu pemasangan PAM" },
+      { name: "/pam/pemasangan/create", description: "Akses halaman tambah pemasangan PAM" },
+      { name: "/pam/pemasangan/edit", description: "Akses halaman edit pemasangan PAM" },
+      { name: "/pam/biaya-rutinan", description: "Akses menu biaya rutinan PAM" },
+      { name: "/pam/biaya-rutinan/create", description: "Akses halaman tambah biaya rutinan PAM" },
+      { name: "/pam/biaya-rutinan/edit", description: "Akses halaman edit biaya rutinan PAM" },
+      { name: "/pam/kas", description: "Akses menu kas PAM" },
+      { name: "/pam/kas/create", description: "Akses halaman tambah kas PAM" },
+      { name: "/pam/kas/edit", description: "Akses halaman edit kas PAM" },
+    ],
+    settings: [
+      { name: "/settings/role-access", description: "Akses menu role access" },
+      { name: "/settings/permissions", description: "Akses menu permissions" },
+    ],
+  };
+
+  const allPermissions = [
+    ...sidebarPermissions.dashboard,
+    ...sidebarPermissions.masterData,
+    ...sidebarPermissions.takmeer,
+    ...sidebarPermissions.keuangan,
+    ...sidebarPermissions.inventaris,
+    ...sidebarPermissions.zakat,
+    ...sidebarPermissions.pam,
+    ...sidebarPermissions.settings,
+  ];
+
+  const rolePermissionMap = {
+    admin: allPermissions,
+    ketua: [
+      ...sidebarPermissions.dashboard,
+      ...sidebarPermissions.keuangan.filter((p) => p.name === "/keuangan/laporan-keuangan"),
+      ...sidebarPermissions.inventaris.filter((p) => p.name === "/inventaris/laporan-inventaris"),
+      ...sidebarPermissions.zakat.filter((p) => ["/zakat", "/zakat/panitia", "/mustahik"].includes(p.name)),
+      ...sidebarPermissions.pam.filter((p) => ["/pam/pemasangan", "/pam/biaya-rutinan", "/pam/kas"].includes(p.name)),
+    ],
+    sekretaris: [
+      ...sidebarPermissions.dashboard,
+      ...sidebarPermissions.masterData,
+      ...sidebarPermissions.takmeer,
+      ...sidebarPermissions.inventaris,
+      ...sidebarPermissions.zakat.filter((p) => ["/zakat/panitia", "/mustahik", "/mustahik/create", "/mustahik/edit"].includes(p.name)),
+    ],
+    bendahara: [
+      ...sidebarPermissions.dashboard,
+      ...sidebarPermissions.keuangan,
+      ...sidebarPermissions.pam,
+      ...sidebarPermissions.zakat,
+    ],
+  };
+
+  const roleDescriptions = {
+    admin: "Akses penuh ke semua menu dan halaman.",
+    ketua: "Akses monitoring laporan utama dan data ringkasan.",
+    sekretaris: "Akses pengelolaan data administratif dan inventaris.",
+    bendahara: "Akses pengelolaan keuangan masjid, PAM, dan zakat.",
+  };
+
+  for (const [roleName, permissions] of Object.entries(rolePermissionMap)) {
+    let role = await prisma.roles.findFirst({ where: { name: roleName } });
+
+    if (!role) {
+      role = await prisma.roles.create({
+        data: {
+          id: randomUUID(),
+          name: roleName,
+          description: roleDescriptions[roleName] || "",
+        },
+      });
+    } else {
+      await prisma.roles.update({
+        where: { id: role.id },
+        data: {
+          description: roleDescriptions[roleName] || role.description,
+        },
+      });
+    }
+
+    await prisma.permissions.deleteMany({ where: { role_id: role.id } });
+    if (permissions.length > 0) {
+      await prisma.$transaction(
+        permissions.map((permission) =>
+          prisma.permissions.create({
+            data: {
+              id: randomUUID(),
+              role_id: role.id,
+              name: permission.name,
+              description: permission.description,
+            },
+          })
+        )
+      );
+    }
+  }
+
+  const staleRoles = await prisma.roles.findMany({
+    where: {
+      name: { notIn: Object.keys(rolePermissionMap) },
+    },
+    select: { id: true, name: true },
+  });
+
+  if (staleRoles.length > 0) {
+    const staleRoleIds = staleRoles.map((role) => role.id);
+    await prisma.permissions.deleteMany({ where: { role_id: { in: staleRoleIds } } });
+    await prisma.roles.deleteMany({ where: { id: { in: staleRoleIds } } });
+  }
+
+  console.log("✅ Roles & Permissions seeded (admin, ketua, sekretaris, bendahara)");
 
   const pelangganSeed = [
     {

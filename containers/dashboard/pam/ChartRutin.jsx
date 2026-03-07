@@ -3,7 +3,7 @@ import { getPamChart } from '@/store/actions/dashboard.action'
 import moment from 'moment'
 import React from 'react'
 import { useDispatch } from 'react-redux'
-import Chart from './chart/Chart'
+import Chart from './chart'
 
 function ChartRutin() {
   const dispatch = useDispatch();

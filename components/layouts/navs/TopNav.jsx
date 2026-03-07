@@ -2,9 +2,10 @@ import React from 'react'
 import IconButton from '@mui/material/IconButton'
 import SettingsIcon from '@mui/icons-material/Settings';
 import { Button } from '@mui/material';
-import { logout } from '@/store/actions/auth.action';
-import { useDispatch } from 'react-redux';
+import { changePassword, logout } from '@/store/actions/auth.action';
+import { useDispatch, useSelector } from 'react-redux';
 import Image from 'next/image';
+import ModalChangePassword from '@/components/modals/ModalChangePassword';
 
 function IconUnToggled() {
   return (
@@ -24,10 +25,42 @@ function IconToggled() {
 
 function TopNav({ toggleHandler, isToggled }) {
   const [openMenu, setOpenMenu] = React.useState(false);
+  const [openChangePassword, setOpenChangePassword] = React.useState(false);
+  const menuRef = React.useRef(null)
   const dispatch = useDispatch();
+  const { isLoadingChangePassword } = useSelector((state) => state.auth)
+
+  React.useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setOpenMenu(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [])
+
   const handleLogout = () => {
     dispatch(logout({}));
   }
+
+  const handleSubmitChangePassword = async (payload) => {
+    try {
+      await dispatch(changePassword({ payload })).unwrap()
+      setOpenChangePassword(false)
+      setOpenMenu(false)
+    } catch (error) {
+    }
+  }
+
+  const openChangePasswordModal = () => {
+    setOpenMenu(false)
+    setOpenChangePassword(true)
+  }
+
   return (
     <div className="w-full h-16 bg-[#003844] shadow-md flex items-center px-6 justify-between fixed top-0 z-9999">
       <div className="flex gap-4">
@@ -38,7 +71,7 @@ function TopNav({ toggleHandler, isToggled }) {
           <Image src="/assets/logo-main.png" alt="Logo" width={140} height={70} className="inline-block mr-2 align-middle" />
         </div>
       </div>
-      <div className="nav-items relative">
+      <div className="nav-items relative" ref={menuRef}>
         {/* Navigation items can be added here */}
         <IconButton aria-label="settings" onClick={() => setOpenMenu(!openMenu)}>
           <SettingsIcon className="text-white" />
@@ -47,11 +80,20 @@ function TopNav({ toggleHandler, isToggled }) {
         <div className={`absolute top-12 right-0 bg-white shadow-lg rounded-md overflow-hidden w-48 ${openMenu ? '' : 'hidden'}`}>
           <ul>
             <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-center">
+              <Button variant="text" color="primary" size="small" onClick={openChangePasswordModal}>Ubah Password</Button>
+            </li>
+            <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-center">
               <Button variant="text" color="primary" size="small" onClick={() => handleLogout()}>Logout</Button>
             </li>
           </ul>
         </div>
       </div>
+      <ModalChangePassword
+        open={openChangePassword}
+        onClose={() => setOpenChangePassword(false)}
+        onSubmit={handleSubmitChangePassword}
+        loading={isLoadingChangePassword}
+      />
     </div>
   )
 }

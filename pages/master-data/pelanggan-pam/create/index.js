@@ -1,5 +1,5 @@
 import RootLayout from '@/components/layouts/RootLayout'
-import Form from '@/containers/master-data/pelanggan-pam/form/Form'
+import Form from '@/containers/master-data/pelanggan-pam/form'
 import React from 'react'
 import IconButton from '@mui/material/IconButton'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';

@@ -1,4 +1,4 @@
-import Login from '@/containers/auth/Login'
+import Login from '@/containers/auth'
 import React from 'react'
 
 function Index() {

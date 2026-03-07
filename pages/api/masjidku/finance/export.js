@@ -84,7 +84,6 @@ export default async function handler(req, res) {
 		const typeFilter = allowedTypes.includes(typeCandidate) ? typeCandidate : null;
 
 		const baseWhere = {
-			userId,
 			...(search
 				? {
 						OR: [
@@ -106,8 +105,8 @@ export default async function handler(req, res) {
 		let openingSaldo = 0;
 		if (periodStart) {
 			const [priorIncome, priorExpense] = await Promise.all([
-				prisma.keuangan.aggregate({ where: { userId, date: { lt: periodStart }, type: "income" }, _sum: { amount: true } }),
-				prisma.keuangan.aggregate({ where: { userId, date: { lt: periodStart }, type: "expense" }, _sum: { amount: true } }),
+				prisma.keuangan.aggregate({ where: { date: { lt: periodStart }, type: "income" }, _sum: { amount: true } }),
+				prisma.keuangan.aggregate({ where: { date: { lt: periodStart }, type: "expense" }, _sum: { amount: true } }),
 			]);
 			openingSaldo = (priorIncome._sum.amount || 0) - (priorExpense._sum.amount || 0);
 		}

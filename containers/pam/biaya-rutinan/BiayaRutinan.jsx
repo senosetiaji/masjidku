@@ -1,8 +1,8 @@
 import { Button } from '@mui/material';
 import { useRouter } from 'next/router';
 import React from 'react'
-import Table from './table/Table';
-import Summary from './components/Summary';
+import Table from './table';
+import Summary from './components';
 
 function BiayaRutinan({ fetchData, params, setParams }) {
   const router = useRouter();

@@ -1,5 +1,5 @@
 import RootLayout from '@/components/layouts/RootLayout';
-import Form from '@/containers/mustahik/form/Form';
+import Form from '@/containers/mustahik/form';
 import { getDetailMustahik } from '@/store/actions/mustahik.action';
 import { useRouter } from 'next/router';
 import React from 'react'

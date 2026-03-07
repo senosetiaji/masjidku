@@ -1,5 +1,6 @@
 import React from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 import TopNav from './navs/TopNav'
 import SideNav from './navs/SideNav'
 import { useDispatch, useSelector } from 'react-redux';
@@ -10,10 +11,21 @@ import ModalSuccess from '../modals/ModalSuccess';
 
 function RootLayout({ breadcrumbs, children }) {
   const items = Array.isArray(breadcrumbs) ? breadcrumbs : [];
+  const router = useRouter();
   
   const dispatch = useDispatch();
   const { currentUser } = useSelector((state) => state.user);
   const { sidebarToggled } = useSelector((state) => state.ui);
+  const permissionSet = React.useMemo(() => new Set(currentUser?.permissions || []), [currentUser?.permissions]);
+  const normalizedPath = React.useMemo(
+    () => (router?.pathname || '').replace(/\/\[[^/]+\]/g, ''),
+    [router?.pathname]
+  );
+  const hasPageAccess = React.useMemo(() => {
+    if (!currentUser) return true;
+    if (permissionSet.has('*')) return true;
+    return permissionSet.has(normalizedPath);
+  }, [currentUser, permissionSet, normalizedPath]);
   
   function toggleHandler() {
     dispatch(toggleSidebar());
@@ -23,7 +35,7 @@ function RootLayout({ breadcrumbs, children }) {
     if (!currentUser) {
       dispatch(getCurrentUser({params: {}}));
     }
-  }, [currentUser]);
+  }, [currentUser, dispatch]);
   return (
     <div>
       <TopNav toggleHandler={toggleHandler} isToggled={sidebarToggled} />
@@ -59,7 +71,12 @@ function RootLayout({ breadcrumbs, children }) {
             </ol>
           </nav>
           <div className="mt-2 bg-white p-4 md:p-6 rounded-lg shadow-sm">
-            {children}
+            {hasPageAccess ? children : (
+              <div className="py-8 text-center">
+                <div className="text-[18px] font-semibold text-gray-700">Akses Ditolak</div>
+                <div className="mt-2 text-sm text-gray-500">Anda tidak memiliki izin untuk membuka halaman ini.</div>
+              </div>
+            )}
           </div>
         </div>
       </div>

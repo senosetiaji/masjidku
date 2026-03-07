@@ -1,10 +1,10 @@
 import React from 'react'
-import Finance from './finance/Finance'
+import Finance from './finance'
 import { useDispatch } from 'react-redux';
 import { getDashboardSummary } from '@/store/actions/dashboard.action';
-import Summary from './summary/Summary';
+import Summary from './summary';
 import { Box } from '@mui/material';
-import ChartRutin from './pam/ChartRutin';
+import ChartRutin from './pam';
 
 function Dashboard() {
   const dispatch = useDispatch();

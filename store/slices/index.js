@@ -14,6 +14,8 @@ import zakatReducer from './zakat.slice'
 import mustahikReducer from './mustahik.slice'
 import panitiaZakatReducer from './panitiaZakat.slice'
 import uiReducer from './ui.slice'
+import rolesReducer from './roles.slice'
+import settingsPermissionsReducer from './settingsPermissions.slice'
 
 const rootReducer = combineReducers({
   // Add your slice reducers here
@@ -33,6 +35,8 @@ const rootReducer = combineReducers({
   mustahik: mustahikReducer,
   panitiaZakat: panitiaZakatReducer,
   ui: uiReducer,
+  roles: rolesReducer,
+  settingsPermissions: settingsPermissionsReducer,
 })
 
 export default rootReducer

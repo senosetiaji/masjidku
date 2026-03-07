@@ -1,6 +1,6 @@
 import Filter from '@/components/filters/Filter'
 import RootLayout from '@/components/layouts/RootLayout'
-import Panitia from '@/containers/zakat/panitia/Panitia'
+import Panitia from '@/containers/zakat/panitia'
 import { getAllPanitiaZakat } from '@/store/actions/panitiaZakat.action'
 import { Button } from '@mui/material'
 import moment from 'moment'

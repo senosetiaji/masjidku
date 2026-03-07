@@ -1,5 +1,5 @@
 import RootLayout from '@/components/layouts/RootLayout'
-import Inventaris from '@/containers/inventaris/Inventaris';
+import Inventaris from '@/containers/inventaris';
 import { getInventaris } from '@/store/actions/inventaris.action';
 import React from 'react'
 import { useDispatch } from 'react-redux';

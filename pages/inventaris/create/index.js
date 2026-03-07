@@ -1,6 +1,6 @@
 import React from 'react'
 import RootLayout from '@/components/layouts/RootLayout'
-import Form from '@/containers/inventaris/form/Form'
+import Form from '@/containers/inventaris/form'
 
 function Index() {
   const breadcrumbs = [

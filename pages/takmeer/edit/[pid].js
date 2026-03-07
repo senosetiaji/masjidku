@@ -1,6 +1,6 @@
 import React from 'react'
 import RootLayout from '@/components/layouts/RootLayout'
-import Form from '@/containers/takmeer/form/Form';
+import Form from '@/containers/takmeer/form';
 import { useRouter } from 'next/router';
 import { useDispatch, useSelector } from 'react-redux';
 import { getDetailUser } from '@/store/actions/user.action';

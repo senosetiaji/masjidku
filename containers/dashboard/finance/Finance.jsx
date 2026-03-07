@@ -4,10 +4,10 @@ import { getFinanceTable, getFinanceChart } from '@/store/actions/dashboard.acti
 import { FormControl, IconButton } from '@mui/material'
 import React from 'react'
 import { useDispatch } from 'react-redux'
-import Table from './table/Table'
+import Table from './table'
 import moment from 'moment'
 import { extractSelect } from '@/lib/helpers/helper'
-import Chart from './chart/Chart'
+import Chart from './chart'
 import { useRouter } from 'next/router'
 import ArrowOutwardIcon from '@mui/icons-material/ArrowOutward';
 
