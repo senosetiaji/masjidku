@@ -23,6 +23,7 @@ function Index() {
     tipe_transaksi: '',
   });
   const breadcrumbs = [
+    { label: 'PAM', href: '/pam/kas', disabled: true },
     { label: 'Keuangan', href: '/pam/kas', disabled: true },
     { label: 'Laporan Kas', href: '/pam/kas' },
   ]

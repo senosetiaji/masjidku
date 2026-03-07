@@ -84,6 +84,16 @@ function MasterDataIcon() {
   )
 }
 
+function IconZakat() {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-5">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M14.25 6.75a2.25 2.25 0 1 0 4.5 0 2.25 2.25 0 0 0-4.5 0Z" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 13.5h6.167c.53 0 1.04.21 1.414.586l1.208 1.207a2 2 0 0 0 1.414.586h3.297a1.5 1.5 0 0 1 0 3H9.5a4 4 0 0 1-2.828-1.172L3.75 14.79V13.5Z" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 13.5V20.25M16.5 10.5l-1.25 1.875" />
+    </svg>
+  )
+}
+
 
 
 function SideNav({ isToggled }) {
@@ -137,7 +147,7 @@ function SideNav({ isToggled }) {
     { name: 'Musyawarah', icon: <IconMeeting />, alias: 'musyawarah', link: '/musyawarah', show: true,
       subMenu: []
     },
-    { name: 'Zakat', icon: <IconMeeting />, alias: 'zakat', link: '/zakat', show: true, 
+    { name: 'Zakat', icon: <IconZakat />, alias: 'zakat', link: '/zakat', show: true, 
       subMenu: [
         { name: 'Panitia Zakat', alias: 'panitia_zakat', link: '/zakat/panitia', show: true },
         { name: 'Mustahik', alias: 'mustahik', link: '/mustahik', show: true },
