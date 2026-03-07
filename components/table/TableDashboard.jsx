@@ -19,15 +19,18 @@ function TableDashboard({ columns = [], data = [], isLoading = false }) {
       <Table size="small">
         <TableHead>
           <TableRow>
-            {columns.map((col) => (
+            {columns.map((col, colIndex) => {
+              const colKey = `${col.id || col.field || "col"}-${colIndex}`;
+              return (
               <TableCell
-                key={col.id || col.field}
+                key={colKey}
                 align={col.align || "left"}
                 sx={{ fontWeight: 600, ...(col.sx || {}) }}
               >
                 {col.label || col.headerName || col.field}
               </TableCell>
-            ))}
+              );
+            })}
           </TableRow>
         </TableHead>
         <TableBody>
@@ -42,10 +45,11 @@ function TableDashboard({ columns = [], data = [], isLoading = false }) {
           ) : (
             rowsToRender.map((row, rowIndex) => (
               <TableRow key={row?.id || rowIndex} hover>
-                {columns.map((col) => {
+                {columns.map((col, colIndex) => {
+                  const colKey = `${col.id || col.field || "col"}-${colIndex}`;
                   const value = col.render ? col.render(row, rowIndex) : row?.[col.id || col.field];
                   return (
-                    <TableCell key={col.id || col.field} align={col.align || "left"} sx={col.sx || {}}>
+                    <TableCell key={`${row?.id || rowIndex}-${colKey}`} align={col.align || "left"} sx={col.sx || {}}>
                       {isLoading ? <Skeleton width="80%" /> : value ?? "-"}
                     </TableCell>
                   );

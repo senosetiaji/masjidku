@@ -1,8 +1,10 @@
 import React from 'react'
-import { Alert, Box, Button, CircularProgress } from '@mui/material'
+import { Alert, Box, Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, InputLabel, MenuItem, Select } from '@mui/material'
 import MyLocationIcon from '@mui/icons-material/MyLocation'
 import { useDispatch, useSelector } from 'react-redux'
-import { getJadwalShalatBulanan, getShalatKabkota } from '@/store/actions/shalat.action'
+import EditLocationAltIcon from '@mui/icons-material/EditLocationAlt'
+import { getJadwalShalatBulanan, getShalatKabkota, getShalatProvinsi } from '@/store/actions/shalat.action'
+import { clearKabkota } from '@/store/slices/shalat.slice'
 
 const normalize = (value = '') =>
   String(value)
@@ -66,13 +68,34 @@ const parsePrayerTime = (dateRef, timeStr) => {
   return parsed
 }
 
+const formatCountdown = (targetDate, nowDate) => {
+  if (!targetDate || !nowDate) return '-'
+
+  const diffMs = targetDate.getTime() - nowDate.getTime()
+  const safeDiffMs = diffMs > 0 ? diffMs : 0
+  const totalMinutes = Math.floor(safeDiffMs / (1000 * 60))
+  const hours = Math.floor(totalMinutes / 60)
+  const minutes = totalMinutes % 60
+
+  return `${String(hours).padStart(2, '0')}j ${String(minutes).padStart(2, '0')}m`
+}
+
 function ShalatWidget() {
   const dispatch = useDispatch()
-  const { jadwal, isLoadingJadwal } = useSelector((state) => state.shalat)
+  const { jadwal, provinsi, kabkota, isLoadingJadwal, isLoadingProvinsi, isLoadingKabkota } = useSelector((state) => state.shalat)
 
   const [isLocating, setIsLocating] = React.useState(false)
   const [error, setError] = React.useState('')
-  const [locationLabel, setLocationLabel] = React.useState('')
+  const [manualModalOpen, setManualModalOpen] = React.useState(false)
+  const [manualError, setManualError] = React.useState('')
+  const [manualProvinsi, setManualProvinsi] = React.useState('')
+  const [manualKabkota, setManualKabkota] = React.useState('')
+  const [detectedLocation, setDetectedLocation] = React.useState({
+    cityRaw: '',
+    provinceRaw: '',
+    kabkota: '',
+    provinsi: '',
+  })
   const [nowTime, setNowTime] = React.useState(() => new Date())
 
   React.useEffect(() => {
@@ -110,17 +133,93 @@ function ShalatWidget() {
       return {
         ...upcoming,
         isTomorrow: false,
+        countdown: formatCountdown(upcoming.date, nowTime),
       }
     }
+
+    const tomorrowFirst = new Date(nowTime)
+    tomorrowFirst.setDate(tomorrowFirst.getDate() + 1)
+    const nextDayDate = parsePrayerTime(tomorrowFirst, timeline[0]?.value)
 
     return {
       ...timeline[0],
       isTomorrow: true,
+      countdown: formatCountdown(nextDayDate, nowTime),
     }
   }, [todaySchedule, nowTime])
 
+  const fetchJadwalByLocation = async (selectedProvinsi, selectedKabkota) => {
+    const now = new Date()
+
+    await dispatch(
+      getJadwalShalatBulanan({
+        payload: {
+          provinsi: selectedProvinsi,
+          kabkota: selectedKabkota,
+          bulan: now.getMonth() + 1,
+          tahun: now.getFullYear(),
+        },
+      })
+    ).unwrap()
+  }
+
+  const openManualModal = async () => {
+    setManualError('')
+    setManualModalOpen(true)
+    if (!provinsi?.length) {
+      await dispatch(getShalatProvinsi()).unwrap().catch(() => {})
+    }
+  }
+
+  const closeManualModal = () => {
+    setManualModalOpen(false)
+    setManualError('')
+  }
+
+  React.useEffect(() => {
+    if (!manualProvinsi) {
+      dispatch(clearKabkota())
+      setManualKabkota('')
+      return
+    }
+
+    setManualKabkota('')
+    dispatch(getShalatKabkota({ provinsi: manualProvinsi }))
+  }, [dispatch, manualProvinsi])
+
+  const submitManualLocation = async () => {
+    setManualError('')
+    setError('')
+
+    if (!manualProvinsi || !manualKabkota) {
+      setManualError('Pilih provinsi dan kab/kota terlebih dahulu.')
+      return
+    }
+
+    try {
+      await fetchJadwalByLocation(manualProvinsi, manualKabkota)
+
+      setDetectedLocation({
+        cityRaw: manualKabkota,
+        provinceRaw: manualProvinsi,
+        kabkota: manualKabkota,
+        provinsi: manualProvinsi,
+      })
+
+      closeManualModal()
+    } catch (err) {
+      setManualError(err?.message || 'Gagal mengambil jadwal shalat dari lokasi manual.')
+    }
+  }
+
   const locateAndFetch = async () => {
     setError('')
+    setDetectedLocation({
+      cityRaw: '',
+      provinceRaw: '',
+      kabkota: '',
+      provinsi: '',
+    })
 
     if (!navigator.geolocation) {
       setError('Browser tidak mendukung geolocation.')
@@ -187,20 +286,14 @@ function ShalatWidget() {
         throw new Error(`Kab/Kota tidak cocok untuk "${cityRaw}" di provinsi "${provinsi}".`)
       }
 
-      const now = new Date()
+      await fetchJadwalByLocation(provinsi, kabkota)
 
-      await dispatch(
-        getJadwalShalatBulanan({
-          payload: {
-            provinsi,
-            kabkota,
-            bulan: now.getMonth() + 1,
-            tahun: now.getFullYear(),
-          },
-        })
-      ).unwrap()
-
-      setLocationLabel(`${kabkota}, ${provinsi}`)
+      setDetectedLocation({
+        cityRaw,
+        provinceRaw,
+        kabkota,
+        provinsi,
+      })
     } catch (err) {
       const geoCode = err?.code
       if (geoCode === 1) {
@@ -224,24 +317,44 @@ function ShalatWidget() {
           <div className="text-[18px] font-semibold text-[#333]">Jadwal Shalat Hari Ini</div>
           <div className="text-[13px] text-gray-500">Deteksi lokasi otomatis untuk provinsi dan kabupaten/kota.</div>
         </div>
-        <Button
-          variant="outlined"
-          startIcon={isLocating || isLoadingJadwal ? <CircularProgress size={16} /> : <MyLocationIcon />}
-          onClick={locateAndFetch}
-          disabled={isLocating || isLoadingJadwal}
-        >
-          {isLocating || isLoadingJadwal ? 'Memproses...' : 'Deteksi Lokasi Saya'}
-        </Button>
+        <div className="flex gap-4">
+          <Button
+            variant="text"
+            startIcon={<EditLocationAltIcon />}
+            onClick={openManualModal}
+            disabled={isLocating || isLoadingJadwal}
+          >
+            Pilih Lokasi Manual
+          </Button>
+          <Button
+            variant="outlined"
+            startIcon={isLocating || isLoadingJadwal ? <CircularProgress size={16} /> : <MyLocationIcon />}
+            onClick={locateAndFetch}
+            disabled={isLocating || isLoadingJadwal}
+          >
+            {isLocating || isLoadingJadwal ? 'Memproses...' : 'Deteksi Lokasi Saya'}
+          </Button>
+        </div>
       </div>
 
       {error && <Alert severity="error" className="mb-3">{error}</Alert>}
 
-      {locationLabel && <div className="text-[13px] text-gray-600 mb-3">Lokasi: <span className="font-semibold">{locationLabel}</span></div>}
+      {(detectedLocation?.kabkota || detectedLocation?.cityRaw) && (
+        <div className="text-[13px] text-gray-600 mb-3 space-y-1">
+          {detectedLocation?.kabkota && detectedLocation?.provinsi && (
+            <div>
+              <MyLocationIcon className="text-sky-700" /> <span className="font-semibold">{detectedLocation.kabkota}, {detectedLocation.provinsi}</span>
+            </div>
+          )}
+        </div>
+      )}
 
       {nextPrayerInfo && (
         <div className="text-[13px] text-emerald-700 mb-3">
           Sholat berikutnya: <span className="font-semibold">{nextPrayerInfo.label} ({nextPrayerInfo.value})</span>{' '}
           {nextPrayerInfo.isTomorrow ? '(besok)' : ''}
+          {' · '}
+          <span className="font-semibold">{nextPrayerInfo.countdown}</span>
         </div>
       )}
 
@@ -256,7 +369,7 @@ function ShalatWidget() {
               >
                 <div className={`text-[12px] ${isNext ? 'text-emerald-700 font-semibold' : 'text-gray-500'}`}>{item.label}</div>
                 <div className="text-[16px] font-semibold">{todaySchedule[item.key]}</div>
-                {isNext && <div className="text-[11px] text-emerald-700 mt-1">Berikutnya</div>}
+                {isNext && <div className="text-[11px] text-emerald-700 mt-1">Berikutnya · {nextPrayerInfo?.countdown}</div>}
               </div>
             )
           })}
@@ -264,6 +377,49 @@ function ShalatWidget() {
       ) : (
         <div className="text-[13px] text-gray-500">Belum ada data jadwal. Klik "Deteksi Lokasi Saya" untuk memuat jadwal shalat.</div>
       )}
+
+      <Dialog open={manualModalOpen} onClose={closeManualModal} fullWidth maxWidth="sm">
+        <DialogTitle>Pilih Lokasi Manual</DialogTitle>
+        <DialogContent className="space-y-4! pt-2!">
+          {manualError && <Alert severity="error">{manualError}</Alert>}
+
+          <FormControl fullWidth size="small" sx={{ mt: 1 }}>
+            <InputLabel id="manual-provinsi-label">Provinsi</InputLabel>
+            <Select
+              labelId="manual-provinsi-label"
+              value={manualProvinsi}
+              label="Provinsi"
+              onChange={(e) => setManualProvinsi(e.target.value)}
+              disabled={isLoadingProvinsi}
+            >
+              {provinsi.map((item) => (
+                <MenuItem key={item} value={item}>{item}</MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
+          <FormControl fullWidth size="small" sx={{ mt: 2 }}>
+            <InputLabel id="manual-kabkota-label">Kab/Kota</InputLabel>
+            <Select
+              labelId="manual-kabkota-label"
+              value={manualKabkota}
+              label="Kab/Kota"
+              onChange={(e) => setManualKabkota(e.target.value)}
+              disabled={!manualProvinsi || isLoadingKabkota}
+            >
+              {kabkota.map((item) => (
+                <MenuItem key={item} value={item}>{item}</MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={closeManualModal}>Batal</Button>
+          <Button variant="contained" onClick={submitManualLocation} disabled={isLoadingJadwal || isLoadingKabkota || !manualProvinsi || !manualKabkota}>
+            Gunakan Lokasi Ini
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   )
 }
