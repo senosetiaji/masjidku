@@ -37,7 +37,7 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/pages/building-your-application/deploying) for more details.
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/pages/building-your-application/deploy
 
 ## Multi-tenant (subdomain)
 
@@ -50,7 +50,7 @@ Project ini mendukung fondasi multi-tenant berbasis subdomain.
 Contoh local sqlite:
 
 ```env
-TENANT_DATABASE_TEMPLATE="file:./prisma/tenants/{tenant}.db"
+TENANT_DATABASE_TEMPLATE="file:./tenants/{tenant}.db"
 DEFAULT_TENANT_KEY="default"
 ```
 

@@ -1,3 +1,5 @@
+import { resolveProvinsiInput } from '../../../../lib/helpers/shalatProvinsi'
+
 const SHALAT_BASE_URL = process.env.SHALAT_API_BASE || process.env.NEXT_PUBLIC_SHALAT_API_BASE || 'https://equran.id/api/v2/shalat'
 
 export default async function handler(req, res) {
@@ -6,7 +8,8 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { provinsi, kabkota, bulan, tahun } = req.body || {}
+    const { provinsi: rawProvinsi, kabkota, bulan, tahun } = req.body || {}
+    const provinsi = resolveProvinsiInput(rawProvinsi)
 
     if (!provinsi || !kabkota) {
       return res.status(400).json({ message: 'provinsi_and_kabkota_required' })
