@@ -2,6 +2,9 @@
 const nextConfig = {
   /* config options here */
   reactStrictMode: true,
+  experimental: {
+    cpus: 1,
+  },
   sassOptions: {
     additionalData: `$var: red;`,
   },

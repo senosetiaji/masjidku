@@ -97,7 +97,21 @@ npm cache clean --force
 npm ci --no-audit --no-fund --omit=optional
 ```
 
+- Jika build error `Cannot find module '../lightningcss.linux-x64-gnu.node'`, pasang binary package manual lalu build ulang:
+
+```bash
+npm i --no-save lightningcss-linux-x64-gnu@1.30.2
+npx next build --webpack
+```
+
 - Jika tetap `Killed`, resource paket hosting tidak cukup untuk build Next.js + Prisma; opsi paling aman upgrade resource atau pindah ke VPS.
+- Jika `next build` sukses lalu `Killed` di tahap akhir, pakai mode build hemat memori (worker serial):
+
+```bash
+NODE_OPTIONS="--max-old-space-size=384" npx next build --webpack
+```
+
+Konfigurasi project ini juga sudah dibatasi ke `experimental.cpus = 1` supaya lebih stabil di shared hosting.
 - `sh: next: command not found`: dependency belum terpasang tuntas (akibat `npm ci` gagal). Selesaikan install dulu, lalu cek:
 
 ```bash
