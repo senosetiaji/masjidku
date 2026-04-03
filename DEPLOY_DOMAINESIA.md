@@ -39,7 +39,7 @@ cp .env.production .env
 ### 3) Build aplikasi
 
 ```bash
-npm ci
+npm ci --ignore-scripts --no-audit --no-fund --omit=optional
 npx prisma generate
 npx prisma db push
 npm run seed
@@ -74,7 +74,7 @@ Jika panel meminta command terpisah, gunakan:
 ```bash
 cd ~/sistem-masjid
 git pull
-npm ci
+npm ci --ignore-scripts --no-audit --no-fund --omit=optional
 npx prisma generate
 npx prisma db push
 npm run build
@@ -198,7 +198,7 @@ cp .env.production .env
 ## 4) Install dependency dan build
 
 ```bash
-npm ci
+npm ci --ignore-scripts --no-audit --no-fund --omit=optional
 npx prisma generate
 npx prisma db push
 npm run seed
@@ -256,7 +256,7 @@ sudo certbot --nginx -d masjidku.com -d www.masjidku.com
 ```bash
 cd /var/www/sistem-masjid
 git pull
-npm ci
+npm ci --ignore-scripts --no-audit --no-fund --omit=optional
 npx prisma generate
 npx prisma db push
 npm run build
@@ -289,7 +289,7 @@ Jalankan dari root project:
 git checkout dev-tenant
 git pull
 rm -rf node_modules package-lock.json .next
-npm install
+npm install --ignore-scripts --no-audit --no-fund --omit=optional
 npx prisma generate
 npm run build
 ```
@@ -304,6 +304,38 @@ Terakhir restart PM2:
 
 ```bash
 pm2 restart sistem-masjid
+```
+
+## 11) Jika `npm install` / `npm ci` selalu `Killed`
+
+Ini hampir selalu karena RAM server tidak cukup (OOM). Pakai flow hemat memori ini:
+
+```bash
+rm -rf node_modules package-lock.json
+npm cache clean --force
+npm install --ignore-scripts --no-audit --no-fund --omit=optional --prefer-offline
+npx prisma generate
+```
+
+Lalu lanjut:
+
+```bash
+npx prisma db push
+npm run build
+```
+
+Jika masih `Killed`:
+- cPanel/shared hosting: tingkatkan resource paket hosting (RAM/CPU) atau pindah ke VPS.
+- VPS Ubuntu: tambah swap sementara (contoh 2GB), lalu ulang install.
+
+Contoh tambah swap (VPS):
+
+```bash
+sudo fallocate -l 2G /swapfile
+sudo chmod 600 /swapfile
+sudo mkswap /swapfile
+sudo swapon /swapfile
+free -h
 ```
 
 ## Troubleshooting cepat
