@@ -86,6 +86,24 @@ Lalu klik **Restart App** di menu Node.js App.
 
 - App 500: cek log aplikasi di Node.js App / Error Log cPanel
 - Build gagal: pastikan Node tetap `20.x`, lalu ulang `npm ci`
+- Build gagal `Module not found` (`@prisma/client`, `bcryptjs`, `pdfkit`): biasanya install dependency belum sinkron. Jalankan dari root project:
+
+```bash
+git checkout dev-tenant
+git pull
+rm -rf node_modules package-lock.json .next
+npm install
+npx prisma generate
+npm run build
+```
+
+Lalu restart app. Verifikasi cepat:
+
+```bash
+npm ls @prisma/client bcryptjs pdfkit --depth=0
+```
+
+Jika pakai cPanel Node.js App, pastikan **Application root** benar-benar ke folder project ini (bukan folder lain).
 - Login gagal: cek `APP_SECRET` tidak kosong
 - Error DB: cek path `DATABASE_URL` dan izin tulis file SQLite
 - Seed error `P2021` (table tidak ada): ulang `cp .env.production .env`, lalu jalankan `npx prisma db push` sebelum `npm run seed`
@@ -256,6 +274,36 @@ Contoh backup manual:
 ```bash
 mkdir -p /var/backups/masjidku
 cp prisma/prod.db /var/backups/masjidku/prod-$(date +%F-%H%M).db
+```
+
+## 10) Troubleshooting `Module not found` di VPS
+
+Jika build menampilkan error seperti:
+- `Can't resolve '@prisma/client'`
+- `Can't resolve 'bcryptjs'`
+- `Can't resolve 'pdfkit'`
+
+Jalankan dari root project:
+
+```bash
+git checkout dev-tenant
+git pull
+rm -rf node_modules package-lock.json .next
+npm install
+npx prisma generate
+npm run build
+```
+
+Lalu pastikan modul terpasang:
+
+```bash
+npm ls @prisma/client bcryptjs pdfkit --depth=0
+```
+
+Terakhir restart PM2:
+
+```bash
+pm2 restart sistem-masjid
 ```
 
 ## Troubleshooting cepat
