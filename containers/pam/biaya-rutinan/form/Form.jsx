@@ -367,7 +367,7 @@ function Form({ isEdit = false}) {
               )}
               {photoPreviewUrl && (
                 <div className="w-full max-w-sm border border-gray-200 rounded-md p-2 bg-white">
-                  <img src={photoPreviewUrl} alt="Preview bukti pembayaran" className="w-full h-auto rounded" />
+                  <img src={photoPreviewUrl} alt="Preview bukti meteran" className="w-full h-auto rounded" />
                 </div>
               )}
             </div>
