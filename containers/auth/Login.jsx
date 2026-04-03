@@ -12,13 +12,42 @@ import Visibility from '@mui/icons-material/Visibility'
 import VisibilityOff from '@mui/icons-material/VisibilityOff'
 import ModalError from '@/components/modals/ModalError'
 import { useRouter } from 'next/router'
+import { API } from '@/lib/config/api'
 
 function Login() {
   const dispatch = useDispatch();
   const router = useRouter();
   const [showPassword, setShowPassword] = React.useState(false);
   const [loginTitle, setLoginTitle] = React.useState('Masjid.ku');
+  const [isCheckingSession, setIsCheckingSession] = React.useState(true);
   const { isLoading } = useSelector((state) => state.auth);
+
+  React.useEffect(() => {
+    let isMounted = true;
+
+    const checkAuth = async () => {
+      try {
+        const res = await API.get('/masjidku/auth/check');
+        const isAuthenticated = res?.data?.data?.authenticated === true;
+
+        if (isMounted && isAuthenticated) {
+          router.replace('/dashboard');
+          return;
+        }
+      } catch (error) {
+      }
+
+      if (isMounted) {
+        setIsCheckingSession(false);
+      }
+    };
+
+    checkAuth();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [router]);
 
   React.useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -121,7 +150,7 @@ function Login() {
           </FormControl>
           <Divider />
           <FormHelperText>
-            <Button variant="contained" className='w-full' color="primary" size='large' onClick={form.handleSubmit} disabled={isLoading} loading={isLoading}>
+            <Button variant="contained" className='w-full' color="primary" size='large' onClick={form.handleSubmit} disabled={isLoading || isCheckingSession} loading={isLoading || isCheckingSession}>
               Login
             </Button>
           </FormHelperText>
