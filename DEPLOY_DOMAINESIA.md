@@ -1,6 +1,118 @@
-# Deploy Next.js ke Domainesia (VPS/Cloud)
+# Deploy Next.js ke Domainesia (cPanel / VPS)
 
 Panduan ini untuk project `sistem-masjid` dengan mode single-tenant.
+
+## Jalur A (direkomendasikan): cPanel Node.js App
+
+Karena paket kamu sudah ada `Node.js App` + `SSH` dan Node `20.19.0`, jalur ini sudah cukup tanpa VPS.
+
+### 1) Upload source code
+
+Pilihan cepat lewat SSH:
+
+```bash
+cd ~
+git clone <REPO_URL> sistem-masjid
+cd sistem-masjid
+git checkout dev-tenant
+```
+
+### 2) Siapkan environment
+
+```bash
+cp env.production.example .env.production
+nano .env.production
+```
+
+Nilai minimal:
+- `APP_SECRET` (wajib random panjang)
+- `DATABASE_URL` (contoh SQLite: `file:./prod.db`)
+- `DISABLE_MULTI_TENANT=true`
+- `NEXT_PUBLIC_DISABLE_MULTI_TENANT=true`
+
+Supaya Prisma CLI membaca env dengan konsisten, buat file `.env` dari `.env.production`:
+
+```bash
+cp .env.production .env
+```
+
+### 3) Build aplikasi
+
+```bash
+npm ci
+npx prisma generate
+npx prisma db push
+npm run seed
+npm run build
+```
+
+### 4) Setup Node.js App di cPanel
+
+Di menu **Setup Node.js App**:
+- Node version: `20.19.0`
+- Application mode: `Production`
+- Application root: folder project (contoh `sistem-masjid`)
+- Application startup file: `node_modules/next/dist/bin/next`
+
+Startup command (App Entry Point) set ke:
+
+```bash
+start -p $PORT
+```
+
+Jika panel meminta command terpisah, gunakan:
+- Install: `npm ci`
+- Startup: `npm run start -- -p $PORT`
+
+### 5) Domain dan SSL
+
+- Arahkan domain utama ke Node.js App dari menu cPanel.
+- Aktifkan SSL (AutoSSL / Let's Encrypt di panel Domainesia).
+
+### 6) Update deploy berikutnya
+
+```bash
+cd ~/sistem-masjid
+git pull
+npm ci
+npx prisma generate
+npx prisma db push
+npm run build
+```
+
+Lalu klik **Restart App** di menu Node.js App.
+
+### 7) Troubleshooting cepat (cPanel)
+
+- App 500: cek log aplikasi di Node.js App / Error Log cPanel
+- Build gagal: pastikan Node tetap `20.x`, lalu ulang `npm ci`
+- Login gagal: cek `APP_SECRET` tidak kosong
+- Error DB: cek path `DATABASE_URL` dan izin tulis file SQLite
+- Seed error `P2021` (table tidak ada): ulang `cp .env.production .env`, lalu jalankan `npx prisma db push` sebelum `npm run seed`
+- `npm ci` berhenti dengan `Killed`: ini biasanya OOM (RAM habis). Coba install ringan:
+
+```bash
+rm -rf node_modules
+npm cache clean --force
+npm ci --no-audit --no-fund --omit=optional
+```
+
+- Jika tetap `Killed`, resource paket hosting tidak cukup untuk build Next.js + Prisma; opsi paling aman upgrade resource atau pindah ke VPS.
+- `sh: next: command not found`: dependency belum terpasang tuntas (akibat `npm ci` gagal). Selesaikan install dulu, lalu cek:
+
+```bash
+npx next --version
+```
+
+- Saat test manual via SSH, jangan pakai `$PORT` jika variabel belum ada. Gunakan contoh:
+
+```bash
+npm run start -- -p 3000
+```
+
+---
+
+## Jalur B (opsional): VPS/Cloud + PM2 + Nginx
 
 ## 1) Persiapan server
 
@@ -41,9 +153,15 @@ nano .env.production
 
 Nilai minimal yang harus diisi:
 - `APP_SECRET` (wajib random panjang)
-- `DATABASE_URL` (untuk SQLite bisa `file:./prisma/prod.db`)
+- `DATABASE_URL` (untuk SQLite: `file:./prod.db`)
 - `DISABLE_MULTI_TENANT=true`
 - `NEXT_PUBLIC_DISABLE_MULTI_TENANT=true`
+
+Supaya Prisma CLI membaca env dengan konsisten, buat file `.env` dari `.env.production`:
+
+```bash
+cp .env.production .env
+```
 
 ## 4) Install dependency dan build
 
@@ -132,3 +250,4 @@ cp prisma/prod.db /var/backups/masjidku/prod-$(date +%F-%H%M).db
 - 502 Bad Gateway: cek port PM2 (`3010`) sama dengan `proxy_pass` Nginx
 - Login gagal setelah deploy: pastikan `APP_SECRET` terisi, tidak kosong
 - API error DB: cek `DATABASE_URL` valid dan file/folder bisa ditulis oleh user proses Node
+- Seed error `P2021` (table tidak ada): ulang `cp .env.production .env`, lalu jalankan `npx prisma db push` sebelum `npm run seed`

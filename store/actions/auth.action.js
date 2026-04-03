@@ -6,6 +6,9 @@ export const loginUser = createAsyncThunk('auth/loginUser', async ({payload}, { 
   try {
     const response = await API.post('/masjidku/auth/login', payload)
     const data = await response.data.data
+    if (typeof window !== 'undefined' && data?.token) {
+      window.localStorage.setItem('session_token', data.token)
+    }
     return data
   } catch(err){
     dispatch(errorHelper(err))
@@ -17,6 +20,9 @@ export const logout = createAsyncThunk('auth/logout', async ({payload}, { dispat
   try {
     const response = await API.post('/masjidku/auth/logout', payload)
     const data = await response.data.data
+    if (typeof window !== 'undefined') {
+      window.localStorage.removeItem('session_token')
+    }
     window.location.href='/'
     return data
   } catch(err){
