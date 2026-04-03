@@ -85,6 +85,7 @@ export default async function handler(req, res) {
 				water_bill: pam.water_bill,
 				billAmount: pam.billAmount,
 				paidAmount: pam.paidAmount,
+				photoUrl: pam.photoUrl,
 				status: pam.status,
 				notes: pam.notes,
 				paymentDate: pam.paymentDate ? pam.paymentDate.toISOString() : null,

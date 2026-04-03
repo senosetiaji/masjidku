@@ -71,6 +71,7 @@ model PamRutin {
   billAmount    Int
   paidAmount    Int
   paymentDate   DateTime?
+  photoUrl      String?
   status        String // paid | half_paid | unpaid
   notes         String
   createdAt     DateTime @default(now())

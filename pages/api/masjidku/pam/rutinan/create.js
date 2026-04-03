@@ -1,5 +1,6 @@
 import crypto from "crypto";
 import { getTenantPrisma } from "../../../../../lib/helpers/tenantPrisma";
+import { savePamRutinanPhotoFromDataUrl } from "../../../../../lib/helpers/pamRutinanImage";
 
 // Prisma singleton to avoid multiple clients in dev hot-reload
 
@@ -75,6 +76,7 @@ export default async function handler(req, res) {
 			status,
 			notes,
 			paymentDate,
+			photoDataUrl,
 		} = req.body || {};
 
 		// Basic validation
@@ -111,6 +113,18 @@ export default async function handler(req, res) {
 		const paidVal = toIntOrNull(paidAmount);
 		const statusVal = normalizeStatus(status);
 
+		let photoUrl = null;
+		if (photoDataUrl) {
+			try {
+				photoUrl = await savePamRutinanPhotoFromDataUrl({
+					dataUrl: photoDataUrl,
+					tenantKey: tenant.tenantKey,
+				});
+			} catch (error) {
+				return res.status(400).json({ message: "invalid_photo_upload" });
+			}
+		}
+
 		const created = await prisma.pamRutin.create({
 			data: {
 				pelangganId: pelangganId.trim(),
@@ -121,6 +135,7 @@ export default async function handler(req, res) {
 				water_bill: waterVal ?? 0,
 				billAmount: billVal ?? 0,
 				paidAmount: paidVal ?? 0,
+				photoUrl,
 				status: statusVal || "unpaid",
 				notes: typeof notes === "string" ? notes : "",
 				paymentDate: paymentDate ? new Date(paymentDate) : null,
@@ -150,6 +165,7 @@ export default async function handler(req, res) {
 				water_bill: created.water_bill,
 				billAmount: created.billAmount,
 				paidAmount: created.paidAmount,
+				photoUrl: created.photoUrl,
 				status: created.status,
 				notes: created.notes,
 				paymentDate: created.paymentDate ? created.paymentDate.toISOString() : null,

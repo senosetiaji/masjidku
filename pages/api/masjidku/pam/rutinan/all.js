@@ -145,6 +145,7 @@ export default async function handler(req, res) {
 			water_bill: item.water_bill,
 			billAmount: item.billAmount,
 			paidAmount: item.paidAmount,
+			photoUrl: item.photoUrl,
 			status: item.status,
 			notes: item.notes,
 			paymentDate: item.paymentDate?.toISOString(),

@@ -1,5 +1,9 @@
 import crypto from "crypto";
 import { getTenantPrisma } from "../../../../../../lib/helpers/tenantPrisma";
+import {
+	deletePamRutinanPhotoIfExists,
+	savePamRutinanPhotoFromDataUrl,
+} from "../../../../../../lib/helpers/pamRutinanImage";
 
 // Prisma singleton to avoid multiple connections during hot reload
 
@@ -86,6 +90,8 @@ export default async function handler(req, res) {
 			status,
 			notes,
 			paymentDate,
+			photoDataUrl,
+			removePhoto,
 		} = req.body || {};
 
 		const monthVal = toIntOrNull(month);
@@ -110,6 +116,28 @@ export default async function handler(req, res) {
 		if (typeof notes === "string") data.notes = notes;
 		if (paymentDate !== undefined) {
 			data.paymentDate = paymentDate ? new Date(paymentDate) : null;
+		}
+
+		if (photoDataUrl) {
+			try {
+				const newPhotoUrl = await savePamRutinanPhotoFromDataUrl({
+					dataUrl: photoDataUrl,
+					tenantKey: tenant.tenantKey,
+				});
+
+				if (existing.photoUrl) {
+					await deletePamRutinanPhotoIfExists(existing.photoUrl);
+				}
+
+				data.photoUrl = newPhotoUrl;
+			} catch (error) {
+				return res.status(400).json({ message: "invalid_photo_upload" });
+			}
+		} else if (removePhoto === true || removePhoto === "true") {
+			if (existing.photoUrl) {
+				await deletePamRutinanPhotoIfExists(existing.photoUrl);
+			}
+			data.photoUrl = null;
 		}
 
 		const updated = await prisma.pamRutin.update({
@@ -140,6 +168,7 @@ export default async function handler(req, res) {
 				water_bill: updated.water_bill,
 				billAmount: updated.billAmount,
 				paidAmount: updated.paidAmount,
+				photoUrl: updated.photoUrl,
 				status: updated.status,
 				notes: updated.notes,
 				paymentDate: updated.paymentDate ? updated.paymentDate.toISOString() : null,
