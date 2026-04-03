@@ -8,12 +8,14 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import ModalConfirm from '@/components/modals/ModalConfirm';
 import { deleteUser } from '@/store/actions/user.action';
 import { useRouter } from 'next/router';
+import { useActionPermissionGuard } from '@/lib/hooks/useActionPermissionGuard';
 
 function Table({ source, params, setParams, fetchData }) {
   const { data, isLoading, meta } = useSelector(state => state.user);
   const deleteModalRef = React.useRef();
   const dispatch = useDispatch();
   const router = useRouter();
+  const { guardAction } = useActionPermissionGuard();
 
   const columns = [
     {
@@ -57,10 +59,10 @@ function Table({ source, params, setParams, fetchData }) {
       render: (val) => {
         return (
           <div className='flex gap-2 w-full justify-center'>
-            <IconButton aria-label="edit" className='bg-yellow-400! text-white! hover:bg-yellow-500!' onClick={() => { router.push(`/takmeer/edit/${val?.id}`) }}>
+            <IconButton aria-label="edit" className='bg-yellow-400! text-white! hover:bg-yellow-500!' onClick={() => guardAction({ action: 'update', permission: '/takmeer/edit', onAllowed: () => router.push(`/takmeer/edit/${val?.id}`) })}>
               <EditIcon fontSize="small" />
             </IconButton>
-            <IconButton aria-label="delete" className='bg-red-400! text-white! hover:bg-red-500!' onClick={() => { deleteModalRef.current.open(val?.id); }}>
+            <IconButton aria-label="delete" className='bg-red-400! text-white! hover:bg-red-500!' onClick={() => guardAction({ action: 'delete', permission: ['/takmeer/delete', '/takmeer/edit'], onAllowed: () => deleteModalRef.current.open(val?.id) })}>
               <DeleteIcon fontSize="small" />
             </IconButton>
           </div>

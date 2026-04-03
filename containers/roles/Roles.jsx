@@ -9,12 +9,14 @@ import ModalConfirm from '@/components/modals/ModalConfirm';
 import { useRouter } from 'next/router';
 import Button from '@mui/material/Button';
 import { deleteRole, getRoles } from '@/store/actions/roles.action';
+import { useActionPermissionGuard } from '@/lib/hooks/useActionPermissionGuard';
 
 function Roles() {
   const { data, isLoading, meta } = useSelector(state => state.roles);
   const deleteModalRef = React.useRef();
   const dispatch = useDispatch();
   const router = useRouter();
+  const { guardAction } = useActionPermissionGuard();
   const [params, setParams] = React.useState({
     page: 1,
     limit: 10,
@@ -63,10 +65,10 @@ function Roles() {
       render: (val) => {
         return (
           <div className='flex gap-2 w-full justify-center'>
-            <IconButton aria-label="edit" className='bg-yellow-400! text-white! hover:bg-yellow-500!' onClick={() => { router.push(`/settings/roles/edit/${val?.id}`) }}>
+            <IconButton aria-label="edit" className='bg-yellow-400! text-white! hover:bg-yellow-500!' onClick={() => guardAction({ action: 'update', permission: '/settings/roles/edit', onAllowed: () => router.push(`/settings/roles/edit/${val?.id}`) })}>
               <EditIcon fontSize="small" />
             </IconButton>
-            <IconButton aria-label="delete" className='bg-red-400! text-white! hover:bg-red-500!' onClick={() => { deleteModalRef.current.open(val?.id); }}>
+            <IconButton aria-label="delete" className='bg-red-400! text-white! hover:bg-red-500!' onClick={() => guardAction({ action: 'delete', permission: ['/settings/roles/delete', '/settings/roles/edit'], onAllowed: () => deleteModalRef.current.open(val?.id) })}>
               <DeleteIcon fontSize="small" />
             </IconButton>
           </div>
@@ -84,7 +86,7 @@ function Roles() {
     <div>
       <div className="flex flex-col gap-4 mb-8 sm:flex-row sm:items-center sm:justify-between">
         <div className="title text-[20px] font-bold text-[#333]">Data Role</div>
-        <Button variant="contained" color="primary" onClick={() => router.push('/settings/roles/create')} className="w-full sm:w-auto">
+        <Button variant="contained" color="primary" onClick={() => guardAction({ action: 'create', permission: '/settings/roles/create', onAllowed: () => router.push('/settings/roles/create') })} className="w-full sm:w-auto">
           Tambah Role
         </Button>
       </div>

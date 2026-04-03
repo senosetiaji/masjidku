@@ -9,12 +9,14 @@ import { useRouter } from 'next/router';
 import { useDispatch, useSelector } from 'react-redux';
 import moment from 'moment';
 import { deletePanitiaZakat } from '@/store/actions/panitiaZakat.action';
+import { useActionPermissionGuard } from '@/lib/hooks/useActionPermissionGuard';
 
 function Table({ params, setParams, fetchData }) {
   const { data, isLoading, meta } = useSelector(state => state.panitiaZakat);
   const dispatch = useDispatch();
   const router = useRouter();
   const deleteModalRef = React.useRef();
+  const { guardAction } = useActionPermissionGuard();
 
   const renderRoleLabel = (value) => {
     if (!value) return '-';
@@ -69,10 +71,10 @@ function Table({ params, setParams, fetchData }) {
       render: (val) => {
         return (
           <div className='flex gap-2 w-full justify-center'>
-            <IconButton aria-label="edit" className='bg-yellow-400! text-white! hover:bg-yellow-500!' onClick={() => { router.push(`/zakat/panitia/edit/${val?.id}`) }}>
+            <IconButton aria-label="edit" className='bg-yellow-400! text-white! hover:bg-yellow-500!' onClick={() => guardAction({ action: 'update', permission: '/zakat/panitia/edit', onAllowed: () => router.push(`/zakat/panitia/edit/${val?.id}`) })}>
               <EditIcon fontSize="small" />
             </IconButton>
-            <IconButton aria-label="delete" className='bg-red-400! text-white! hover:bg-red-500!' onClick={() => { deleteModalRef.current.open(val?.id); }}>
+            <IconButton aria-label="delete" className='bg-red-400! text-white! hover:bg-red-500!' onClick={() => guardAction({ action: 'delete', permission: ['/zakat/panitia/delete', '/zakat/panitia/edit'], onAllowed: () => deleteModalRef.current.open(val?.id) })}>
               <DeleteIcon fontSize="small" />
             </IconButton>
           </div>

@@ -5,6 +5,7 @@ import Button from '@mui/material/Button'
 import { useDispatch } from 'react-redux'
 import { getPamPemasangan } from '@/store/actions/pam.action'
 import Pemasangan from '@/containers/pam/pemasangan'
+import { useActionPermissionGuard } from '@/lib/hooks/useActionPermissionGuard'
 
 function Index() {
   const [params, setParams] = React.useState({
@@ -14,6 +15,7 @@ function Index() {
   })
   const router = useRouter();
   const dispatch = useDispatch();
+  const { guardAction } = useActionPermissionGuard();
 
   const breadcrumb = [
     { label: 'PAM', link: '/pam', isDisabled: true },
@@ -33,8 +35,12 @@ function Index() {
         <div className="title text-[20px] font-bold text-[#333]">Pemasangan PAM</div>
         <Button variant="contained" color="primary"
           className="w-full sm:w-auto"
-          onClick={() => router.push({
-            pathname: '/pam/pemasangan/create',
+          onClick={() => guardAction({
+            action: 'create',
+            permission: '/pam/pemasangan/create',
+            onAllowed: () => router.push({
+              pathname: '/pam/pemasangan/create',
+            }),
           })}>
           Masukan Biaya Pemasangan
         </Button>

@@ -5,10 +5,12 @@ import { useRouter } from 'next/router';
 import Musyawarah from '@/containers/musyawarah';
 import { useDispatch } from 'react-redux';
 import { getAllMusyawarah } from '@/store/actions/musyawarah.action';
+import { useActionPermissionGuard } from '@/lib/hooks/useActionPermissionGuard';
 
 function Index() {
   const router = useRouter();
   const dispatch = useDispatch();
+  const { guardAction } = useActionPermissionGuard();
   const [params, setParams] = React.useState({
     page:1,
     limit:10,
@@ -35,8 +37,12 @@ function Index() {
         <div className="title text-[20px] font-bold text-[#333]">Musyawarah</div>
         <Button variant="contained" color="primary"
           className="w-full sm:w-auto"
-          onClick={() => router.push({
-            pathname: '/musyawarah/create',
+          onClick={() => guardAction({
+            action: 'create',
+            permission: '/musyawarah/create',
+            onAllowed: () => router.push({
+              pathname: '/musyawarah/create',
+            }),
           })}>
           Buat Musyawarah
         </Button>

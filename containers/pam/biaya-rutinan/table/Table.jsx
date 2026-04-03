@@ -10,12 +10,14 @@ import { deleteUser } from '@/store/actions/user.action';
 import { useRouter } from 'next/router';
 import moment from 'moment';
 import { deleteData } from '@/store/actions/finance.action';
+import { useActionPermissionGuard } from '@/lib/hooks/useActionPermissionGuard';
 
 function Table({ params, setParams, fetchData }) {
   const { rutinan: data, isLoading, meta } = useSelector(state => state.pam);
   const deleteModalRef = React.useRef();
   const dispatch = useDispatch();
   const router = useRouter();
+  const { guardAction } = useActionPermissionGuard();
 
   const columns = [
     {
@@ -122,13 +124,17 @@ function Table({ params, setParams, fetchData }) {
       render: (val) => {
         return (
           <div className='flex gap-2 w-full justify-center'>
-            <IconButton aria-label="edit" className='bg-yellow-400! text-white! hover:bg-yellow-500!' onClick={() => { router.push({
-              pathname: `/pam/biaya-rutinan/edit/${val?.id}`,
-              query: {
-                tahun: params.tahun,
-                bulan: params.bulan
-              }
-            }) }}>
+            <IconButton aria-label="edit" className='bg-yellow-400! text-white! hover:bg-yellow-500!' onClick={() => guardAction({
+              action: 'update',
+              permission: '/pam/biaya-rutinan/edit',
+              onAllowed: () => router.push({
+                pathname: `/pam/biaya-rutinan/edit/${val?.id}`,
+                query: {
+                  tahun: params.tahun,
+                  bulan: params.bulan
+                }
+              }),
+            })}>
               <EditIcon fontSize="small" />
             </IconButton>
             {/* <IconButton aria-label="delete" className='bg-red-400! text-white! hover:bg-red-500!' onClick={() => { deleteModalRef.current.open(val?.id); }}>

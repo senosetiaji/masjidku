@@ -10,12 +10,14 @@ import { useRouter } from 'next/router';
 import { deleteZakat } from '@/store/actions/zakat.action';
 import moment from 'moment';
 import { dataNotAvailable } from '@/lib/helpers/emptyDataHandler';
+import { useActionPermissionGuard } from '@/lib/hooks/useActionPermissionGuard';
 
 function Table({ source, params, setParams, fetchData }) {
   const { data, isLoading, meta } = useSelector(state => state.zakat);
   const deleteModalRef = React.useRef();
   const dispatch = useDispatch();
   const router = useRouter();
+  const { guardAction } = useActionPermissionGuard();
 
   const renderTypeLabel = (value) => {
     if (!value) return dataNotAvailable();
@@ -100,10 +102,10 @@ function Table({ source, params, setParams, fetchData }) {
       render: (val) => {
         return (
           <div className='flex gap-2 w-full justify-center'>
-            <IconButton aria-label="edit" className='bg-yellow-400! text-white! hover:bg-yellow-500!' onClick={() => { router.push(`/zakat/edit/${val?.id}`) }}>
+            <IconButton aria-label="edit" className='bg-yellow-400! text-white! hover:bg-yellow-500!' onClick={() => guardAction({ action: 'update', permission: '/zakat/edit', onAllowed: () => router.push(`/zakat/edit/${val?.id}`) })}>
               <EditIcon fontSize="small" />
             </IconButton>
-            <IconButton aria-label="delete" className='bg-red-400! text-white! hover:bg-red-500!' onClick={() => { deleteModalRef.current.open(val?.id); }}>
+            <IconButton aria-label="delete" className='bg-red-400! text-white! hover:bg-red-500!' onClick={() => guardAction({ action: 'delete', permission: ['/zakat/delete', '/zakat/edit'], onAllowed: () => deleteModalRef.current.open(val?.id) })}>
               <DeleteIcon fontSize="small" />
             </IconButton>
           </div>

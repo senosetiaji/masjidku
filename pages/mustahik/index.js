@@ -8,12 +8,14 @@ import moment from 'moment'
 import { useRouter } from 'next/router'
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import { useActionPermissionGuard } from '@/lib/hooks/useActionPermissionGuard'
 
 function Index() {
 	const dispatch = useDispatch();
 	const router = useRouter();
 	const duplicateModalRef = React.useRef();
 	const { isLoadingDuplicate, isLoadingExport } = useSelector((state) => state.mustahik);
+	const { guardAction } = useActionPermissionGuard();
 
 	const [selectedFilter, setSelectedFilter] = React.useState({
 		tahun: { label: moment().year().toString(), value: moment().year().toString() },
@@ -61,6 +63,9 @@ function Index() {
 	}, [selectedFilter]);
 
 	const handleDuplicate = async ({ fromYear, toYear, onSuccess }) => {
+		const hasAccess = guardAction({ action: 'create', permission: '/mustahik/create' });
+		if (!hasAccess) return;
+
 		const result = await dispatch(duplicateMustahik({ payload: { fromYear, toYear } }));
 		if (!duplicateMustahik.rejected.match(result)) {
 			await fetchData();
@@ -80,10 +85,10 @@ function Index() {
 					<Button variant="contained" color="inherit" onClick={handleExport} disabled={isLoadingExport} className="w-full sm:w-auto">
 						{isLoadingExport ? 'Exporting...' : 'Export PDF'}
 					</Button>
-					<Button variant="contained" color="secondary" onClick={() => duplicateModalRef.current?.open()} className="w-full sm:w-auto">
+					<Button variant="contained" color="secondary" onClick={() => guardAction({ action: 'create', permission: '/mustahik/create', onAllowed: () => duplicateModalRef.current?.open() })} className="w-full sm:w-auto">
 						Duplicate Data Mustahik
 					</Button>
-					<Button variant="contained" color="primary" onClick={() => router.push('/mustahik/create')} className="w-full sm:w-auto">
+					<Button variant="contained" color="primary" onClick={() => guardAction({ action: 'create', permission: '/mustahik/create', onAllowed: () => router.push('/mustahik/create') })} className="w-full sm:w-auto">
 						Input Data Mustahik
 					</Button>
 				</div>

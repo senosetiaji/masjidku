@@ -10,6 +10,7 @@ import { useRouter } from 'next/router';
 import moment from 'moment';
 import { deleteData } from '@/store/actions/musyawarah.action';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import { useActionPermissionGuard } from '@/lib/hooks/useActionPermissionGuard';
 
 function Table({ params, setParams, fetchData }) {
   const { data, meta, isLoading } = useSelector((state) => state.musyawarah);
@@ -17,6 +18,7 @@ function Table({ params, setParams, fetchData }) {
   const dispatch = useDispatch();
   const router = useRouter();
   const refModalDetail = React.useRef();
+  const { guardAction } = useActionPermissionGuard();
 
   const copyToClipboard = () => {
     let allSummaries = data.map(item => item.summary).filter(summary => summary).join('\n\n');
@@ -88,10 +90,10 @@ function Table({ params, setParams, fetchData }) {
       render: (val) => {
         return (
           <div className='flex gap-2 w-full justify-center'>
-            <IconButton aria-label="edit" className='bg-yellow-400! text-white! hover:bg-yellow-500!' onClick={() => { router.push(`/musyawarah/edit/${val?.id}`) }}>
+            <IconButton aria-label="edit" className='bg-yellow-400! text-white! hover:bg-yellow-500!' onClick={() => guardAction({ action: 'update', permission: '/musyawarah/edit', onAllowed: () => router.push(`/musyawarah/edit/${val?.id}`) })}>
               <EditIcon fontSize="small" />
             </IconButton>
-            <IconButton aria-label="delete" className='bg-red-400! text-white! hover:bg-red-500!' onClick={() => { deleteModalRef.current.open(val?.id); }}>
+            <IconButton aria-label="delete" className='bg-red-400! text-white! hover:bg-red-500!' onClick={() => guardAction({ action: 'delete', permission: ['/musyawarah/delete', '/musyawarah/edit'], onAllowed: () => deleteModalRef.current.open(val?.id) })}>
               <DeleteIcon fontSize="small" />
             </IconButton>
           </div>

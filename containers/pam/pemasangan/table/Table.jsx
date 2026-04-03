@@ -9,6 +9,7 @@ import ModalConfirm from '@/components/modals/ModalConfirm';
 import { useRouter } from 'next/router';
 import moment from 'moment';
 import { deleteDataPamKas, deleteDataPamPemasangan } from '@/store/actions/pam.action';
+import { useActionPermissionGuard } from '@/lib/hooks/useActionPermissionGuard';
 
 function Table({ params, setParams, fetchData }) {
   const { installation, isLoading } = useSelector(state => state.pam);
@@ -16,6 +17,7 @@ function Table({ params, setParams, fetchData }) {
   const deleteModalRef = React.useRef();
   const dispatch = useDispatch();
   const router = useRouter();
+  const { guardAction } = useActionPermissionGuard();
 
   const columns = [
     {
@@ -135,10 +137,10 @@ function Table({ params, setParams, fetchData }) {
       render: (val) => {
         return (
           <div className='flex gap-2 w-full justify-center'>
-            <IconButton aria-label="edit" className='bg-yellow-400! text-white! hover:bg-yellow-500!' onClick={() => { router.push(`/pam/pemasangan/edit/${val?.id}`) }}>
+            <IconButton aria-label="edit" className='bg-yellow-400! text-white! hover:bg-yellow-500!' onClick={() => guardAction({ action: 'update', permission: '/pam/pemasangan/edit', onAllowed: () => router.push(`/pam/pemasangan/edit/${val?.id}`) })}>
               <EditIcon fontSize="small" />
             </IconButton>
-            <IconButton aria-label="delete" className='bg-red-400! text-white! hover:bg-red-500!' onClick={() => { deleteModalRef.current.open(val?.id); }}>
+            <IconButton aria-label="delete" className='bg-red-400! text-white! hover:bg-red-500!' onClick={() => guardAction({ action: 'delete', permission: ['/pam/pemasangan/delete', '/pam/pemasangan/edit'], onAllowed: () => deleteModalRef.current.open(val?.id) })}>
               <DeleteIcon fontSize="small" />
             </IconButton>
           </div>

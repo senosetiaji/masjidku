@@ -8,6 +8,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import ModalConfirm from '@/components/modals/ModalConfirm';
 import { useRouter } from 'next/router';
 import { deleteData } from '@/store/actions/master.action';
+import { useActionPermissionGuard } from '@/lib/hooks/useActionPermissionGuard';
 
 function Table({ source, params, setParams, fetchData }) {
   const { pelanggan, isLoading, meta } = useSelector(state => state.master);
@@ -15,6 +16,7 @@ function Table({ source, params, setParams, fetchData }) {
   const deleteModalRef = React.useRef();
   const dispatch = useDispatch();
   const router = useRouter();
+  const { guardAction } = useActionPermissionGuard();
 
   const columns = [
     {
@@ -58,10 +60,10 @@ function Table({ source, params, setParams, fetchData }) {
       render: (val) => {
         return (
           <div className='flex gap-2 w-full justify-center'>
-            <IconButton aria-label="edit" className='bg-yellow-400! text-white! hover:bg-yellow-500!' onClick={() => { router.push(`/master-data/pelanggan-pam/edit/${val?.id}`) }}>
+            <IconButton aria-label="edit" className='bg-yellow-400! text-white! hover:bg-yellow-500!' onClick={() => guardAction({ action: 'update', permission: '/master-data/pelanggan-pam/edit', onAllowed: () => router.push(`/master-data/pelanggan-pam/edit/${val?.id}`) })}>
               <EditIcon fontSize="small" />
             </IconButton>
-            <IconButton aria-label="delete" className='bg-red-400! text-white! hover:bg-red-500!' onClick={() => { deleteModalRef.current.open(val?.id); }}>
+            <IconButton aria-label="delete" className='bg-red-400! text-white! hover:bg-red-500!' onClick={() => guardAction({ action: 'delete', permission: ['/master-data/pelanggan-pam/delete', '/master-data/pelanggan-pam/edit'], onAllowed: () => deleteModalRef.current.open(val?.id) })}>
               <DeleteIcon fontSize="small" />
             </IconButton>
           </div>

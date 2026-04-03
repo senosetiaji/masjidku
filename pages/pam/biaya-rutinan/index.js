@@ -8,10 +8,12 @@ import moment from 'moment';
 import { useRouter } from 'next/router';
 import React from 'react'
 import { useDispatch } from 'react-redux';
+import { useActionPermissionGuard } from '@/lib/hooks/useActionPermissionGuard';
 
 function Index() {
   const router = useRouter();
   const dispatch = useDispatch();
+  const { guardAction } = useActionPermissionGuard();
   const [selectedFilter, setSelectedFilter] = React.useState({
     tahun: {label: moment().format('YYYY'), value: moment().format('YYYY')},
     bulan: {label: moment().format('MMMM'), value: moment().format('MM')},
@@ -51,9 +53,13 @@ function Index() {
       <div className="flex flex-col gap-4 mb-6 sm:flex-row sm:items-center sm:justify-between">
         <div className="title text-[20px] font-bold text-[#333]">Biaya Rutinan</div>
         <Button variant="contained" color="primary" disabled={!params?.tahun || !params?.bulan} className="w-full sm:w-auto"
-          onClick={() => router.push({
-            pathname: '/pam/biaya-rutinan/create',
-            query: { tahun: extractSelect(params?.tahun, 'value'), bulan: extractSelect(params?.bulan, 'value') || '' }
+          onClick={() => guardAction({
+            action: 'create',
+            permission: '/pam/biaya-rutinan/create',
+            onAllowed: () => router.push({
+              pathname: '/pam/biaya-rutinan/create',
+              query: { tahun: extractSelect(params?.tahun, 'value'), bulan: extractSelect(params?.bulan, 'value') || '' }
+            }),
           })}>
           Input Biaya PAM
         </Button>

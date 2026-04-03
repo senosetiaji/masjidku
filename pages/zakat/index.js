@@ -7,10 +7,12 @@ import moment from 'moment';
 import { useRouter } from 'next/router';
 import React from 'react'
 import { useDispatch } from 'react-redux';
+import { useActionPermissionGuard } from '@/lib/hooks/useActionPermissionGuard';
 
 function Index() {
   const dispatch = useDispatch();
   const router = useRouter();
+  const { guardAction } = useActionPermissionGuard();
   const [selectedFilter, setSelectedFilter] = React.useState({
     tahun: { label: moment().year().toString(), value: moment().year().toString() },
     zakat_type: '',
@@ -50,7 +52,7 @@ function Index() {
     <RootLayout breadcrumbs={breadcrumbs}>
       <div className="flex flex-col gap-4 mb-8 sm:flex-row sm:items-center sm:justify-between">
         <div className="title text-[20px] font-bold text-[#333]">Laporan Zakat</div>
-        <Button variant="contained" color="primary" onClick={() => router.push('/zakat/create')} className="w-full sm:w-auto">
+        <Button variant="contained" color="primary" onClick={() => guardAction({ action: 'create', permission: '/zakat/create', onAllowed: () => router.push('/zakat/create') })} className="w-full sm:w-auto">
           Input Data Zakat
         </Button>
       </div>

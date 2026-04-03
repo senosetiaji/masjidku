@@ -7,10 +7,12 @@ import { useDispatch, useSelector } from 'react-redux';
 import Button from '@mui/material/Button'
 import moment from 'moment';
 import { useRouter } from 'next/router';
+import { useActionPermissionGuard } from '@/lib/hooks/useActionPermissionGuard';
 
 function Index() {
   const dispatch = useDispatch();
   const router = useRouter();
+  const { guardAction } = useActionPermissionGuard();
   const { isLoadingExport } = useSelector((state) => state.finance);
   const [params, setParams] = React.useState({
     page: 1,
@@ -66,7 +68,7 @@ function Index() {
           <Button variant="contained" color="inherit" onClick={handleExport} disabled={isLoadingExport}>
             {isLoadingExport ? 'Exporting...' : 'Export PDF'}
           </Button>
-          <Button variant="contained" color="primary" onClick={() => router.push('/keuangan/create')}>
+          <Button variant="contained" color="primary" onClick={() => guardAction({ action: 'create', permission: '/keuangan/create', onAllowed: () => router.push('/keuangan/create') })}>
             Input Data Keuangan
           </Button>
         </div>

@@ -7,10 +7,12 @@ import moment from 'moment'
 import { useRouter } from 'next/router'
 import React from 'react'
 import { useDispatch } from 'react-redux'
+import { useActionPermissionGuard } from '@/lib/hooks/useActionPermissionGuard'
 
 function Index() {
   const dispatch = useDispatch();
   const router = useRouter();
+  const { guardAction } = useActionPermissionGuard();
 
   const [params, setParams] = React.useState({
     page: 1,
@@ -51,7 +53,7 @@ function Index() {
     <RootLayout breadcrumbs={breadcrumbs}>
       <div className="flex flex-col gap-4 mb-8 sm:flex-row sm:items-center sm:justify-between">
         <div className="title text-[20px] font-bold text-[#333]">Data Panitia Zakat</div>
-        <Button variant="contained" color="primary" onClick={() => router.push('/zakat/panitia/create')} className="w-full sm:w-auto">
+        <Button variant="contained" color="primary" onClick={() => guardAction({ action: 'create', permission: '/zakat/panitia/create', onAllowed: () => router.push('/zakat/panitia/create') })} className="w-full sm:w-auto">
           Input Data Panitia
         </Button>
       </div>
