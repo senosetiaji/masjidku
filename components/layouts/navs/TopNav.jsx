@@ -6,6 +6,7 @@ import { changePassword, logout } from '@/store/actions/auth.action';
 import { useDispatch, useSelector } from 'react-redux';
 import Image from 'next/image';
 import ModalChangePassword from '@/components/modals/ModalChangePassword';
+import { modalError } from '@/store/actions/modal.action';
 
 function IconUnToggled() {
   return (
@@ -29,6 +30,9 @@ function TopNav({ toggleHandler, isToggled }) {
   const menuRef = React.useRef(null)
   const dispatch = useDispatch();
   const { isLoadingChangePassword } = useSelector((state) => state.auth)
+  const { currentUser } = useSelector((state) => state.user)
+  const normalizedRole = String(currentUser?.role || currentUser?.effectiveRole || '').toLowerCase();
+  const isTakmeerRole = normalizedRole === 'takmeer' || normalizedRole === 'tekmeer';
 
   React.useEffect(() => {
     const handleClickOutside = (event) => {
@@ -57,6 +61,14 @@ function TopNav({ toggleHandler, isToggled }) {
   }
 
   const openChangePasswordModal = () => {
+    if (isTakmeerRole) {
+      setOpenMenu(false)
+      dispatch(modalError(true, {
+        message: 'Role Takmeer tidak memiliki akses untuk mengubah password.',
+      }))
+      return
+    }
+
     setOpenMenu(false)
     setOpenChangePassword(true)
   }
@@ -80,7 +92,7 @@ function TopNav({ toggleHandler, isToggled }) {
         <div className={`absolute top-12 right-0 bg-white shadow-lg rounded-md overflow-hidden w-48 ${openMenu ? '' : 'hidden'}`}>
           <ul>
             <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-center">
-              <Button variant="text" color="primary" size="small" onClick={openChangePasswordModal}>Ubah Password</Button>
+              <Button variant="text" color="primary" size="small" onClick={openChangePasswordModal} disabled={isTakmeerRole}>Ubah Password</Button>
             </li>
             <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-center">
               <Button variant="text" color="primary" size="small" onClick={() => handleLogout()}>Logout</Button>

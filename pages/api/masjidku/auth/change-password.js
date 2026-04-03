@@ -14,6 +14,11 @@ export default async function handler(req, res) {
     const authUser = await authenticateSessionUser({ req, res, prisma });
     if (!authUser) return;
 
+    const normalizedRole = String(authUser?.session?.role || authUser?.user?.role || "").toLowerCase();
+    if (normalizedRole === "takmeer" || normalizedRole === "tekmeer") {
+      return res.status(403).json({ status: 403, message: "forbidden_change_password" });
+    }
+
     const { oldPassword, newPassword, confirmPassword } = req.body || {};
     if (!oldPassword || !newPassword || !confirmPassword) {
       return res.status(400).json({ status: 400, message: "missing_required_fields" });
