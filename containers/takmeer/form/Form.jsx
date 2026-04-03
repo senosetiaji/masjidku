@@ -21,7 +21,7 @@ function Form({ isEdit = false }) {
   const onSubmit = (values) => {
     const payload = {
       ...values,
-      role: extractSelect(values.role, 'value'),
+      role: extractSelect(values.role, 'value').toLowerCase(),
       password: generatedPassword,
     };
     if(isEdit){
@@ -49,7 +49,7 @@ function Form({ isEdit = false }) {
         phone: detail.phone || '',
         jabatan: detail.jabatan || '',
         username: detail.username || '',
-        role: {label: detail.role.toUpperCase(), value: detail.role} || '',
+        role: {label: detail.role.toUpperCase(), value: detail.role.toLowerCase()} || '',
       });
     }
   }, [isEdit, detail]);

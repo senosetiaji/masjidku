@@ -3,7 +3,7 @@ import { getTenantPrisma } from "../../../../lib/helpers/tenantPrisma";
 
 // Reuse Prisma client in dev to avoid connection spam on hot reload
 
-const VALID_ROLES = new Set(["superadmin", "admin", "ketua", "sekretaris", "bendahara"]);
+const VALID_ROLES = new Set(["superadmin", "admin", "ketua", "sekretaris", "bendahara", "takmeer"]);
 const SALT_ROUNDS = 10;
 
 export default async function handler(req, res) {

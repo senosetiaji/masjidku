@@ -163,7 +163,7 @@ function SideNav({ isToggled }) {
     },
     { name: 'Settings', icon: <IconSettings />, alias: 'settings', link: '/settings', show: true, 
       subMenu: [
-        { name: 'Role Access', alias: 'role_access', link: '/settings/role-access', show: true },
+        { name: 'Roles', alias: 'roles', link: '/settings/roles', show: true },
         { name: 'Permissions', alias: 'permissions', link: '/settings/permissions', show: true },
       ] 
     },
