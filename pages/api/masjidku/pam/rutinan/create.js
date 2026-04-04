@@ -1,6 +1,7 @@
 import crypto from "crypto";
 import { getTenantPrisma } from "../../../../../lib/helpers/tenantPrisma";
 import { savePamRutinanPhotoFromDataUrl } from "../../../../../lib/helpers/pamRutinanImage";
+import { syncPamKasFromRutinan } from "../../../../../lib/helpers/pamFinanceSync";
 
 // Prisma singleton to avoid multiple clients in dev hot-reload
 
@@ -125,31 +126,43 @@ export default async function handler(req, res) {
 			}
 		}
 
-		const created = await prisma.pamRutin.create({
-			data: {
-				pelangganId: pelangganId.trim(),
-				month: monthVal,
-				year: yearVal,
-				previous_used: prevVal ?? 0,
-				current_used: currVal ?? 0,
-				water_bill: waterVal ?? 0,
-				billAmount: billVal ?? 0,
-				paidAmount: paidVal ?? 0,
-				photoUrl,
-				status: statusVal || "unpaid",
-				notes: typeof notes === "string" ? notes : "",
-				paymentDate: paymentDate ? new Date(paymentDate) : null,
-			},
-		});
-
-		let pelangganName = null;
-		if (created.pelangganId) {
-			const pelanggan = await prisma.masterDataPelanggan.findUnique({
-				where: { id: created.pelangganId },
-				select: { name: true },
+		const userId = String(session.id);
+		const { created, pelangganName } = await prisma.$transaction(async (tx) => {
+			const newRutinan = await tx.pamRutin.create({
+				data: {
+					pelangganId: pelangganId.trim(),
+					month: monthVal,
+					year: yearVal,
+					previous_used: prevVal ?? 0,
+					current_used: currVal ?? 0,
+					water_bill: waterVal ?? 0,
+					billAmount: billVal ?? 0,
+					paidAmount: paidVal ?? 0,
+					photoUrl,
+					status: statusVal || "unpaid",
+					notes: typeof notes === "string" ? notes : "",
+					paymentDate: paymentDate ? new Date(paymentDate) : null,
+				},
 			});
-			pelangganName = pelanggan?.name ?? null;
-		}
+
+			let name = null;
+			if (newRutinan.pelangganId) {
+				const pelanggan = await tx.masterDataPelanggan.findUnique({
+					where: { id: newRutinan.pelangganId },
+					select: { name: true },
+				});
+				name = pelanggan?.name ?? null;
+			}
+
+			await syncPamKasFromRutinan({
+				tx,
+				userId,
+				rutinan: newRutinan,
+				pelangganName: name,
+			});
+
+			return { created: newRutinan, pelangganName: name };
+		});
 
 		return res.status(200).json({
 			status: 200,

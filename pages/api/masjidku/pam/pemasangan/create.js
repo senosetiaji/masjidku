@@ -125,27 +125,31 @@ export default async function handler(req, res) {
 			});
 		}
 
-		const createdRecords = await prisma.$transaction(
-			sanitizedPayments.map((payment) =>
-				prisma.pamPemasangan.create({
-					data: {
-						pelangganId,
-						date: payment.date,
-						amount: payment.amount,
-						notes: payment.notes,
-					},
-				})
-			)
-		);
+		const { createdRecords, pelangganName } = await prisma.$transaction(async (tx) => {
+			let name = null;
+			if (pelangganId) {
+				const pelanggan = await tx.masterDataPelanggan.findUnique({
+					where: { id: pelangganId },
+					select: { name: true },
+				});
+				name = pelanggan?.name ?? null;
+			}
 
-		let pelangganName = null;
-		if (pelangganId) {
-			const pelanggan = await prisma.masterDataPelanggan.findUnique({
-				where: { id: pelangganId },
-				select: { name: true },
-			});
-			pelangganName = pelanggan?.name ?? null;
-		}
+			const createdPayments = await Promise.all(
+				sanitizedPayments.map((payment) =>
+					tx.pamPemasangan.create({
+						data: {
+							pelangganId,
+							date: payment.date,
+							amount: payment.amount,
+							notes: payment.notes,
+						},
+					})
+				)
+			);
+
+			return { createdRecords: createdPayments, pelangganName: name };
+		});
 
 		const responsePayload = createdRecords.map((record) => ({
 			id: record.id,

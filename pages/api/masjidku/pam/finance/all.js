@@ -99,22 +99,22 @@ export default async function handler(req, res) {
 				],
 			});
 		}
-		if (dateFilter) {
-			baseConditions.push({ date: dateFilter });
+		if (typeFilter) {
+			baseConditions.push({ type: typeFilter });
 		}
 
-		const baseWhere = { AND: baseConditions };
-		const where = typeFilter ? { AND: [baseWhere, { type: typeFilter }] } : baseWhere;
+		const saldoBaseWhere = { AND: baseConditions };
+		const where = dateFilter ? { AND: [saldoBaseWhere, { date: dateFilter }] } : saldoBaseWhere;
 
 		let openingSaldo = 0;
 		if (periodStart) {
 			const [priorIncome, priorExpense] = await Promise.all([
 				prisma.pamKas.aggregate({
-					where: { date: { lt: periodStart }, type: "income" },
+					where: { AND: [saldoBaseWhere, { date: { lt: periodStart }, type: "income" }] },
 					_sum: { amount: true },
 				}),
 				prisma.pamKas.aggregate({
-					where: { date: { lt: periodStart }, type: "expense" },
+					where: { AND: [saldoBaseWhere, { date: { lt: periodStart }, type: "expense" }] },
 					_sum: { amount: true },
 				}),
 			]);
@@ -127,11 +127,11 @@ export default async function handler(req, res) {
 
 		const [sumIncome, sumExpense] = await Promise.all([
 			prisma.pamKas.aggregate({
-				where: { AND: [baseWhere, { type: "income" }] },
+				where: { AND: [where, { type: "income" }] },
 				_sum: { amount: true },
 			}),
 			prisma.pamKas.aggregate({
-				where: { AND: [baseWhere, { type: "expense" }] },
+				where: { AND: [where, { type: "expense" }] },
 				_sum: { amount: true },
 			}),
 		]);

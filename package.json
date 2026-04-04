@@ -8,6 +8,7 @@
     "start": "next start",
     "seed": "node prisma/seed.js",
     "seed:tenant-users": "node scripts/seed-multitenant-users.js",
+    "reconcile:pam-kas:pemasangan": "node scripts/reconcile-pam-kas-remove-pemasangan.js",
     "smoke:rbac": "node scripts/smoke-rbac.js",
     "smoke:tenant": "node scripts/smoke-multitenant.js"
   },

@@ -4,6 +4,7 @@ import {
 	deletePamRutinanPhotoIfExists,
 	savePamRutinanPhotoFromDataUrl,
 } from "../../../../../../lib/helpers/pamRutinanImage";
+import { syncPamKasFromRutinan } from "../../../../../../lib/helpers/pamFinanceSync";
 
 // Prisma singleton to avoid multiple connections during hot reload
 
@@ -140,19 +141,31 @@ export default async function handler(req, res) {
 			data.photoUrl = null;
 		}
 
-		const updated = await prisma.pamRutin.update({
-			where: { id: id.trim() },
-			data,
-		});
-
-		let pelangganName = null;
-		if (updated.pelangganId) {
-			const pelanggan = await prisma.masterDataPelanggan.findUnique({
-				where: { id: updated.pelangganId },
-				select: { name: true },
+		const userId = String(session.id);
+		const { updated, pelangganName } = await prisma.$transaction(async (tx) => {
+			const updatedRutinan = await tx.pamRutin.update({
+				where: { id: id.trim() },
+				data,
 			});
-			pelangganName = pelanggan?.name ?? null;
-		}
+
+			let name = null;
+			if (updatedRutinan.pelangganId) {
+				const pelanggan = await tx.masterDataPelanggan.findUnique({
+					where: { id: updatedRutinan.pelangganId },
+					select: { name: true },
+				});
+				name = pelanggan?.name ?? null;
+			}
+
+			await syncPamKasFromRutinan({
+				tx,
+				userId,
+				rutinan: updatedRutinan,
+				pelangganName: name,
+			});
+
+			return { updated: updatedRutinan, pelangganName: name };
+		});
 
 		return res.status(200).json({
 			status: 200,

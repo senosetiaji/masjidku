@@ -160,10 +160,10 @@ function Form({ isEdit = false}) {
       // form initial values here
       pelangganId: '',
       paymentDate: '',
-      previous_used: '',
-      current_used: '',
-      billAmount: '',
-      paidAmount: '',
+      previous_used: 0,
+      current_used: 0,
+      billAmount: 0,
+      paidAmount: 0,
       status: '',
       notes: '',
     },
@@ -197,10 +197,10 @@ function Form({ isEdit = false}) {
       form.setValues({
         pelangganId: detailRutinan.pelangganId ? { label: detailRutinan.pelangganName, value: detailRutinan.pelangganId } : '',
         paymentDate: detailRutinan.paymentDate ? new Date(detailRutinan.paymentDate) : '',
-        previous_used: detailRutinan.previous_used || '',
-        current_used: detailRutinan.current_used || '',
-        billAmount: detailRutinan.billAmount || '',
-        paidAmount: detailRutinan.paidAmount || '',
+        previous_used: detailRutinan.previous_used || 0,
+        current_used: detailRutinan.current_used || 0,
+        billAmount: detailRutinan.billAmount || 0,
+        paidAmount: detailRutinan.paidAmount || 0,
         status: detailRutinan.status ? { label: detailRutinan.status.charAt(0).toUpperCase() + detailRutinan.status.slice(1), value: String(detailRutinan.status).replace('-', '_') } : '',
         notes: detailRutinan.notes || '',
       });
@@ -211,6 +211,14 @@ function Form({ isEdit = false}) {
       setPhotoError('');
     }
   }, [isEdit, detailRutinan]);
+
+  React.useEffect(() => {
+    if (form.values.status?.value !== 'unpaid') return;
+    if (form.values.paymentDate || parseNumeric(form.values.paidAmount) !== 0) {
+      form.setFieldValue('paymentDate', '');
+      form.setFieldValue('paidAmount', 0);
+    }
+  }, [form.values.status]);
 
   function calculateBillAmount() {
     const currentUsed = parseFloat(form.values.current_used) || 0;
