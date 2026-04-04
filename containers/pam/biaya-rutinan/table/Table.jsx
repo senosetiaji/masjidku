@@ -5,16 +5,20 @@ import { useDispatch, useSelector } from 'react-redux';
 import IconButton from '@mui/material/IconButton'
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import PreviewIcon from '@mui/icons-material/Preview';
 import ModalConfirm from '@/components/modals/ModalConfirm';
+import ModalPreviewImage from '@/components/modals/ModalPreviewImage';
 import { deleteUser } from '@/store/actions/user.action';
 import { useRouter } from 'next/router';
 import moment from 'moment';
 import { deleteData } from '@/store/actions/finance.action';
 import { useActionPermissionGuard } from '@/lib/hooks/useActionPermissionGuard';
+import { Button } from '@mui/material';
 
 function Table({ params, setParams, fetchData }) {
   const { rutinan: data, isLoading, meta } = useSelector(state => state.pam);
   const deleteModalRef = React.useRef();
+  const previewModalRef = React.useRef();
   const dispatch = useDispatch();
   const router = useRouter();
   const { guardAction } = useActionPermissionGuard();
@@ -108,6 +112,27 @@ function Table({ params, setParams, fetchData }) {
       }
     },
     {
+      label:"Bukti Meteran",
+      align:"center",
+      sx: {
+        minWidth: 170,
+      },
+      render: (val) => {
+        const hasProof = !!val?.photoUrl;
+        return (
+          <Button
+            variant="outlined"
+            size="small"
+            startIcon={<PreviewIcon fontSize="small" />}
+            disabled={!hasProof}
+            onClick={() => previewModalRef.current?.open(val?.photoUrl)}
+          >
+            Preview
+          </Button>
+        )
+      }
+    },
+    {
       label:"Catatan",
       align:"left",
       sx: {
@@ -165,6 +190,7 @@ function Table({ params, setParams, fetchData }) {
         isLoading={isLoading}
       />
       <ModalConfirm ref={deleteModalRef} description="Data yang sudah dihapus tidak dapat dikembalikan." onConfirm={(data) => handleDelete(data)} />
+      <ModalPreviewImage ref={previewModalRef} title="Preview Bukti Meteran" />
     </div>
   )
 }
