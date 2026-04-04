@@ -76,10 +76,11 @@ export default async function handler(req, res) {
 			data.amount = Math.trunc(parsedAmount);
 		}
 		if (type !== undefined) {
-			if (!VALID_TYPES.has(type)) {
+			const normalizedType = (type || "").toString().trim().toLowerCase();
+			if (!VALID_TYPES.has(normalizedType)) {
 				return res.status(400).json({ message: "invalid_type" });
 			}
-			data.type = type;
+			data.type = normalizedType;
 		}
 		if (description !== undefined) {
 			data.description = description;

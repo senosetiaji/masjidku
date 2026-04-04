@@ -4,7 +4,7 @@ import { getTenantPrisma } from "../../../../lib/helpers/tenantPrisma";
 // Prisma singleton (avoid new clients per hot-reload)
 
 const SECRET = process.env.APP_SECRET || "dev-secret";
-const VALID_TYPES = new Set(["income", "expense", "transfer"]);
+const VALID_TYPES = new Set(["income", "expense"]);
 
 const verifyToken = (token) => {
 	if (!token) return null;
@@ -62,11 +62,12 @@ export default async function handler(req, res) {
 		const records = [];
 		for (const item of payload) {
 			const { date, amount, type, description = "" } = item || {};
+			const normalizedType = (type || "").toString().trim().toLowerCase();
 			if (!date || typeof amount === "undefined" || amount === null || !type) {
 				return res.status(400).json({ message: "missing_fields" });
 			}
 
-			if (!VALID_TYPES.has(type)) {
+			if (!VALID_TYPES.has(normalizedType)) {
 				return res.status(400).json({ message: "invalid_type" });
 			}
 
@@ -83,7 +84,7 @@ export default async function handler(req, res) {
 			records.push({
 				date: parsedDate,
 				amount: Math.trunc(parsedAmount),
-				type,
+				type: normalizedType,
 				description,
 				userId,
 			});

@@ -36,6 +36,12 @@ export default async function handler(req, res) {
 		const monthCandidate = parsePositiveInt(normalizeQueryValue(req.query.month ?? req.query.bulan), null);
 		const yearCandidate = parsePositiveInt(normalizeQueryValue(req.query.year ?? req.query.tahun), null);
 		const typeCandidate = (normalizeQueryValue(req.query.tipe_transaksi ?? req.query.type) || "").toString().trim().toLowerCase();
+		const validTransactionTypes = ["income", "expense"];
+		const getSignedAmount = (type, amount) => {
+			if (type === "income") return amount;
+			if (type === "expense") return -amount;
+			return 0;
+		};
 
 		let dateFilter = null;
 		if (monthCandidate && monthCandidate >= 1 && monthCandidate <= 12 && yearCandidate) {
@@ -48,27 +54,25 @@ export default async function handler(req, res) {
 			dateFilter = { gte: from, lt: to };
 		}
 
-		const allowedTypes = ["income", "expense"];
-		const typeFilter = allowedTypes.includes(typeCandidate) ? typeCandidate : null;
+		const typeFilter = validTransactionTypes.includes(typeCandidate) ? typeCandidate : null;
 
 		const periodStart = dateFilter?.gte ?? null;
 
-		const baseWhere = {
-			...(search
-				? {
-					OR: [
-						{ description: { contains: search } },
-						{ type: { contains: search } },
-					],
-				}
-				: {}),
-			...(dateFilter ? { date: dateFilter } : {}),
-		};
+		const baseConditions = [{ type: { in: validTransactionTypes } }];
+		if (search) {
+			baseConditions.push({
+				OR: [
+					{ description: { contains: search } },
+					{ type: { contains: search } },
+				],
+			});
+		}
+		if (dateFilter) {
+			baseConditions.push({ date: dateFilter });
+		}
 
-		const where = {
-			...baseWhere,
-			...(typeFilter ? { type: typeFilter } : {}),
-		};
+		const baseWhere = { AND: baseConditions };
+		const where = typeFilter ? { AND: [baseWhere, { type: typeFilter }] } : baseWhere;
 
 		let openingSaldo = 0;
 		if (periodStart) {
@@ -87,11 +91,12 @@ export default async function handler(req, res) {
 		}
 
 		const total = await prisma.keuangan.count({ where });
+		const skip = (page - 1) * limit;
 
 		const rows = await prisma.keuangan.findMany({
 			where,
 			orderBy: [{ date: "asc" }, { createdAt: "asc" }, { id: "asc" }],
-			skip: (page - 1) * limit,
+			skip,
 			take: limit,
 			select: {
 				id: true,
@@ -104,28 +109,23 @@ export default async function handler(req, res) {
 		});
 
 		let initialSaldo = openingSaldo;
-		if (page > 1 && rows.length > 0) {
-			const first = rows[0];
-			const boundaryWhere = {
-				...where,
-				OR: [
-					{ date: { lt: first.date } },
-					{ date: first.date, createdAt: { lt: first.createdAt } },
-					{ date: first.date, createdAt: first.createdAt, id: { lt: first.id } },
-				],
-			};
+		if (skip > 0) {
+			const previousRows = await prisma.keuangan.findMany({
+				where,
+				orderBy: [{ date: "asc" }, { createdAt: "asc" }, { id: "asc" }],
+				take: skip,
+				select: {
+					type: true,
+					amount: true,
+				},
+			});
 
-			const [priorIncome, priorExpense] = await Promise.all([
-				prisma.keuangan.aggregate({ where: { ...boundaryWhere, type: "income" }, _sum: { amount: true } }),
-				prisma.keuangan.aggregate({ where: { ...boundaryWhere, type: "expense" }, _sum: { amount: true } }),
-			]);
-
-			initialSaldo = (priorIncome._sum.amount || 0) - (priorExpense._sum.amount || 0);
+			initialSaldo += previousRows.reduce((sum, item) => sum + getSignedAmount(item.type, item.amount), 0);
 		}
 
 		let runningSaldo = initialSaldo;
 		const data = rows.map((item) => {
-			runningSaldo += item.type === "income" ? item.amount : -item.amount;
+			runningSaldo += getSignedAmount(item.type, item.amount);
 			return {
 				id: item.id,
 				date: item.date.toISOString(),
@@ -138,11 +138,11 @@ export default async function handler(req, res) {
 
 		const [sumIncome, sumExpense] = await Promise.all([
 			prisma.keuangan.aggregate({
-				where: { ...baseWhere, type: "income" },
+				where: { AND: [baseWhere, { type: "income" }] },
 				_sum: { amount: true },
 			}),
 			prisma.keuangan.aggregate({
-				where: { ...baseWhere, type: "expense" },
+				where: { AND: [baseWhere, { type: "expense" }] },
 				_sum: { amount: true },
 			}),
 		]);
