@@ -1,5 +1,6 @@
 import crypto from "crypto";
 import { getTenantPrisma } from "../../../../../../lib/helpers/tenantPrisma";
+import { deleteFinanceReceiptPhotoIfExists } from "../../../../../../lib/helpers/financeReceiptImage";
 
 // Prisma singleton (avoid new clients per hot-reload)
 
@@ -58,7 +59,7 @@ export default async function handler(req, res) {
 
     const existing = await prisma.pamKas.findFirst({
       where: { id: financeId },
-      select: { id: true },
+      select: { id: true, photoUrl: true },
     });
 
     if (!existing) {
@@ -66,6 +67,10 @@ export default async function handler(req, res) {
     }
 
     await prisma.pamKas.delete({ where: { id: financeId } });
+
+    if (existing.photoUrl) {
+      await deleteFinanceReceiptPhotoIfExists(existing.photoUrl);
+    }
 
     return res.status(200).json({
       status: 200,

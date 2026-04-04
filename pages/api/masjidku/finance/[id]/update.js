@@ -1,5 +1,9 @@
 import crypto from "crypto";
 import { getTenantPrisma } from "../../../../../lib/helpers/tenantPrisma";
+import {
+	deleteFinanceReceiptPhotoIfExists,
+	saveFinanceReceiptPhotoFromDataUrl,
+} from "../../../../../lib/helpers/financeReceiptImage";
 
 // Prisma singleton (avoid new clients per hot-reload)
 
@@ -59,7 +63,7 @@ export default async function handler(req, res) {
 
 		// Accept either object payload or array with a single object (frontend might send array)
 		const inputBody = Array.isArray(req.body) ? req.body[0] : req.body || {};
-		const { date, amount, type, description } = inputBody;
+		const { date, amount, type, description, photoDataUrl, removePhoto } = inputBody;
 		const data = {};
 		if (date !== undefined) {
 			const parsedDate = new Date(date);
@@ -97,10 +101,32 @@ export default async function handler(req, res) {
 			return res.status(404).json({ message: "finance_not_found" });
 		}
 
+		if (photoDataUrl) {
+			try {
+				const newPhotoUrl = await saveFinanceReceiptPhotoFromDataUrl({
+					dataUrl: photoDataUrl,
+					tenantKey: tenant.tenantKey,
+				});
+				data.photoUrl = newPhotoUrl;
+			} catch (error) {
+				return res.status(400).json({ message: "invalid_photo_upload" });
+			}
+		} else if (removePhoto === true || removePhoto === "true") {
+			data.photoUrl = null;
+		}
+
 		const updated = await prisma.keuangan.update({
 			where: { id: financeId },
 			data,
 		});
+
+		if (photoDataUrl && existing.photoUrl) {
+			await deleteFinanceReceiptPhotoIfExists(existing.photoUrl);
+		}
+
+		if ((removePhoto === true || removePhoto === "true") && existing.photoUrl) {
+			await deleteFinanceReceiptPhotoIfExists(existing.photoUrl);
+		}
 
 		const responseData = {
 			id: updated.id,
@@ -108,6 +134,7 @@ export default async function handler(req, res) {
 			amount: updated.amount,
 			type: updated.type,
 			description: updated.description,
+			photoUrl: updated.photoUrl,
 		};
 
 		return res.status(200).json({

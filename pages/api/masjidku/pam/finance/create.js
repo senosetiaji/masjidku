@@ -1,5 +1,6 @@
 import crypto from "crypto";
 import { getTenantPrisma } from "../../../../../lib/helpers/tenantPrisma";
+import { saveFinanceReceiptPhotoFromDataUrl } from "../../../../../lib/helpers/financeReceiptImage";
 
 // Prisma singleton (avoid new clients per hot-reload)
 
@@ -61,7 +62,7 @@ export default async function handler(req, res) {
 		// basic validation & normalization
 		const records = [];
 		for (const item of payload) {
-			const { date, amount, type, description = "" } = item || {};
+			const { date, amount, type, description = "", photoDataUrl } = item || {};
 			const normalizedType = (type || "").toString().trim().toLowerCase();
 			if (!date || typeof amount === "undefined" || amount === null || !type) {
 				return res.status(400).json({ message: "missing_fields" });
@@ -86,13 +87,37 @@ export default async function handler(req, res) {
 				amount: Math.trunc(parsedAmount),
 				type: normalizedType,
 				description,
+				photoDataUrl,
 				userId,
 			});
 		}
 
-		// createMany not available for this model setup; use transaction of creates
+		const preparedRecords = [];
+		for (const item of records) {
+			let photoUrl = null;
+			if (item.photoDataUrl) {
+				try {
+					photoUrl = await saveFinanceReceiptPhotoFromDataUrl({
+						dataUrl: item.photoDataUrl,
+						tenantKey: tenant.tenantKey,
+					});
+				} catch (error) {
+					return res.status(400).json({ message: "invalid_photo_upload" });
+				}
+			}
+
+			preparedRecords.push({
+				date: item.date,
+				amount: item.amount,
+				type: item.type,
+				description: item.description,
+				photoUrl,
+				userId: item.userId,
+			});
+		}
+
 		const created = await prisma.$transaction(
-			records.map((data) => prisma.pamKas.create({ data }))
+			preparedRecords.map((data) => prisma.pamKas.create({ data }))
 		);
 
 		return res.status(201).json({

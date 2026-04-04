@@ -17,6 +17,9 @@ import moment from 'moment'
 import SelectTipeKeuangan from '@/components/forms/SelectTipeKeuangan'
 import { createPamKas, updateDataPamKas } from '@/store/actions/pam.action'
 
+const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+const MAX_IMAGE_SIZE_BYTES = 5 * 1024 * 1024;
+
 const typeOptions = [
   { label: 'Pemasukan', value: 'income' },
   { label: 'Pengeluaran', value: 'expense' },
@@ -27,6 +30,10 @@ const createEmptyEntry = () => ({
   nominal: '',
   type: typeOptions[0],
   description: '',
+  photoDataUrl: '',
+  photoPreviewUrl: '',
+  photoFileName: '',
+  removePhoto: false,
 })
 
 function Form({ isEdit = false }) {
@@ -35,6 +42,17 @@ function Form({ isEdit = false }) {
   const dispatch = useDispatch();
   const { finance } = useSelector(state => state.pam);
   const { detail } = finance;
+  const fileInputRefs = React.useRef({});
+  const [photoErrors, setPhotoErrors] = React.useState({});
+  const [isProcessingPhoto, setIsProcessingPhoto] = React.useState({});
+
+  const convertFileToDataUrl = (file) =>
+    new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
   
   function onSubmit(values) {
     const payload = {
@@ -43,6 +61,8 @@ function Form({ isEdit = false }) {
         amount: Number(item.nominal.toString().replace(/[^0-9,-]+/g, '').replace(',', '.')),
         type: item.type.value,
         description: item.description,
+        photoDataUrl: item.photoDataUrl || undefined,
+        removePhoto: !!item.removePhoto,
       })),
     }
     // Example dispatch call
@@ -67,17 +87,61 @@ function Form({ isEdit = false }) {
 
   React.useEffect(() => {
     if (isEdit && detail) {
-      console.log(detail)
       form.setValues({
         data: [{
           date: moment(detail.date).format('YYYY-MM-DD'),
           nominal: detail.amount,
           type: typeOptions.find(opt => opt.value === detail.type) || typeOptions[0],
           description: detail.description,
+          photoDataUrl: '',
+          photoPreviewUrl: detail.photoUrl || '',
+          photoFileName: '',
+          removePhoto: false,
         }]
       });
     }
   }, [isEdit, detail])
+
+  const handleSelectPhoto = async (event, index) => {
+    const selectedFile = event.target.files?.[0];
+    if (!selectedFile) return;
+
+    if (!ALLOWED_IMAGE_TYPES.includes(selectedFile.type)) {
+      setPhotoErrors((prev) => ({ ...prev, [index]: 'Format foto harus JPG, PNG, atau WEBP.' }));
+      return;
+    }
+
+    if (selectedFile.size > MAX_IMAGE_SIZE_BYTES) {
+      setPhotoErrors((prev) => ({ ...prev, [index]: 'Ukuran foto maksimal 5MB.' }));
+      return;
+    }
+
+    setIsProcessingPhoto((prev) => ({ ...prev, [index]: true }));
+    setPhotoErrors((prev) => ({ ...prev, [index]: '' }));
+
+    try {
+      const dataUrl = await convertFileToDataUrl(selectedFile);
+      form.setFieldValue(`data[${index}].photoDataUrl`, dataUrl);
+      form.setFieldValue(`data[${index}].photoPreviewUrl`, dataUrl);
+      form.setFieldValue(`data[${index}].photoFileName`, selectedFile.name);
+      form.setFieldValue(`data[${index}].removePhoto`, false);
+    } catch (error) {
+      setPhotoErrors((prev) => ({ ...prev, [index]: 'Gagal memproses foto. Silakan coba lagi.' }));
+    } finally {
+      setIsProcessingPhoto((prev) => ({ ...prev, [index]: false }));
+      if (event.target) {
+        event.target.value = '';
+      }
+    }
+  }
+
+  const handleRemovePhoto = (index) => {
+    form.setFieldValue(`data[${index}].photoDataUrl`, '');
+    form.setFieldValue(`data[${index}].photoPreviewUrl`, '');
+    form.setFieldValue(`data[${index}].photoFileName`, '');
+    form.setFieldValue(`data[${index}].removePhoto`, true);
+    setPhotoErrors((prev) => ({ ...prev, [index]: '' }));
+  }
 
   const handleFieldChange = (name, value) => {
     form.setFieldValue(name, value)
@@ -163,6 +227,53 @@ function Form({ isEdit = false }) {
                   fontSize="13px"
                   labelMb="6px"
                 />
+              </FormControl>
+              <FormControl fullWidth className="md:col-span-2 lg:col-span-3">
+                <div className="text-[#4F4F4F] font-medium mb-2 text-[13px]">Foto Bukti Kwitansi (Opsional)</div>
+                <div className="flex flex-col gap-3">
+                  <input
+                    ref={(el) => {
+                      fileInputRefs.current[idx] = el;
+                    }}
+                    type="file"
+                    accept="image/jpeg,image/jpg,image/png,image/webp"
+                    className="hidden"
+                    onChange={(event) => handleSelectPhoto(event, idx)}
+                  />
+                  <div className="flex flex-wrap items-center gap-3">
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      onClick={() => fileInputRefs.current[idx]?.click()}
+                      disabled={!!isProcessingPhoto[idx]}
+                    >
+                      {isProcessingPhoto[idx] ? 'Memproses Foto...' : 'Pilih Foto'}
+                    </Button>
+                    {(item.photoFileName || item.photoPreviewUrl) && (
+                      <Button
+                        variant="text"
+                        size="small"
+                        color="error"
+                        onClick={() => handleRemovePhoto(idx)}
+                      >
+                        Hapus Foto
+                      </Button>
+                    )}
+                    {(item.photoFileName || item.photoPreviewUrl) && (
+                      <div className="text-[12px] text-gray-600 break-all">
+                        {item.photoFileName || item.photoPreviewUrl?.split('/').pop()}
+                      </div>
+                    )}
+                  </div>
+                  {!!photoErrors[idx] && (
+                    <div className="text-[12px] text-red-600">{photoErrors[idx]}</div>
+                  )}
+                  {!!item.photoPreviewUrl && (
+                    <div className="w-full max-w-sm border border-gray-200 rounded-md p-2 bg-white">
+                      <img src={item.photoPreviewUrl} alt="Preview bukti kwitansi" className="w-full h-auto rounded" />
+                    </div>
+                  )}
+                </div>
               </FormControl>
             </div>
 

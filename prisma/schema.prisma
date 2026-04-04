@@ -32,6 +32,7 @@ model Keuangan {
   type        String // income | expense
   amount      Int
   description String
+  photoUrl    String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   userId      String
@@ -84,6 +85,7 @@ model PamKas {
   type        String // income | expense
   amount      Int
   description String
+  photoUrl    String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   userId      String

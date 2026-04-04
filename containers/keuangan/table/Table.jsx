@@ -5,15 +5,19 @@ import { useDispatch, useSelector } from 'react-redux';
 import IconButton from '@mui/material/IconButton'
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import PreviewIcon from '@mui/icons-material/Preview';
 import ModalConfirm from '@/components/modals/ModalConfirm';
+import ModalPreviewImage from '@/components/modals/ModalPreviewImage';
 import { useRouter } from 'next/router';
 import moment from 'moment';
 import { deleteData } from '@/store/actions/finance.action';
 import { useActionPermissionGuard } from '@/lib/hooks/useActionPermissionGuard';
+import { Button } from '@mui/material';
 
 function Table({ params, setParams, fetchData }) {
   const { data, isLoading, meta } = useSelector(state => state.finance);
   const deleteModalRef = React.useRef();
+  const previewModalRef = React.useRef();
   const dispatch = useDispatch();
   const router = useRouter();
   const { guardAction } = useActionPermissionGuard();
@@ -52,6 +56,27 @@ function Table({ params, setParams, fetchData }) {
         if(val.type === 'income') return <div className="text-emerald-600 font-bold uppercase">Pemasukan</div>
         return (
           <div className="text-yellow-500 font-bold uppercase">Pengeluaran</div>
+        )
+      }
+    },
+    {
+      label:"Bukti",
+      align:"center",
+      sx: {
+        width: 150,
+      },
+      render: (val) => {
+        const hasProof = !!val?.photoUrl;
+        return (
+          <Button
+            variant="outlined"
+            size="small"
+            startIcon={<PreviewIcon fontSize="small" />}
+            disabled={!hasProof}
+            onClick={() => previewModalRef.current?.open(val?.photoUrl)}
+          >
+            Preview
+          </Button>
         )
       }
     },
@@ -112,6 +137,7 @@ function Table({ params, setParams, fetchData }) {
         isLoading={isLoading}
       />
       <ModalConfirm ref={deleteModalRef} description="Data yang sudah dihapus tidak dapat dikembalikan." onConfirm={(data) => handleDelete(data)} />
+      <ModalPreviewImage ref={previewModalRef} title="Preview Bukti Kwitansi" />
     </div>
   )
 }

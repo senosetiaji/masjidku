@@ -66,6 +66,7 @@ export default async function handler(req, res) {
         amount: true,
         type: true,
         description: true,
+        photoUrl: true,
       },
     });
 
@@ -79,6 +80,7 @@ export default async function handler(req, res) {
       amount: record.amount,
       type: record.type,
       description: record.description,
+      photoUrl: record.photoUrl,
     };
 
     return res.status(200).json({

@@ -152,6 +152,7 @@ export default async function handler(req, res) {
 				amount: true,
 				type: true,
 				description: true,
+				photoUrl: true,
 			},
 		});
 
@@ -179,6 +180,7 @@ export default async function handler(req, res) {
 				amount: item.amount,
 				type: item.type,
 				description: item.description,
+				photoUrl: item.photoUrl,
 				saldo: saldoAfter,
 			};
 		});
