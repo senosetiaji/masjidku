@@ -68,6 +68,12 @@ export default async function handler(req, res) {
 		const monthCandidate = parsePositiveInt(normalizeQueryValue(req.query.month ?? req.query.bulan), null);
 		const yearCandidate = parsePositiveInt(normalizeQueryValue(req.query.year ?? req.query.tahun), null);
 		const typeCandidate = (normalizeQueryValue(req.query.tipe_transaksi ?? req.query.type) || "").toString().trim().toLowerCase();
+		const validTransactionTypes = ["income", "expense"];
+		const getSignedAmount = (type, amount) => {
+			if (type === "income") return amount;
+			if (type === "expense") return -amount;
+			return 0;
+		};
 
 		let dateFilter = null;
 		if (monthCandidate && monthCandidate >= 1 && monthCandidate <= 12 && yearCandidate) {
@@ -80,27 +86,25 @@ export default async function handler(req, res) {
 			dateFilter = { gte: from, lt: to };
 		}
 
-		const allowedTypes = ["income", "expense"];
-		const typeFilter = allowedTypes.includes(typeCandidate) ? typeCandidate : null;
+		const typeFilter = validTransactionTypes.includes(typeCandidate) ? typeCandidate : null;
 
 		const periodStart = dateFilter?.gte ?? null;
 
-		const baseWhere = {
-			...(search
-				? {
-					OR: [
-						{ description: { contains: search } },
-						{ type: { contains: search } },
-					],
-				}
-				: {}),
-			...(dateFilter ? { date: dateFilter } : {}),
-		};
+		const baseConditions = [{ type: { in: validTransactionTypes } }];
+		if (search) {
+			baseConditions.push({
+				OR: [
+					{ description: { contains: search } },
+					{ type: { contains: search } },
+				],
+			});
+		}
+		if (dateFilter) {
+			baseConditions.push({ date: dateFilter });
+		}
 
-		const where = {
-			...baseWhere,
-			...(typeFilter ? { type: typeFilter } : {}),
-		};
+		const baseWhere = { AND: baseConditions };
+		const where = typeFilter ? { AND: [baseWhere, { type: typeFilter }] } : baseWhere;
 
 		let openingSaldo = 0;
 		if (periodStart) {
@@ -119,14 +123,15 @@ export default async function handler(req, res) {
 		}
 
 		const total = await prisma.pamKas.count({ where });
+		const skip = (page - 1) * limit;
 
 		const [sumIncome, sumExpense] = await Promise.all([
 			prisma.pamKas.aggregate({
-				where: { ...baseWhere, type: "income" },
+				where: { AND: [baseWhere, { type: "income" }] },
 				_sum: { amount: true },
 			}),
 			prisma.pamKas.aggregate({
-				where: { ...baseWhere, type: "expense" },
+				where: { AND: [baseWhere, { type: "expense" }] },
 				_sum: { amount: true },
 			}),
 		]);
@@ -138,7 +143,7 @@ export default async function handler(req, res) {
 		const rows = await prisma.pamKas.findMany({
 			where,
 			orderBy: [{ date: "desc" }, { createdAt: "desc" }, { id: "desc" }],
-			skip: (page - 1) * limit,
+			skip,
 			take: limit,
 			select: {
 	        id: true,
@@ -151,29 +156,23 @@ export default async function handler(req, res) {
 		});
 
 		let runningSaldo = totalSaldo;
-		if (page > 1 && rows.length > 0) {
-			const first = rows[0];
-			const newerWhere = {
-				...where,
-				OR: [
-					{ date: { gt: first.date } },
-					{ date: first.date, createdAt: { gt: first.createdAt } },
-					{ date: first.date, createdAt: first.createdAt, id: { gt: first.id } },
-				],
-			};
+		if (skip > 0) {
+			const previousRows = await prisma.pamKas.findMany({
+				where,
+				orderBy: [{ date: "desc" }, { createdAt: "desc" }, { id: "desc" }],
+				take: skip,
+				select: {
+					type: true,
+					amount: true,
+				},
+			});
 
-			const [newerIncome, newerExpense] = await Promise.all([
-				prisma.pamKas.aggregate({ where: { ...newerWhere, type: "income" }, _sum: { amount: true } }),
-				prisma.pamKas.aggregate({ where: { ...newerWhere, type: "expense" }, _sum: { amount: true } }),
-			]);
-
-			const netNewer = (newerIncome._sum.amount || 0) - (newerExpense._sum.amount || 0);
-			runningSaldo = totalSaldo - netNewer;
+			runningSaldo = totalSaldo - previousRows.reduce((sum, item) => sum + getSignedAmount(item.type, item.amount), 0);
 		}
 
 		const data = rows.map((item) => {
 			const saldoAfter = runningSaldo;
-			runningSaldo += item.type === "income" ? -item.amount : item.amount;
+			runningSaldo -= getSignedAmount(item.type, item.amount);
 			return {
 	      id: item.id,
 				date: item.date.toISOString(),

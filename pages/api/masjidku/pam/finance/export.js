@@ -28,6 +28,13 @@ const normalizeQueryValue = (val) => {
 	return val;
 };
 
+const validTransactionTypes = ["income", "expense"];
+const getSignedAmount = (type, amount) => {
+	if (type === "income") return amount;
+	if (type === "expense") return -amount;
+	return 0;
+};
+
 const formatDate = (value) => {
 	const d = new Date(value);
 	return new Intl.DateTimeFormat('id-ID', {
@@ -78,25 +85,23 @@ export default async function handler(req, res) {
 			dateFilter = { gte: from, lt: to };
 		}
 
-		const allowedTypes = ["income", "expense"];
-		const typeFilter = allowedTypes.includes(typeCandidate) ? typeCandidate : null;
+		const typeFilter = validTransactionTypes.includes(typeCandidate) ? typeCandidate : null;
 
-		const baseWhere = {
-			...(search
-				? {
-						OR: [
-							{ description: { contains: search } },
-							{ type: { contains: search } },
-						],
-					}
-				: {}),
-			...(dateFilter ? { date: dateFilter } : {}),
-		};
+		const baseConditions = [{ type: { in: validTransactionTypes } }];
+		if (search) {
+			baseConditions.push({
+				OR: [
+					{ description: { contains: search } },
+					{ type: { contains: search } },
+				],
+			});
+		}
+		if (dateFilter) {
+			baseConditions.push({ date: dateFilter });
+		}
 
-		const where = {
-			...baseWhere,
-			...(typeFilter ? { type: typeFilter } : {}),
-		};
+		const baseWhere = { AND: baseConditions };
+		const where = typeFilter ? { AND: [baseWhere, { type: typeFilter }] } : baseWhere;
 
 		const periodStart = dateFilter?.gte ?? null;
 
@@ -110,8 +115,8 @@ export default async function handler(req, res) {
 		}
 
 		const [sumIncome, sumExpense, rows] = await Promise.all([
-			prisma.pamKas.aggregate({ where: { ...baseWhere, type: "income" }, _sum: { amount: true } }),
-			prisma.pamKas.aggregate({ where: { ...baseWhere, type: "expense" }, _sum: { amount: true } }),
+			prisma.pamKas.aggregate({ where: { AND: [baseWhere, { type: "income" }] }, _sum: { amount: true } }),
+			prisma.pamKas.aggregate({ where: { AND: [baseWhere, { type: "expense" }] }, _sum: { amount: true } }),
 			prisma.pamKas.findMany({
 				where,
 				orderBy: [{ date: "asc" }, { createdAt: "asc" }, { id: "asc" }],
@@ -130,9 +135,6 @@ export default async function handler(req, res) {
 
 		const incomeSum = sumIncome._sum.amount || 0;
 		const expenseSum = sumExpense._sum.amount || 0;
-		const firstRowSaldo = rows.length
-			? openingSaldo + (rows[0].type === "income" ? rows[0].amount : -rows[0].amount)
-			: openingSaldo;
 		const closingSaldo = openingSaldo + incomeSum - expenseSum;
 
 		const filenameParts = ["pam-finance"];
@@ -158,7 +160,7 @@ export default async function handler(req, res) {
 		doc.fontSize(10).text(metaLines.join(" | "), { align: "center" });
 
 		doc.moveDown(0.8);
-		doc.fontSize(10).text(`Saldo Awal: Rp ${new Intl.NumberFormat("id-ID").format(firstRowSaldo)}`);
+		doc.fontSize(10).text(`Saldo Awal: Rp ${new Intl.NumberFormat("id-ID").format(openingSaldo)}`);
 		doc.moveDown(0.2);
 		doc.text(`Total Pemasukan: Rp ${new Intl.NumberFormat("id-ID").format(incomeSum)}`);
 		doc.moveDown(0.2);
@@ -205,7 +207,7 @@ export default async function handler(req, res) {
 
 		let running = openingSaldo;
 		rows.forEach((row) => {
-			running += row.type === "income" ? row.amount : -row.amount;
+			running += getSignedAmount(row.type, row.amount);
 			const formattedAmount = new Intl.NumberFormat("id-ID").format(row.amount);
 			const formattedSaldo = new Intl.NumberFormat("id-ID").format(running);
 			drawRow([
