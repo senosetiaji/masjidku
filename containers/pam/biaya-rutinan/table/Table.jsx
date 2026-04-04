@@ -101,7 +101,7 @@ function Table({ params, setParams, fetchData }) {
       },
       render: (val) => {
         if(val.status === 'paid') return <div className="text-emerald-600 font-bold uppercase">LUNAS</div>
-        if(val.status === 'half_paid') return <div className="text-yellow-600 font-bold uppercase">BELUM LUNAS</div>
+        if(val.status === 'half-paid') return <div className="text-yellow-600 font-bold uppercase">BELUM LUNAS</div>
         return (
           <div className="text-red-600 font-bold uppercase">BELUM BAYAR</div>
         )
